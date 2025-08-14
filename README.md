@@ -9,6 +9,41 @@
 
 Claude Super-Agents (AET - Autonomous Engineering Team) is a production-ready orchestration system that enables Claude Code to delegate complex tasks to specialized AI agents. Each agent has specific expertise and responsibilities, working together to handle planning, architecture, development, review, testing, and integration autonomously.
 
+## 🎈 How Does It Work? (Simple Explanation)
+
+Imagine you're building something really big with LEGO blocks, but instead of doing it all yourself, you have a team of robot helpers. Each robot is really good at one specific thing:
+
+**The Team of Helpers:**
+- 🎯 **The Planner** (pm-agent) - Takes your big idea and breaks it into smaller steps, like making a to-do list
+- 🏗️ **The Designer** (architect-agent) - Draws the blueprint showing how everything fits together
+- 👨‍💻 **The Builder** (developer-agent) - Actually builds the thing following the blueprint
+- 🔍 **The Checker** (reviewer-agent) - Double-checks that everything was built correctly
+- 🛡️ **The Security Guard** (contract-guardian) - Makes sure no one breaks important rules
+- 🧪 **The Tester** (test-executor) - Tests everything to make sure it works properly
+
+**How They Work Together:**
+1. **You give Claude a task** → "Build me a website with a login system"
+2. **Claude becomes the manager** → Instead of doing everything alone, Claude asks the robot helpers
+3. **Each helper does their part** → The planner makes a list, the designer draws plans, the builder builds, etc.
+4. **They pass work between each other** → Like a relay race, each helper hands their work to the next one
+5. **Everything gets recorded** → Like keeping a diary of who did what and when
+6. **You get the finished product** → All the helpers worked together to build exactly what you wanted!
+
+**The Magic Behind It:**
+- Each helper works in their own **sandbox** (a safe space where they can't mess up other things)
+- They all write notes in a **shared diary** (event log) so everyone knows what's happening
+- If someone makes a mistake, there's an **undo button** (rollback system) to fix it
+- There's a **smart librarian** (Knowledge Manager) who remembers everything and helps find information
+- Everything happens **step by step** so nothing gets confused or mixed up
+
+**Why It's Cool:**
+- Instead of Claude trying to do everything at once (and maybe getting confused), each specialist focuses on what they do best
+- It's like having a whole software company working for you, but it's all AI
+- If something goes wrong, the system can fix itself and try again
+- You can watch everything happening in real-time, like watching a kitchen through a glass window
+
+The best part? You just type one command (`super-agents`) and this whole team springs into action!
+
 ## ✨ Key Features
 
 - **12 Specialized Agents**: Each with defined roles and optimal model assignments
