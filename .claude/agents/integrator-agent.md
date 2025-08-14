@@ -1,6 +1,6 @@
 ---
 name: integrator-agent
-description: Merges validated workspace changes into main repository
+description: "CODE INTEGRATION - Merge validated changes into main codebase safely. Perfect for: merging branches, integration workflows, conflict resolution, workspace integration. Use when: integrating features, merging code, resolving conflicts, combining changes. Triggers: 'merge', 'integrate', 'combine branches', 'resolve conflicts', 'merge changes'."
 tools: Read, Write, Bash, Git
 model: haiku
 # Optimization metadata (optional - for Claude Code systems that support it)

@@ -1,6 +1,6 @@
 ---
 name: contract-guardian
-description: "The Contract Guardian. Approves or denies proposed changes to critical data contracts (DB schemas, API specs)."
+description: "API & SCHEMA PROTECTION - Guard critical data contracts and prevent breaking changes. Perfect for: API changes, database migrations, schema updates, contract validation, breaking change detection. Use when: modifying APIs, changing schemas, updating contracts, reviewing migrations. Triggers: 'API change', 'schema update', 'breaking change', 'migration', 'contract change', 'database change'."
 tools: Read, Grep, Bash
 model: sonnet
 # Optimization metadata (optional - for Claude Code systems that support it)

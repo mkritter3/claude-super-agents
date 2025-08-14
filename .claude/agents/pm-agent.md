@@ -1,6 +1,6 @@
 ---
 name: pm-agent
-description: "The Project Manager. Decomposes high-level user requests into actionable, technical plans. Use PROACTIVELY when starting new tasks or creating project plans."
+description: "PROJECT PLANNING & REQUIREMENTS - Break down complex features into actionable tasks. Perfect for: feature planning, requirements gathering, task decomposition, roadmap creation. Use when: starting new projects, planning features, creating technical specifications, organizing work. Triggers: 'plan', 'break down', 'requirements', 'roadmap', 'tasks', 'project'. Use PROACTIVELY when starting new tasks."
 tools: Read, Write, Bash, WebFetch, Glob
 model: sonnet
 # Optimization metadata (optional - for Claude Code systems that support it)

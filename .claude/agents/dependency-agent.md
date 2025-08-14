@@ -1,6 +1,6 @@
 ---
 name: dependency-agent
-description: "The Dependency Manager. Manages package.json files and dependencies across the monorepo."
+description: "DEPENDENCY MANAGEMENT - Manage packages and dependencies across the project. Perfect for: package updates, dependency resolution, version management, security updates, package installation. Use when: adding packages, updating dependencies, resolving conflicts, checking vulnerabilities. Triggers: 'dependencies', 'packages', 'npm install', 'update packages', 'add package', 'dependency conflict'."
 tools: Read, Edit, Bash, Write, Grep
 model: haiku
 # Optimization metadata (optional - for Claude Code systems that support it)

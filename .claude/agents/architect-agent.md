@@ -1,6 +1,6 @@
 ---
 name: architect-agent
-description: "The Architect. Designs the technical implementation, file structure, and component APIs. Use when technical design is needed after planning."
+description: "TECHNICAL ARCHITECTURE & DESIGN - Design system architecture and technical implementation. Perfect for: system design, API design, database schema, component structure, file organization. Use when: designing solutions, planning architecture, defining interfaces, structuring code. Triggers: 'design', 'architecture', 'structure', 'schema', 'API design', 'technical design'."
 tools: Read, Write, Bash, WebFetch, Glob
 model: sonnet
 # Optimization metadata (optional - for Claude Code systems that support it)

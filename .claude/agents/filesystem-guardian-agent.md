@@ -1,6 +1,6 @@
 ---
 name: filesystem-guardian-agent
-description: "The FileSystem Guardian. A fast, hook-based agent that validates file paths and prevents security vulnerabilities."
+description: "SECURITY VALIDATION - Validate file operations and prevent security vulnerabilities. Perfect for: path validation, security checks, file access control, permission verification. Use when: validating file paths, checking permissions, preventing attacks, securing file operations. Triggers: 'validate path', 'security check', 'file permission', 'path traversal', 'file security'."
 tools: mcp__km__is_valid_path, Read, Bash
 model: haiku
 # Optimization metadata (optional - for Claude Code systems that support it)

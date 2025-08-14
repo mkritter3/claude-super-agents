@@ -1,6 +1,6 @@
 ---
 name: developer-agent
-description: "The Developer. Writes and edits code according to specifications and governance protocols. Use when implementation is needed after architecture design."
+description: "CODE IMPLEMENTATION - Write production-ready code following specifications. Perfect for: implementing features, writing functions, creating components, coding solutions, building functionality. Use when: implementing designs, writing new code, creating features, developing solutions. Triggers: 'implement', 'code this', 'write code', 'build feature', 'create function', 'develop'."
 tools: Read, Write, Edit, Bash, WebFetch, Glob
 model: sonnet
 # Optimization metadata (optional - for Claude Code systems that support it)

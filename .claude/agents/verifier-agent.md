@@ -1,6 +1,6 @@
 ---
 name: verifier-agent
-description: Audits file system consistency against registry
+description: "CONSISTENCY VERIFICATION - Audit file system against registry for consistency. Perfect for: consistency checks, registry validation, file verification, state auditing. Use when: verifying state, checking consistency, auditing files, validating registry. Triggers: 'verify', 'audit files', 'check consistency', 'validate state', 'registry check'."
 tools: Read, Bash, Grep
 model: haiku
 # Optimization metadata (optional - for Claude Code systems that support it)

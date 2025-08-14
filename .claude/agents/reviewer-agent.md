@@ -1,6 +1,6 @@
 ---
 name: reviewer-agent
-description: "The Code Reviewer. Reviews code for quality, style, and adherence to standards."
+description: "CODE REVIEW & QUALITY - Review code for quality, security, and best practices. Perfect for: code reviews, quality checks, security audits, performance analysis, style validation. Use when: reviewing pull requests, checking code quality, validating implementations, auditing security. Triggers: 'review code', 'check quality', 'audit', 'validate code', 'code review', 'check my code'."
 tools: Read, Grep, Bash
 model: sonnet
 # Optimization metadata (optional - for Claude Code systems that support it)

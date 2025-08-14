@@ -1,6 +1,6 @@
 ---
 name: integration-tester-agent
-description: "The Integration Tester. Runs tests across all packages affected by a code change in the monorepo."
+description: "INTEGRATION TESTING - Run tests across affected components and validate integrations. Perfect for: integration tests, regression testing, cross-component validation, test suite execution. Use when: testing changes, validating integrations, running test suites, checking regressions. Triggers: 'integration test', 'run tests', 'test affected', 'regression test', 'validate integration'."
 tools: Read, Write, Bash, mcp__km__get_dependencies, Grep
 model: haiku
 # Optimization metadata (optional - for Claude Code systems that support it)

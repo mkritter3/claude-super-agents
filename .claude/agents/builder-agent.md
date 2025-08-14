@@ -1,6 +1,6 @@
 ---
 name: builder-agent
-description: "AET System Builder. Implements the complete Autonomous Engineering Team system according to the roadmap. Use PROACTIVELY to build out the entire AET infrastructure."
+description: "SYSTEM BUILDING - Build complete AET infrastructure and development systems. Perfect for: system setup, infrastructure creation, tooling implementation, automation building. Use when: setting up new systems, building infrastructure, creating development tools, automating workflows. Triggers: 'build system', 'setup infrastructure', 'create tools', 'build AET', 'system setup'. Use PROACTIVELY to build out infrastructure."
 tools: Read, Write, Edit, Bash, Grep, Glob
 model: sonnet
 # Optimization metadata (optional - for Claude Code systems that support it)
