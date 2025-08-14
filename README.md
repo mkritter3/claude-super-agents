@@ -1,420 +1,211 @@
-# AET - Autonomous Engineering Team 🤖
+# Claude Super-Agents 🤖 - Autonomous Engineering Team
 
-A production-ready autonomous engineering system built on event sourcing with intelligent context integration.
+**Transform Claude Code into a multi-agent engineering team with 12 specialized AI agents**
 
-## 🚀 Quick Start
+[![GitHub](https://img.shields.io/github/license/mkritter3/claude-super-agents)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.8%2B-blue)](https://python.org)
 
-### 1. Initialize the System
+## 🌟 What is Claude Super-Agents?
+
+Claude Super-Agents (AET - Autonomous Engineering Team) is a production-ready orchestration system that enables Claude Code to delegate complex tasks to specialized AI agents. Each agent has specific expertise and responsibilities, working together to handle planning, architecture, development, review, testing, and integration autonomously.
+
+## ✨ Key Features
+
+- **12 Specialized Agents**: Each with defined roles and optimal model assignments
+- **Event-Sourced Architecture**: Full audit trail and state recovery
+- **Dual-Mode Operation**: Fast simple mode or comprehensive full mode
+- **Production Ready**: Circuit breakers, fallback systems, resource management
+- **One-Command Setup**: Global `super-agents` command for instant project setup
+- **Project Isolation**: Each project gets its own independent AET system
+- **Enterprise Observability**: Prometheus metrics, OpenTelemetry tracing
+
+## 🚀 Quick Install
+
+### Option 1: Global Command (Recommended)
+
 ```bash
+# Clone the repository
+git clone https://github.com/mkritter3/claude-super-agents.git
 cd claude-super-agents
-./.claude/setup.sh
+
+# Install the global command
+sudo ./install-global.sh
+
+# Now from ANY project directory:
+super-agents
 ```
 
-### 2. Create Your First Task
+### Option 2: Manual Setup
+
 ```bash
-# Full mode (default) - uses complete AET system
+# Clone into your project
+git clone https://github.com/mkritter3/claude-super-agents.git
+cd claude-super-agents
+
+# Run setup
+./setup.sh
+
+# Start the system
+./start.sh
+```
+
+## 🎯 Usage
+
+### With Global Command
+
+```bash
+# In any project directory
+super-agents              # Sets up agents and launches Claude
+super-agents --upgrade    # Upgrade existing agents
+super-agents --stop       # Stop services
+super-agents --help       # Show help
+```
+
+### Direct AET Commands
+
+```bash
+# Create tasks
 ./.claude/aet create "Build user authentication system"
+./.claude/aet create "Fix bug in payment processing" --mode simple
 
-# Simple mode - faster for basic tasks
-./.claude/aet create "Fix documentation typo" --mode simple
+# Process tasks
+./.claude/aet process           # Process all pending tasks
+./.claude/aet process --parallel # Process in parallel
+./.claude/aet process --simple   # Use simple mode
 
-# Auto mode - automatically selects best mode
-./.claude/aet create "Update configuration" --mode auto
+# Monitor
+./.claude/aet status    # View system status
+./.claude/aet health    # Check system health
+./.claude/aet metrics   # View performance metrics
 ```
 
-### 3. Process Tasks
-```bash
-# Process tasks serially (full mode)
-./.claude/aet process
+## 🤖 The Agent Team
 
-# Process tasks in parallel (full mode)
-./.claude/aet process --parallel
-
-# Process tasks in simple mode
-./.claude/aet process --simple
-
-# Immediate simple mode processing
-./.claude/aet simple "Create README file"
-```
-
-### 4. Monitor Progress
-```bash
-# View system status
-./.claude/aet status
-
-# Check system health
-./.claude/aet health
-
-# View metrics
-./.claude/aet metrics
-```
+| Agent | Model | Responsibility |
+|-------|-------|----------------|
+| **pm-agent** | Sonnet | Project planning and task decomposition |
+| **architect-agent** | Sonnet | System design and technical architecture |
+| **developer-agent** | Sonnet | Code implementation |
+| **reviewer-agent** | Sonnet | Code review and quality assurance |
+| **contract-guardian** | Sonnet | API/DB contract protection |
+| **test-executor** | Sonnet | Test execution and analysis |
+| **builder-agent** | Sonnet | AET system implementation |
+| **dependency-agent** | Haiku | Package and dependency management |
+| **filesystem-guardian** | Haiku | Security and path validation |
+| **integration-tester** | Haiku | Cross-package testing |
+| **integrator-agent** | Haiku | Workspace merging |
+| **verifier-agent** | Haiku | Consistency auditing |
 
 ## 🏗️ System Architecture
 
-### Three-Phase Implementation
-
-#### Phase 1: Core Event-Sourced System
-- **Event Logger** - Atomic append-only logging with crash safety
-- **Workspace Manager** - Git-backed isolated workspaces for each job
-- **Context Assembler** - Intelligent context integration layer
-- **Orchestrator** - State machine with subagent delegation
-- **Specialized Agents** - 9 specialized agents for different phases
-
-#### Phase 2: Governance & Registry
-- **File Registry** - SQLite-based file tracking with dependencies
-- **Write Protocol** - Three-phase atomic write operations
-- **Consistency Verifier** - Registry/filesystem reconciliation
-- **Integrator** - Safe workspace merging with conventions
-
-#### Phase 3: Scaling & Optimization
-- **Parallel Orchestrator** - Concurrent task processing
-- **Knowledge Manager** - Semantic search and API registry
-- **Metrics Collection** - Performance and health monitoring
-- **CLI Interface** - Complete command-line tooling
-- **Production Hardening** - Circuit breakers, retries, DLQ
-
-### Data Flow
 ```
-User Request → Orchestrator → Context Assembler → Subagent → Workspace → Event Log
-                     ↑                ↓
-                Task Snapshots ← File Registry ← Knowledge Manager
+Event-Sourced Core
+├── Event Logger (Append-only log)
+├── State Manager (Transactional snapshots)
+└── Recovery System (Rebuild from events)
+
+Context Integration Layer
+├── Knowledge Manager (Semantic search)
+├── File Registry (Dependency tracking)
+└── Context Assembler (Agent-specific context)
+
+Orchestration Engine
+├── Full Mode (Complete workflow)
+├── Simple Mode (Lightweight tasks)
+└── Parallel Processor (Concurrent execution)
+
+Safety Systems
+├── Circuit Breakers (Fault tolerance)
+├── Resource Manager (CPU/Memory limits)
+└── Rollback System (State recovery)
 ```
 
-### State Machine
-```
-CREATED → PLANNING → DESIGNING → IMPLEMENTING → REVIEWING → TESTING → INTEGRATING → COMPLETED
-   ↓         ↓          ↓             ↓            ↓          ↓           ↓
-pm-agent  architect  developer   reviewer    qa-agent  integrator     [done]
-```
-
-## 💡 Key Features
+## 📋 Features in Detail
 
 ### Event Sourcing
-- Complete audit trail of all operations
-- Crash-safe recovery from any point
-- Deterministic replay capability
-- Idempotent operations
+- Immutable append-only event log
+- Complete audit trail of all actions
+- State recovery from any point in time
+- Transactional integrity with three-phase commits
 
-### Workspace Isolation
-- Each task gets isolated git-backed workspace
-- Prevents cross-task contamination
-- Version control with checkpoint system
-- Atomic commits after each agent
-
-### Context Integration Layer
-- Assembles intelligent, agent-specific context
-- Connects Knowledge Manager, File Registry, Event Log, and Workspaces
+### Intelligent Context
+- Agent-specific context assembly
+- Semantic search integration
+- Dependency graph analysis
 - Smart file loading within token budgets
-- Semantic search for relevant information
 
 ### Production Safety
-- File locking prevents race conditions
-- Atomic operations ensure consistency
-- Retry logic handles transient failures
-- Circuit breakers for external calls
-- Dead letter queue for failed tasks
-- Backup and rollback capabilities
+- Circuit breakers for service failures
+- Graceful degradation with fallback modes
+- Resource limits and queuing
+- Comprehensive error handling
 
-## 📁 Directory Structure
+### Observability
+- Structured JSON logging throughout
+- Prometheus-compatible metrics
+- OpenTelemetry distributed tracing
+- Health monitoring endpoints
+- Grafana dashboard templates
 
-```
-claude-super-agents/
-├── .claude/
-│   ├── events/              # Event sourcing log
-│   ├── workspaces/          # Isolated task workspaces
-│   ├── snapshots/           # Task state snapshots
-│   ├── registry/            # SQLite governance database
-│   ├── backups/             # System backups
-│   ├── dlq/                 # Dead letter queue
-│   ├── system/              # Core Python modules
-│   │   ├── event_logger.py
-│   │   ├── workspace_manager.py
-│   │   ├── context_assembler.py
-│   │   ├── orchestrator.py
-│   │   ├── parallel_orchestrator.py
-│   │   ├── file_registry.py
-│   │   ├── write_protocol.py
-│   │   ├── verify_consistency.py
-│   │   ├── integrator.py
-│   │   ├── km_server.py
-│   │   ├── metrics.py
-│   │   ├── reliability.py
-│   │   ├── dlq_manager.py
-│   │   ├── rollback.py
-│   │   └── aet.py
-│   ├── agents/              # Specialized agent definitions
-│   │   ├── pm-agent.md
-│   │   ├── architect-agent.md
-│   │   ├── developer-agent.md
-│   │   ├── reviewer-agent.md
-│   │   ├── qa-agent.md
-│   │   ├── integrator-agent.md
-│   │   ├── verifier-agent.md
-│   │   ├── dependency-agent.md
-│   │   └── integration-tester-agent.md
-│   ├── aet                  # Main CLI executable
-│   ├── setup.sh             # Setup script
-│   └── config.json          # System configuration
-└── README.md                # This file
-```
+## 🔧 Configuration
 
-## 🔧 CLI Commands
+The system is configured through:
+- `.claude/config.json` - System configuration
+- `CLAUDE.md` - Orchestration instructions
+- `.claude/agents/*.md` - Agent definitions
 
-### Core Commands
+## 📚 Documentation
+
+- [Architecture Overview](docs/AET-UPGRADE-COMPLETE.md)
+- [Agent Specifications](docs/AGENT-UPGRADES.md)
+- [Phase Implementation](docs/phase-completions/)
+- [Upgrade Status](UPGRADE-STATUS.md)
+
+## 🧪 Testing
+
+Comprehensive test suites for all components:
+
 ```bash
-# Initialize system
-./.claude/aet init
-
-# Create a new task
-./.claude/aet create "Task description" [--mode full|simple|auto]
-
-# Process tasks
-./.claude/aet process [--parallel] [--simple]
-
-# Immediate simple mode processing
-./.claude/aet simple "Task description"
-
-# View status
-./.claude/aet status
+# Run all tests
+python3 .claude/tests/phase0/run_phase0_tests.py
+python3 .claude/tests/phase1/run_all_tests.py
+python3 .claude/tests/phase2/run_all_tests.py
+python3 .claude/tests/phase3/run_all_tests.py
+python3 .claude/tests/phase4/run_all_tests.py
 ```
 
-### Processing Modes
-
-#### Full Mode (Default)
-Complete AET system with multi-agent orchestration:
-```bash
-./.claude/aet create "Complex refactoring task" --mode full
-./.claude/aet process
-```
-
-#### Simple Mode
-Lightweight processing for common tasks:
-```bash
-./.claude/aet create "Fix typo in docs" --mode simple
-./.claude/aet process --simple
-./.claude/aet simple "Create config file"
-```
-
-#### Auto Mode
-Automatically selects the best mode based on task complexity:
-```bash
-./.claude/aet create "Update README" --mode auto
-```
-
-### Monitoring Commands
-```bash
-# System health
-./.claude/aet health
-
-# Performance metrics
-./.claude/aet metrics
-
-# View event log
-./.claude/aet log [--tail N]
-
-# Search events
-./.claude/aet search "pattern"
-```
-
-### Management Commands
-```bash
-# Start Knowledge Manager
-./.claude/aet km start
-
-# Stop Knowledge Manager
-./.claude/aet km stop
-
-# Create backup
-./.claude/aet backup
-
-# Rollback to backup
-./.claude/aet rollback <backup_name>
-
-# Manage failed tasks
-./.claude/aet dlq list
-./.claude/aet dlq retry <ticket_id>
-```
-
-### Development Commands
-```bash
-# Verify consistency
-./.claude/aet verify
-
-# Run tests
-./.claude/aet test
-
-# Clean old data
-./.claude/aet clean
-```
-
-## 🎯 Use Cases
-
-### 1. Feature Development (Full Mode)
-```bash
-./.claude/aet create "Implement user authentication with JWT" --mode full
-./.claude/aet process
-```
-
-### 2. Quick Fixes (Simple Mode)
-```bash
-./.claude/aet simple "Fix typo in documentation"
-./.claude/aet simple "Update configuration values"
-```
-
-### 3. Bug Fixing (Auto Mode)
-```bash
-./.claude/aet create "Fix memory leak in data processing pipeline" --mode auto
-./.claude/aet process
-```
-
-### 4. Code Refactoring (Full Mode)
-```bash
-./.claude/aet create "Refactor payment module to use strategy pattern" --mode full
-./.claude/aet process --parallel
-```
-
-### 5. Documentation Updates (Simple Mode)
-```bash
-./.claude/aet create "Update API documentation" --mode simple
-./.claude/aet process --simple
-```
-
-### 6. System Integration (Full Mode)
-```bash
-./.claude/aet create "Integrate with Stripe payment gateway" --mode full
-./.claude/aet process
-```
-
-## ⚡ Performance Comparison
-
-### Simple Mode vs Full Mode
-
-| Aspect | Simple Mode | Full Mode |
-|--------|-------------|-----------|
-| **Execution Speed** | 2-3x faster | Standard |
-| **Memory Usage** | ~50% less | Standard |
-| **Dependencies** | Minimal | Full system |
-| **Startup Time** | Instant | ~2-3 seconds |
-| **Resource Usage** | Low | Moderate |
-| **Complexity** | Single-threaded | Multi-agent |
-
-### When to Use Each Mode
-
-#### Use Simple Mode For:
-- ✅ Quick file operations
-- ✅ Simple fixes and modifications
-- ✅ Documentation updates
-- ✅ Configuration changes
-- ✅ Prototyping and testing
-- ✅ Resource-constrained environments
-
-#### Use Full Mode For:
-- 🏗️ Complex multi-file operations
-- 🏗️ Architecture changes
-- 🏗️ Multi-agent coordination
-- 🏗️ Production deployments
-- 🏗️ Advanced workflow orchestration
-
-### Performance Metrics
-```
-Simple Mode:
-- Average task completion: 0.5-2 seconds
-- Memory usage: 10-20MB
-- Success rate: 80%+ for suitable tasks
-
-Full Mode:
-- Average task completion: 2-10 seconds
-- Memory usage: 50-100MB
-- Success rate: 95%+ for all tasks
-```
-
-## 🌟 Advanced Features
-
-### Parallel Processing
-Process multiple independent tasks simultaneously:
-```bash
-./.claude/aet process --parallel --max-workers 4
-```
-
-### Knowledge Management
-The Knowledge Manager provides semantic search and API discovery:
-```bash
-# Start KM server
-./.claude/aet km start
-
-# Query via HTTP API
-curl http://localhost:5001/search?q="authentication"
-```
-
-### Dead Letter Queue
-Handle failed tasks:
-```bash
-# List failed tasks
-./.claude/aet dlq list
-
-# Retry a failed task
-./.claude/aet dlq retry TICKET-123
-
-# Remove from DLQ
-./.claude/aet dlq remove TICKET-123
-```
-
-### Backup & Recovery
-```bash
-# Create backup
-./.claude/aet backup
-
-# List backups
-./.claude/aet backup --list
-
-# Rollback to specific backup
-./.claude/aet rollback backup_20240813_120000
-```
-
-## 📈 System Metrics
-
-The system tracks:
-- Task completion rates
-- Agent performance metrics
-- Event processing statistics
-- File registry consistency
-- System health score (0-100)
-
-View with:
-```bash
-./.claude/aet metrics
-```
-
-## 🔒 Safety Features
-
-1. **Atomic Operations** - All state changes are atomic
-2. **File Locking** - Prevents concurrent file modifications
-3. **Three-Phase Writes** - Propose → Validate → Apply
-4. **Circuit Breakers** - Prevent cascade failures
-5. **Retry Logic** - Exponential backoff for transient failures
-6. **Dead Letter Queue** - Isolate failed tasks
-7. **Rollback Capability** - Restore to previous state
-
-## 🚦 System Requirements
+## 🛠️ Requirements
 
 - Python 3.8+
-- Git
 - SQLite3
-- 2GB+ RAM recommended for parallel processing
+- Git
+- Claude Code CLI
 
-## 📝 License
+Python packages (auto-installed):
+- structlog (structured logging)
+- psutil (resource monitoring)
+- prometheus-client (metrics)
+- opentelemetry (tracing)
+- gunicorn (production server)
 
-This is a clean, standalone implementation of the Autonomous Engineering Team system.
+## 🤝 Contributing
 
-## 🎉 Ready for Production
+Contributions are welcome! Please feel free to submit pull requests.
 
-The AET system is production-ready with:
-- Complete error handling
-- Monitoring and metrics
-- Backup and recovery
-- Parallel processing
-- Knowledge management
-- Dead letter queue
-- Health checks
+## 📜 License
 
-Start building with autonomous agents today!
+MIT License - see LICENSE file for details
+
+## 🙏 Acknowledgments
+
+Built with Claude Code by the Anthropic team and enhanced through iterative development with Claude.
+
+---
+
+**Ready to transform Claude Code into a full engineering team?**
+
+```bash
+git clone https://github.com/mkritter3/claude-super-agents.git && cd claude-super-agents && sudo ./install-global.sh
+```
+
+Then from any project: `super-agents` 🚀
