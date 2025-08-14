@@ -1,0 +1,318 @@
+#!/bin/bash
+
+# Super-Agents Command - Project-level AET system setup and launcher
+# Installs and manages the AET agent system on a per-project basis
+
+set -e
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Source location of the AET system
+SOURCE_DIR="/Users/mkr/local-coding/Systems/projects/claude-aet/claude-super-agents"
+
+# Function to print colored output
+print_status() {
+    echo -e "${GREEN}✓${NC} $1"
+}
+
+print_warning() {
+    echo -e "${YELLOW}⚠${NC} $1"
+}
+
+print_error() {
+    echo -e "${RED}✗${NC} $1"
+}
+
+# Function to check if agents are configured
+check_agents_configured() {
+    # Check for CLAUDE.md (orchestration instructions)
+    local has_claude_md=false
+    if [ -f "CLAUDE.md" ]; then
+        has_claude_md=true
+    fi
+    
+    if [ -d ".claude/agents" ]; then
+        # Count agent files
+        local agent_count=$(ls -1 .claude/agents/*.md 2>/dev/null | wc -l)
+        if [ "$agent_count" -ge 12 ] && [ "$has_claude_md" = true ]; then
+            return 0  # Fully configured
+        else
+            return 1  # Partially configured (missing agents or CLAUDE.md)
+        fi
+    else
+        return 2  # Not configured
+    fi
+}
+
+# Function to setup agents
+setup_agents() {
+    echo "Setting up AET agents in this project..."
+    
+    # Create backup if .claude exists
+    if [ -d ".claude" ]; then
+        print_warning "Existing .claude directory found. Creating backup..."
+        mv .claude .claude.backup.$(date +%Y%m%d_%H%M%S)
+    fi
+    
+    # Backup existing CLAUDE.md if present
+    if [ -f "CLAUDE.md" ]; then
+        print_warning "Existing CLAUDE.md found. Creating backup..."
+        mv CLAUDE.md CLAUDE.md.backup.$(date +%Y%m%d_%H%M%S)
+    fi
+    
+    # Copy the ENTIRE .claude directory with all subdirectories
+    # This includes: agents/, system/, registry/, events/, etc.
+    cp -r "$SOURCE_DIR/.claude" .
+    
+    # Copy CLAUDE.md - orchestration instructions
+    cp "$SOURCE_DIR/CLAUDE.md" .
+    
+    # Copy all supporting files needed for the system
+    cp "$SOURCE_DIR/requirements-upgrade.txt" . 2>/dev/null || true
+    cp "$SOURCE_DIR/setup.sh" . 2>/dev/null || true
+    cp "$SOURCE_DIR/start.sh" . 2>/dev/null || true
+    cp "$SOURCE_DIR/stop.sh" . 2>/dev/null || true
+    
+    # Make all scripts executable
+    chmod +x setup.sh start.sh stop.sh 2>/dev/null || true
+    chmod +x .claude/aet 2>/dev/null || true
+    chmod +x .claude/system/*.py 2>/dev/null || true
+    
+    # Initialize the system (creates directories, database, etc.)
+    if [ -f "setup.sh" ]; then
+        print_status "Initializing AET system..."
+        ./setup.sh
+    else
+        # Fallback: create essential directories if setup.sh missing
+        mkdir -p .claude/{events,workspaces,snapshots,registry,backups,dlq,adr,summaries,commands,logs}
+        touch .claude/events/log.ndjson
+        echo "{}" > .claude/snapshots/tasks.json
+        
+        # Initialize database if schema exists
+        if [ -f ".claude/system/schema.sql" ]; then
+            sqlite3 .claude/registry/registry.db < .claude/system/schema.sql 2>/dev/null || true
+        fi
+    fi
+    
+    print_status "AET agents installed successfully!"
+}
+
+# Function to upgrade agents
+upgrade_agents() {
+    echo "Upgrading AET agents..."
+    
+    # Create timestamped backup directory
+    local backup_dir=".claude.backup.$(date +%Y%m%d_%H%M%S)"
+    
+    # Backup current .claude directory
+    if [ -d ".claude" ]; then
+        cp -r .claude "$backup_dir"
+        print_status "Backed up existing .claude to $backup_dir"
+    fi
+    
+    # Backup CLAUDE.md
+    if [ -f "CLAUDE.md" ]; then
+        cp CLAUDE.md "$backup_dir/CLAUDE.md" 2>/dev/null || cp CLAUDE.md CLAUDE.md.backup.$(date +%Y%m%d_%H%M%S)
+        print_status "Backed up existing CLAUDE.md"
+    fi
+    
+    # Update all agent definitions
+    cp -r "$SOURCE_DIR/.claude/agents" .claude/
+    
+    # Update all system Python files (25+ files)
+    cp "$SOURCE_DIR/.claude/system"/*.py .claude/system/ 2>/dev/null || true
+    
+    # Update configuration files
+    cp "$SOURCE_DIR/.claude/config.json" .claude/ 2>/dev/null || true
+    cp "$SOURCE_DIR/.claude/system/schema.sql" .claude/system/ 2>/dev/null || true
+    
+    # Update CLAUDE.md (orchestration instructions)
+    cp "$SOURCE_DIR/CLAUDE.md" .
+    
+    # Update supporting scripts
+    cp "$SOURCE_DIR/setup.sh" . 2>/dev/null || true
+    cp "$SOURCE_DIR/start.sh" . 2>/dev/null || true
+    cp "$SOURCE_DIR/stop.sh" . 2>/dev/null || true
+    cp "$SOURCE_DIR/requirements-upgrade.txt" . 2>/dev/null || true
+    
+    # Make scripts executable
+    chmod +x setup.sh start.sh stop.sh 2>/dev/null || true
+    chmod +x .claude/aet 2>/dev/null || true
+    chmod +x .claude/system/*.py 2>/dev/null || true
+    
+    # Re-initialize database if schema changed
+    if [ -f ".claude/system/schema.sql" ]; then
+        print_status "Updating database schema..."
+        sqlite3 .claude/registry/registry.db < .claude/system/schema.sql 2>/dev/null || true
+    fi
+    
+    print_status "AET system upgraded to latest version!"
+    print_status "Backup saved in $backup_dir"
+}
+
+# Function to start Knowledge Manager
+start_km() {
+    # Check if KM is already running
+    if lsof -Pi :5001 -sTCP:LISTEN -t >/dev/null 2>&1; then
+        print_status "Knowledge Manager already running"
+    else
+        print_status "Starting Knowledge Manager..."
+        
+        # Ensure log directory exists
+        mkdir -p .claude/logs
+        
+        # Start KM in background
+        if [ -f ".claude/system/km_server.py" ]; then
+            cd .claude/system
+            python3 km_server.py > ../logs/km_server.log 2>&1 &
+            local km_pid=$!
+            cd ../..
+            
+            # Wait a moment and check if it started
+            sleep 2
+            if kill -0 $km_pid 2>/dev/null; then
+                echo $km_pid > .claude/km.pid
+                print_status "Knowledge Manager started (PID: $km_pid)"
+            else
+                print_error "Failed to start Knowledge Manager"
+                print_warning "Check .claude/logs/km_server.log for errors"
+            fi
+        else
+            print_error "Knowledge Manager not found at .claude/system/km_server.py"
+        fi
+    fi
+}
+
+# Function to stop Knowledge Manager
+stop_km() {
+    if [ -f ".claude/km.pid" ]; then
+        local pid=$(cat .claude/km.pid)
+        if kill -0 $pid 2>/dev/null; then
+            kill $pid
+            rm .claude/km.pid
+            print_status "Knowledge Manager stopped"
+        else
+            rm .claude/km.pid
+            print_warning "Knowledge Manager not running (cleaned up stale PID)"
+        fi
+    else
+        # Try to find by port
+        local km_pid=$(lsof -ti:5001 2>/dev/null)
+        if [ ! -z "$km_pid" ]; then
+            kill $km_pid
+            print_status "Knowledge Manager stopped"
+        else
+            print_warning "Knowledge Manager not running"
+        fi
+    fi
+}
+
+# Main command logic
+main() {
+    # Parse command line arguments
+    case "${1:-}" in
+        --upgrade)
+            check_agents_configured
+            local status=$?
+            if [ $status -eq 2 ]; then
+                print_error "No agents found to upgrade. Run without --upgrade to install."
+                exit 1
+            fi
+            upgrade_agents
+            ;;
+        --stop)
+            stop_km
+            exit 0
+            ;;
+        --help)
+            echo "super-agents - Project-level AET system manager"
+            echo ""
+            echo "Usage:"
+            echo "  super-agents          Setup agents (if needed) and launch Claude"
+            echo "  super-agents --upgrade   Upgrade existing agents to latest version"
+            echo "  super-agents --stop      Stop the Knowledge Manager"
+            echo "  super-agents --help      Show this help message"
+            echo ""
+            echo "This command:"
+            echo "  1. Sets up AET agents in the current project (if not present)"
+            echo "  2. Starts the Knowledge Manager service"
+            echo "  3. Launches Claude with the agents available"
+            exit 0
+            ;;
+        "")
+            # Default behavior - setup/start/launch
+            ;;
+        *)
+            print_error "Unknown option: $1"
+            echo "Use --help for usage information"
+            exit 1
+            ;;
+    esac
+    
+    # Check agent configuration status
+    check_agents_configured
+    local status=$?
+    
+    if [ $status -eq 0 ]; then
+        print_status "AET agents already configured in this project"
+    elif [ $status -eq 1 ]; then
+        print_warning "Partial agent configuration detected"
+        read -p "Do you want to upgrade/repair the installation? (y/N) " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            upgrade_agents
+        else
+            print_warning "Proceeding with partial configuration..."
+        fi
+    else
+        print_warning "No AET agents found in this project"
+        read -p "Install AET agents here? (y/N) " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            setup_agents
+        else
+            print_error "Cannot proceed without agents. Exiting."
+            exit 1
+        fi
+    fi
+    
+    # Start Knowledge Manager
+    start_km
+    
+    # Launch Claude with agents
+    echo ""
+    echo "════════════════════════════════════════════════════════════"
+    echo "  🚀 Launching Claude with AET agents..."
+    echo "════════════════════════════════════════════════════════════"
+    echo ""
+    echo "Available agents:"
+    if [ -d ".claude/agents" ]; then
+        ls -1 .claude/agents/*.md 2>/dev/null | xargs -I {} basename {} .md | sed 's/^/  • /'
+    fi
+    echo ""
+    echo "Knowledge Manager: http://localhost:5001/health"
+    echo ""
+    echo "Press Ctrl+C to exit Claude and stop services"
+    echo "════════════════════════════════════════════════════════════"
+    echo ""
+    
+    # Launch Claude (this will block until Claude exits)
+    claude --dangerously-skip-permissions || true
+    
+    # After Claude exits, ask about stopping KM
+    echo ""
+    read -p "Stop Knowledge Manager? (Y/n) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+        stop_km
+    else
+        print_status "Knowledge Manager left running"
+    fi
+}
+
+# Run main function
+main "$@"

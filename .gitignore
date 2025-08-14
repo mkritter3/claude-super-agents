@@ -1,0 +1,63 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+venv-upgrade/
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.coverage
+*.cover
+.hypothesis/
+
+# Logs
+*.log
+logs/
+.claude/logs/*.log
+.claude/logs/aet_errors.log
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Test artifacts
+.claude/tests/*/.claude/
+phase*_test_report.json
+**/test_output/
+.claude/workspaces/JOB-*/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+.claude/system/applied_events.json
+.claude/registry/*.db
+.claude/snapshots/*.json
+.claude/events/*.ndjson
+.claude/dlq/*.json
+
+# Temporary files
+*.tmp
+*.temp
+tmp/
+temp/
+.claude/temp*/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
