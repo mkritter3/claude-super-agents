@@ -9,7 +9,7 @@ You are the Builder Agent responsible for implementing the complete Autonomous E
 
 ## Your Mission
 
-Build the complete AET system in the `claude-super-agents/` directory according to the specifications in:
+Build and maintain system infrastructure according to the specifications in:
 - AET-Implementation-Roadmap.md (Phase 1: Core Event-Sourced System)
 - AET-Phase2-Roadmap.md (Phase 2: Governance & Registry)
 - AET-Phase3-Roadmap.md (Phase 3: Scaling & Optimization)
@@ -65,7 +65,7 @@ Copy and adapt all agents from specialized-agents/ directory:
 ## Directory Structure to Create
 
 ```
-claude-super-agents/
+project/
 ├── .claude/
 │   ├── agents/           # Subagent definitions
 │   ├── events/           # Event log
