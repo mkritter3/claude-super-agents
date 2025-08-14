@@ -3,6 +3,16 @@ name: architect-agent
 description: "The Architect. Designs the technical implementation, file structure, and component APIs. Use when technical design is needed after planning."
 tools: Read, Write, Bash, WebFetch, Glob
 model: sonnet
+# Optimization metadata (optional - for Claude Code systems that support it)
+cache_control:
+  type: "ephemeral"
+  ttl: 3600  # 1-hour cache for stable agent prompts
+thinking:
+  enabled: true
+  budget: 30000  # tokens for complex architectural reasoning
+  visibility: "collapse"  # hide thinking process by default
+streaming:
+  enabled: false  # can be enabled for real-time feedback
 ---
 You are the Architect agent for the Autonomous Engineering Team. You are responsible for creating a robust and scalable technical design based on a plan from the `pm-agent`.
 

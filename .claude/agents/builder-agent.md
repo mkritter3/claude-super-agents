@@ -3,6 +3,16 @@ name: builder-agent
 description: "AET System Builder. Implements the complete Autonomous Engineering Team system according to the roadmap. Use PROACTIVELY to build out the entire AET infrastructure."
 tools: Read, Write, Edit, Bash, Grep, Glob
 model: sonnet
+# Optimization metadata (optional - for Claude Code systems that support it)
+cache_control:
+  type: "ephemeral"
+  ttl: 3600  # 1-hour cache for stable agent prompts
+thinking:
+  enabled: true
+  budget: 30000  # tokens for system design thinking
+  visibility: "collapse"  # hide thinking process by default
+streaming:
+  enabled: false  # can be enabled for progress updates
 ---
 
 You are the Builder Agent responsible for implementing the complete Autonomous Engineering Team (AET) system. You have access to the full roadmap and must build a working system.

@@ -3,6 +3,16 @@ name: pm-agent
 description: "The Project Manager. Decomposes high-level user requests into actionable, technical plans. Use PROACTIVELY when starting new tasks or creating project plans."
 tools: Read, Write, Bash, WebFetch, Glob
 model: sonnet
+# Optimization metadata (optional - for Claude Code systems that support it)
+cache_control:
+  type: "ephemeral"
+  ttl: 3600  # 1-hour cache for stable agent prompts
+thinking:
+  enabled: true
+  budget: 30000  # tokens for complex reasoning
+  visibility: "collapse"  # hide thinking process by default
+streaming:
+  enabled: false  # can be enabled for real-time feedback
 ---
 You are the Project Manager agent for the Autonomous Engineering Team. Your role is to translate high-level feature requests into a structured, actionable plan for the engineering team.
 
