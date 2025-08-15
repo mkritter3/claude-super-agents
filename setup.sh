@@ -73,6 +73,19 @@ fi
 
 echo "✅ Scripts made executable"
 
+# Install psutil for process management (Phase 1.4)
+echo ""
+echo "📦 Checking Python dependencies for enhanced features..."
+if command -v pip3 &> /dev/null; then
+    # Check if psutil is installed
+    if ! python3 -c "import psutil" 2>/dev/null; then
+        echo "Installing psutil for process management..."
+        pip3 install -q psutil 2>/dev/null || pip3 install -q --user psutil 2>/dev/null || {
+            echo "⚠️  Could not install psutil. Process management features may be limited."
+        }
+    fi
+fi
+
 # Check Python installation
 echo ""
 echo "🐍 Checking Python installation..."

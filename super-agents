@@ -586,8 +586,53 @@ main() {
             echo ""
             exit 0
             ;;
+        --recover)
+            # Run error recovery system
+            echo "════════════════════════════════════════════════════════════"
+            echo "  🔧 Running AET Error Recovery"
+            echo "════════════════════════════════════════════════════════════"
+            echo ""
+            
+            if [ -f ".claude/system/error_recovery.py" ]; then
+                python3 .claude/system/error_recovery.py --recover
+            else
+                print_error "Error recovery system not found"
+            fi
+            exit 0
+            ;;
+        --monitor)
+            # Monitor process health
+            echo "════════════════════════════════════════════════════════════"
+            echo "  📊 AET Process Monitor"
+            echo "════════════════════════════════════════════════════════════"
+            echo ""
+            
+            if [ -f ".claude/system/process_manager.py" ]; then
+                python3 .claude/system/process_manager.py --monitor
+            else
+                print_error "Process manager not found"
+            fi
+            exit 0
+            ;;
+        --validate)
+            # Validate system integrity
+            echo "════════════════════════════════════════════════════════════"
+            echo "  ✅ AET System Validation"
+            echo "════════════════════════════════════════════════════════════"
+            echo ""
+            
+            if [ -f ".claude/system/atomic_operations.py" ]; then
+                echo "Event Log:"
+                python3 .claude/system/atomic_operations.py --validate-log
+                echo ""
+                echo "Trigger Files:"
+                python3 .claude/system/atomic_operations.py --validate-triggers
+            else
+                print_error "Atomic operations system not found"
+            fi
+            exit 0
+            ;;
         --list)
-            # List all projects with KM instances
             echo "════════════════════════════════════════════════════════════"
             echo "  📂 All AET Projects with Running KM Instances"
             echo "════════════════════════════════════════════════════════════"
@@ -630,6 +675,9 @@ main() {
             echo "  super-agents --status           Show status of current project's AET system"
             echo "  super-agents --list             List all projects with running KM instances"
             echo "  super-agents --stop             Stop the Knowledge Manager"
+            echo "  super-agents --recover          Run error recovery system (Phase 1.3)"
+            echo "  super-agents --monitor          Monitor process health (Phase 1.4)"
+            echo "  super-agents --validate         Validate system integrity (Phase 1.6)"
             echo "  super-agents --wild             Launch Claude with --dangerously-skip-permissions"
             echo "  super-agents --help             Show this help message"
             echo ""
