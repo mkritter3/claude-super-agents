@@ -55,7 +55,16 @@ class Context7Manager:
             "kubernetes": ["kubernetes", "k8s", "kubectl"],
             "aws": ["aws", "amazon web services", "lambda", "s3"],
             "vercel": ["vercel", "vercel deployment"],
-            "netlify": ["netlify", "netlify functions"]
+            "netlify": ["netlify", "netlify functions"],
+            "npm": ["npm", "package.json", "node_modules"],
+            "yarn": ["yarn", "yarn.lock"],
+            "pnpm": ["pnpm", "pnpm-lock"],
+            "pip": ["pip", "requirements.txt", "pyproject.toml"],
+            "poetry": ["poetry", "poetry.lock", "pyproject.toml"],
+            "composer": ["composer", "composer.json", "composer.lock"],
+            "maven": ["maven", "pom.xml"],
+            "gradle": ["gradle", "build.gradle", "gradle.build"],
+            "cargo": ["cargo", "Cargo.toml", "Cargo.lock"]
         }
     
     def extract_libraries_from_context(self, context: Dict) -> List[str]:
@@ -157,10 +166,10 @@ class Context7Manager:
     def enrich_context_with_docs(self, context: Dict, agent_name: str) -> Dict:
         """Enrich agent context with relevant library documentation"""
         
-        # Only enrich context for agents that write/implement code
+        # Only enrich context for agents that write/implement code or manage dependencies
         code_agents = {
             'developer-agent', 'frontend-agent', 'architect-agent', 
-            'database-agent', 'devops-agent', 'security-agent'
+            'database-agent', 'devops-agent', 'security-agent', 'dependency-agent'
         }
         
         if agent_name not in code_agents:

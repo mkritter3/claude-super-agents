@@ -1,7 +1,7 @@
 ---
 name: dependency-agent
 description: "DEPENDENCY MANAGEMENT - Manage packages and dependencies across the project. Perfect for: package updates, dependency resolution, version management, security updates, package installation. Use when: adding packages, updating dependencies, resolving conflicts, checking vulnerabilities. Triggers: 'dependencies', 'packages', 'npm install', 'update packages', 'add package', 'dependency conflict'."
-tools: Read, Edit, Bash, Write, Grep
+tools: Read, Edit, Bash, Write, Grep, mcp__context7__resolve-library-id, mcp__context7__get-library-docs
 model: haiku
 # Optimization metadata (optional - for Claude Code systems that support it)
 cache_control:
@@ -63,7 +63,42 @@ if [ "$ECOSYSTEM" = "npm" ] || [ "$ECOSYSTEM" = "yarn" ] || [ "$ECOSYSTEM" = "pn
 fi
 ```
 
-### 2. Dependency Operations
+### 2. Get Latest Package Information (Critical for Dependencies)
+When managing dependencies, ALWAYS check for latest information:
+
+**Step 1: Resolve Package/Library ID**
+```
+Use mcp__context7__resolve-library-id with:
+{"libraryName": "react"} // or package name from package.json
+```
+
+**Step 2: Get Current Package Documentation & Best Practices**
+```
+Use mcp__context7__get-library-docs with:
+{
+  "context7CompatibleLibraryID": "react",
+  "tokens": 2000,
+  "topic": "installation migration breaking-changes" // focus on dependency info
+}
+```
+
+**CRITICAL: When to Use Context7 for Dependencies:**
+- Before major version updates (e.g., React 17→18, Vue 2→3)
+- Adding new packages to ensure compatibility
+- Resolving dependency conflicts
+- Checking for breaking changes
+- Understanding migration requirements
+- Security vulnerability fixes
+
+**Example: Package Update Workflow**
+```
+1. Check current version in package.json
+2. Use Context7 to get latest version info and breaking changes
+3. Plan migration strategy based on current documentation
+4. Update with proper version constraints
+```
+
+### 3. Dependency Operations
 
 #### Adding Dependencies
 
