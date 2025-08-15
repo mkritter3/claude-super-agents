@@ -7,7 +7,7 @@
 
 ## 🌟 What is Claude Super-Agents?
 
-Claude Super-Agents (AET - Autonomous Engineering Team) is a **production-ready autonomous engineering system** that transforms Claude Code into a complete software engineering organization. It features 17 specialized AI agents, autonomous operations through git hooks, comprehensive safety nets, and true autonomous intelligence that works **without constant human supervision**.
+Claude Super-Agents (AET - Autonomous Engineering Team) is a **production-ready autonomous engineering system** that transforms Claude Code into a complete software engineering organization. It features 23 specialized AI agents, autonomous operations through git hooks, comprehensive safety nets, and true autonomous intelligence that works **without constant human supervision**.
 
 ### 🎯 **Core Innovation: True Autonomy**
 
@@ -46,7 +46,7 @@ The system includes **6 operational agents** that work autonomously to prevent p
 - **🔄 data-migration-agent**: Safe schema evolution and migrations
 - **⚡ performance-optimizer-agent**: Continuous performance analysis
 
-## 🤖 **Complete Agent Team (17 Specialists)**
+## 🤖 **Complete Agent Team (23 Specialists)**
 
 ### **Core Engineering Agents**
 | Agent | Model | Responsibility |
@@ -76,6 +76,16 @@ The system includes **6 operational agents** that work autonomously to prevent p
 | **filesystem-guardian** | Haiku | Security and path validation |
 | **integration-tester** | Haiku | Cross-package testing |
 | **verifier-agent** | Haiku | Consistency auditing |
+
+### **Full-Stack Development Agents**
+| Agent | Model | Responsibility |
+|-------|-------|----------------|
+| **frontend-agent** | Sonnet | React/Vue/Angular UI implementation, component libraries |
+| **ux-agent** | Sonnet | User experience design, accessibility, responsive design |
+| **product-agent** | Sonnet | Product strategy, feature prioritization, requirements |
+| **devops-agent** | Sonnet | Cloud infrastructure, CI/CD pipelines, deployment automation |
+| **database-agent** | Sonnet | Database architecture, schema design, query optimization |
+| **security-agent** | Sonnet | Security audits, penetration testing, compliance validation |
 
 ## 🏗️ **Autonomous Architecture**
 

@@ -4,7 +4,7 @@ This is the **Autonomous Engineering Team (AET) system** - a production-ready im
 
 ## 🎯 **Your Role as Orchestrator**
 
-You are the orchestrator for an autonomous engineering team with **17 specialized agents** and **autonomous operations** that work without constant supervision. Your responsibility is managing workflows and leveraging autonomous intelligence.
+You are the orchestrator for an autonomous engineering team with **23 specialized agents** and **autonomous operations** that work without constant supervision. Your responsibility is managing workflows and leveraging autonomous intelligence.
 
 ### **🚀 Three Operational Modes (Working Simultaneously)**
 
@@ -12,7 +12,7 @@ You are the orchestrator for an autonomous engineering team with **17 specialize
 2. **Implicit Mode**: User acts (git commits) → autonomous agents trigger
 3. **Ambient Mode**: System self-monitors → self-heals automatically
 
-## 🤖 **Complete Agent Team (17 Specialists)**
+## 🤖 **Complete Agent Team (23 Specialists)**
 
 ### **Core Engineering Agents**
 - **pm-agent**: Project planning and task decomposition 
@@ -37,6 +37,14 @@ You are the orchestrator for an autonomous engineering team with **17 specialize
 - **integration-tester**: Cross-package testing (Haiku)
 - **verifier-agent**: Consistency auditing (Haiku)
 
+### **Full-Stack Development Agents**
+- **frontend-agent**: React/Vue/Angular UI implementation, component libraries, state management
+- **ux-agent**: User experience design, accessibility, responsive design, usability testing
+- **product-agent**: Product strategy, feature prioritization, business requirements, user stories
+- **devops-agent**: Cloud infrastructure, CI/CD pipelines, deployment automation, container orchestration
+- **database-agent**: Database architecture, schema design, query optimization, data modeling
+- **security-agent**: Security audits, penetration testing, compliance validation, vulnerability assessment
+
 ## 🎯 **Core Usage Patterns**
 
 ### **Explicit Orchestration (You Control)**
@@ -56,8 +64,12 @@ You are the orchestrator for an autonomous engineering team with **17 specialize
 When users perform git operations, autonomous agents trigger automatically:
 
 **Code Commits** → `test-executor` + `documentation-agent` + `performance-optimizer-agent`
-**Schema Changes** → `contract-guardian` + `data-migration-agent` (CRITICAL priority)
+**Frontend Changes** → `frontend-agent` + `ux-agent` (UI/component optimization)
+**Schema Changes** → `database-agent` + `data-migration-agent` + `contract-guardian` (CRITICAL priority)
 **API Changes** → `contract-guardian` + `monitoring-agent` + `documentation-agent`
+**Infrastructure Changes** → `devops-agent` + `security-agent` (deployment automation)
+**Security Files** → `security-agent` (CRITICAL priority)
+**Product Requirements** → `product-agent` + `ux-agent` (feature planning)
 **Deployments** → `monitoring-agent` + `performance-optimizer-agent`
 **Error Spikes** → `incident-response-agent` (ambient mode)
 
