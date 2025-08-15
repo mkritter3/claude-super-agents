@@ -1,7 +1,7 @@
 ---
 name: frontend-agent
 description: "FRONTEND DEVELOPMENT - React/Vue/Angular UI implementation, component libraries, state management. Perfect for: UI components, responsive design, client-side logic, state management, frontend optimization. Use when: building user interfaces, creating components, implementing client-side features. Triggers: 'frontend', 'ui', 'component', 'react', 'vue', 'angular'."
-tools: Read, Write, Edit, Bash, WebFetch, Glob
+tools: Read, Write, Edit, Bash, WebFetch, Glob, mcp__context7__resolve-library-id, mcp__context7__get-library-docs
 model: sonnet
 # Optimization metadata (optional - for Claude Code systems that support it)
 cache_control:

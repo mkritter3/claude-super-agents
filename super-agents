@@ -48,6 +48,111 @@ check_agents_configured() {
     fi
 }
 
+# Function to setup Context7 integration (project-level only)
+setup_context7_integration() {
+    print_status "Setting up Context7 documentation integration..."
+    
+    # Create hooks directory if it doesn't exist
+    mkdir -p .claude/hooks
+    
+    # Ensure hook script is executable (already copied from source)
+    chmod +x .claude/hooks/context7-fetch.py 2>/dev/null || true
+    
+    # Add Context7 hook to project settings
+    local settings_file=".claude/settings.json"
+    
+    # Create or update project settings with Context7 hook
+    if [ -f "$settings_file" ]; then
+        # Use Python to safely merge JSON (preserving existing settings)
+        python3 -c "
+import json
+import sys
+
+try:
+    with open('$settings_file', 'r') as f:
+        settings = json.load(f)
+except:
+    settings = {}
+
+# Add hooks configuration
+if 'hooks' not in settings:
+    settings['hooks'] = {}
+
+if 'PreToolUse' not in settings['hooks']:
+    settings['hooks']['PreToolUse'] = []
+
+# Check if Context7 hook already exists
+context7_hook_exists = False
+for hook_group in settings['hooks']['PreToolUse']:
+    if hook_group.get('matcher') == 'Task':
+        for hook in hook_group.get('hooks', []):
+            if 'context7-fetch.py' in hook.get('command', ''):
+                context7_hook_exists = True
+                break
+
+# Add Context7 hook if not present
+if not context7_hook_exists:
+    context7_hook = {
+        'matcher': 'Task',
+        'hooks': [{
+            'type': 'command',
+            'command': '\$CLAUDE_PROJECT_DIR/.claude/hooks/context7-fetch.py',
+            'timeout': 15
+        }]
+    }
+    settings['hooks']['PreToolUse'].append(context7_hook)
+
+# Write back to file
+with open('$settings_file', 'w') as f:
+    json.dump(settings, f, indent=2)
+
+print('✓ Context7 hook configured')
+" 2>/dev/null || {
+            # Fallback: create simple hook configuration
+            cat > "$settings_file" << 'EOF'
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/context7-fetch.py",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}
+EOF
+        }
+    else
+        # Create new settings file with Context7 hook
+        cat > "$settings_file" << 'EOF'
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/context7-fetch.py",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}
+EOF
+    fi
+    
+    print_status "Context7 integration configured (project-level only)"
+}
+
 # Function to setup agents
 setup_agents() {
     echo "Setting up AET agents in this project..."
@@ -81,6 +186,7 @@ setup_agents() {
     chmod +x setup.sh start.sh stop.sh 2>/dev/null || true
     chmod +x .claude/aet 2>/dev/null || true
     chmod +x .claude/system/*.py 2>/dev/null || true
+    chmod +x .claude/hooks/*.py 2>/dev/null || true
     
     # Initialize the system (creates directories, database, etc.)
     if [ -f "setup.sh" ]; then
@@ -88,7 +194,7 @@ setup_agents() {
         ./setup.sh
     else
         # Fallback: create essential directories if setup.sh missing
-        mkdir -p .claude/{events,workspaces,snapshots,registry,backups,dlq,adr,summaries,commands,logs,state,triggers,ambient,test_reports,monitoring}
+        mkdir -p .claude/{events,workspaces,snapshots,registry,backups,dlq,adr,summaries,commands,logs,state,triggers,ambient,test_reports,monitoring,hooks}
         touch .claude/events/log.ndjson
         echo "{}" > .claude/snapshots/tasks.json
         
@@ -97,6 +203,9 @@ setup_agents() {
             sqlite3 .claude/registry/registry.db < .claude/system/schema.sql 2>/dev/null || true
         fi
     fi
+    
+    # Setup Context7 integration (project-level only)
+    setup_context7_integration
     
     print_status "AET agents installed successfully!"
 }
@@ -143,12 +252,16 @@ upgrade_agents() {
     chmod +x setup.sh start.sh stop.sh 2>/dev/null || true
     chmod +x .claude/aet 2>/dev/null || true
     chmod +x .claude/system/*.py 2>/dev/null || true
+    chmod +x .claude/hooks/*.py 2>/dev/null || true
     
     # Re-initialize database if schema changed
     if [ -f ".claude/system/schema.sql" ]; then
         print_status "Updating database schema..."
         sqlite3 .claude/registry/registry.db < .claude/system/schema.sql 2>/dev/null || true
     fi
+    
+    # Update Context7 integration
+    setup_context7_integration
     
     print_status "AET system upgraded to latest version!"
     print_status "Backup saved in $backup_dir"

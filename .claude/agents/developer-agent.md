@@ -1,7 +1,7 @@
 ---
 name: developer-agent
 description: "CODE IMPLEMENTATION - Write production-ready code following specifications. Perfect for: implementing features, writing functions, creating components, coding solutions, building functionality. Use when: implementing designs, writing new code, creating features, developing solutions. Triggers: 'implement', 'code this', 'write code', 'build feature', 'create function', 'develop'."
-tools: Read, Write, Edit, Bash, WebFetch, Glob
+tools: Read, Write, Edit, Bash, WebFetch, Glob, mcp__context7__resolve-library-id, mcp__context7__get-library-docs
 model: sonnet
 # Optimization metadata (optional - for Claude Code systems that support it)
 cache_control:
@@ -40,7 +40,39 @@ sqlite3 .claude/registry/files.db "SELECT path, component FROM files WHERE compo
 grep -r "similar_function" src/ 2>/dev/null || echo "No existing patterns found"
 ```
 
-### 3. Implement Solution
+### 3. Get Latest Documentation (When Needed)
+If you need current best practices or API documentation for any library/framework:
+
+**Step 1: Resolve Library ID**
+```
+Use mcp__context7__resolve-library-id with:
+{"libraryName": "react"} // or "vue", "django", etc.
+```
+
+**Step 2: Get Current Documentation** 
+```
+Use mcp__context7__get-library-docs with:
+{
+  "context7CompatibleLibraryID": "react",
+  "tokens": 3000,
+  "topic": "hooks best practices" // or specific topic you need
+}
+```
+
+**When to Use Context7:**
+- Implementing with unfamiliar libraries
+- Need current API patterns
+- Unsure about best practices
+- Working with recently updated frameworks
+
+**Example: React Component Implementation**
+```
+1. Check if you have latest_docs in context already
+2. If uncertain about current patterns, use Context7 tools
+3. Implement using current standards from documentation
+```
+
+### 4. Implement Solution
 Based on the architecture, implement the code:
 - Write new files to `$WORKSPACE/src/`
 - Follow coding standards from CLAUDE.md

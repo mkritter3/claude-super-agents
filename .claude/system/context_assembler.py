@@ -106,6 +106,9 @@ class ContextAssembler:
             'ticket_id': ticket_id
         }
         
+        # 7. CONTEXT7 INTEGRATION - Latest library documentation
+        context = self._enrich_with_context7(context, agent_type)
+        
         # Cache the result
         self._cache_result(cache_key, context)
         
@@ -453,3 +456,29 @@ class ContextAssembler:
             'timestamp': time.time(),
             'data': data
         }
+    
+    def _enrich_with_context7(self, context: Dict, agent_type: str) -> Dict:
+        """Enrich context with latest library documentation using Context7."""
+        try:
+            # Import Context7 manager
+            from context7_integration import context7_manager
+            
+            # Enrich context with latest docs
+            enriched_context = context7_manager.enrich_context_with_docs(context, agent_type)
+            
+            if 'latest_docs' in enriched_context:
+                libraries = enriched_context['latest_docs']['libraries']
+                self.logger.info("Context7 enrichment successful", extra={
+                    'libraries': libraries,
+                    'agent_type': agent_type
+                })
+            
+            return enriched_context
+            
+        except Exception as e:
+            # Context7 failures should not break the orchestrator
+            self.logger.warning("Context7 enrichment failed", extra={
+                'error': str(e),
+                'agent_type': agent_type
+            })
+            return context

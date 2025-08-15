@@ -1,0 +1,27 @@
+{
+  "agent": "performance-optimizer-agent",
+  "trigger_event": {
+    "type": "CODE_COMMITTED",
+    "commit": "3036355a65b2b7111e2778fd007cd1177721d6f3", 
+    "performance_relevant_files": [".claude/hooks/context7-fetch.py"]
+  },
+  "context": {
+    "commit_message": "feat: Add Context7 integration for latest documentation
+
+- Add context7-fetch.py hook script with graceful fallback
+- Configure PreToolUse hook to fetch docs before agent tasks
+- Project-level only integration (not user-level)
+- Auto-detects libraries in task prompts (React, Vue, etc.)
+- 15-second timeout with error handling
+- Automatically configures Context7 MCP server in project settings
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",
+    "performance_files": [".claude/hooks/context7-fetch.py"],
+    "performance_trigger": "code_changes_analysis"
+  },
+  "created_at": "2025-08-14T22:38:15-07:00",
+  "priority": "low",
+  "automation_level": "full"
+}

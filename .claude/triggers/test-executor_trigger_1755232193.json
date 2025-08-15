@@ -1,0 +1,48 @@
+{
+  "agent": "test-executor",
+  "trigger_event": {
+    "type": "CODE_CHANGES_NEED_TESTING",
+    "commit": "107987ada40df33d0efc71428c44a623d029a8e8",
+    "test_relevant_files": [".claude/system/hallucination_guard.py",".claude/system/orchestrator.py",".claude/system/response_verifier.py",".claude/triggers/test-executor_trigger_1755223381.json"]
+  },
+  "context": {
+    "commit_message": "Implement Comprehensive Hallucination Reduction System
+
+Core Features:
+- HallucinationGuard: Automatic verification level detection for agents
+- ResponseVerifier: Post-processing validation of agent responses
+- Orchestrator Integration: Enhanced context with verification requirements
+- Agent Instructions: Updated critical agents with verification protocols
+
+Verification Levels:
+- BASIC: General tasks → admit uncertainty when unsure
+- EVIDENCE: Code changes → require direct file quotes for claims
+- CONSENSUS: Architecture → step-by-step reasoning + confidence
+- CRITICAL: Security/DB/API → maximum evidence requirements
+
+Critical Agent Protection:
+- security-agent: Maximum verification for security assessments
+- contract-guardian: Evidence-based breaking change detection
+- database-agent: Schema change validation with evidence
+- Auto-escalation for high-risk operations
+
+Implementation:
+- Automatic operation type detection (schema_changes, api_modifications, etc.)
+- Evidence extraction and verification against workspace files
+- Confidence scoring and risk assessment
+- Human review triggers for critical operations
+- Comprehensive verification reporting
+
+Based on claude-infrastructure/reduce-hallucinations.md guidelines.
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",
+    "changed_files": [".claude/system/hallucination_guard.py",".claude/system/orchestrator.py",".claude/system/response_verifier.py",".claude/triggers/test-executor_trigger_1755223381.json"],
+    "test_trigger": "quality_gate_validation",
+    "test_scope": "relevant_to_changes"
+  },
+  "created_at": "2025-08-14T21:29:53-07:00",
+  "priority": "high",
+  "automation_level": "full"
+}
