@@ -7,11 +7,13 @@ from typing import Dict, Optional, Tuple
 from event_logger import EventLogger
 from workspace_manager import WorkspaceManager
 from logger_config import get_contextual_logger, log_system_event
+from hallucination_guard import HallucinationGuard, VerificationLevel, create_hallucination_resistant_prompt
 
 class TaskOrchestrator:
     def __init__(self):
         self.event_logger = EventLogger()
         self.workspace_manager = WorkspaceManager()
+        self.hallucination_guard = HallucinationGuard()
         self.snapshot_path = Path(".claude/snapshots/tasks.json")
         self.snapshot_path.parent.mkdir(parents=True, exist_ok=True)
         self.logger = get_contextual_logger("orchestrator", component="orchestrator")
@@ -134,20 +136,83 @@ class TaskOrchestrator:
                 return config.get("conventions", {})
         return {}
     
+    def _detect_operation_type(self, context: Dict) -> str:
+        """Detect the type of operation based on context."""
+        original_prompt = context.get('original_prompt', '').lower()
+        
+        # Critical operations
+        if any(keyword in original_prompt for keyword in ['schema', 'migration', 'database']):
+            return "schema_changes"
+        if any(keyword in original_prompt for keyword in ['api', 'endpoint', 'interface']):
+            return "api_modifications"
+        if any(keyword in original_prompt for keyword in ['security', 'auth', 'permission']):
+            return "security_updates"
+        if any(keyword in original_prompt for keyword in ['deploy', 'infrastructure', 'docker']):
+            return "deployment_configs"
+        
+        # Standard operations
+        if any(keyword in original_prompt for keyword in ['review', 'analyze', 'audit']):
+            return "review"
+        if any(keyword in original_prompt for keyword in ['plan', 'design', 'architecture']):
+            return "planning"
+        if any(keyword in original_prompt for keyword in ['implement', 'code', 'develop']):
+            return "code_changes"
+        
+        return "general"
+    
+    def _get_verification_instructions(self, verification_level: VerificationLevel) -> str:
+        """Get verification instructions for the agent."""
+        instructions_map = {
+            VerificationLevel.BASIC: "Say 'I don't know' if uncertain. Base responses on provided context only.",
+            VerificationLevel.EVIDENCE: "Provide direct quotes from files as evidence for all factual claims.",
+            VerificationLevel.CONSENSUS: "Show step-by-step reasoning and rate confidence levels.",
+            VerificationLevel.CRITICAL: "CRITICAL: Every claim needs file evidence. Retract unsupported claims."
+        }
+        return instructions_map.get(verification_level, instructions_map[VerificationLevel.BASIC])
+    
     def invoke_agent(self, agent_name: str, context: Dict) -> Tuple[bool, Dict]:
-        """Request Claude to delegate to subagent."""
-        # Write context to workspace for agent to discover
+        """Request Claude to delegate to subagent with hallucination protection."""
+        
+        # Determine verification level based on agent and operation
+        ticket_id = context['workspace']['ticket_id']
+        operation_type = self._detect_operation_type(context)
+        verification_level = self.hallucination_guard.get_verification_requirements(
+            agent_name, operation_type, ticket_id
+        )
+        
+        # Get workspace files for context
+        workspace_path = Path(context['workspace']['path'])
+        workspace_files = []
+        if workspace_path.exists():
+            workspace_files = [str(f.relative_to(workspace_path)) 
+                             for f in workspace_path.rglob("*") 
+                             if f.is_file() and f.suffix in ['.py', '.js', '.ts', '.md', '.json']]
+        
+        # Enhance context with hallucination protection
+        enhanced_context = context.copy()
+        enhanced_context['hallucination_protection'] = {
+            'verification_level': verification_level.value,
+            'agent_name': agent_name,
+            'operation_type': operation_type,
+            'requires_evidence': verification_level in [VerificationLevel.EVIDENCE, VerificationLevel.CRITICAL],
+            'workspace_files': workspace_files[:50],  # Limit for prompt size
+            'verification_instructions': self._get_verification_instructions(verification_level)
+        }
+        
+        # Write enhanced context to workspace for agent to discover
         context_file = Path(f"{context['workspace']['path']}/../context.json")
         with open(context_file, 'w') as f:
-            json.dump(context, f, indent=2)
+            json.dump(enhanced_context, f, indent=2)
         
-        # Log delegation request
+        # Log delegation request with verification info
         self.event_logger.append_event(
             ticket_id=context['workspace']['ticket_id'],
             event_type="AGENT_DELEGATION_REQUEST",
             payload={
                 "agent": agent_name,
-                "context_file": str(context_file)
+                "context_file": str(context_file),
+                "verification_level": verification_level.value,
+                "operation_type": operation_type
             }
         )
         

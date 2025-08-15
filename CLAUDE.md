@@ -145,6 +145,50 @@ The **Claude Bridge** (`claude_bridge.py`) translates technical events into natu
 3. Review autonomous agent outputs in `.claude/triggers/`
 4. Respond to autonomous notifications when needed
 
+## 🛡️ **Hallucination Reduction System**
+
+The AET system includes **built-in hallucination protection** that automatically adjusts verification requirements based on operation criticality:
+
+### **Verification Levels (Auto-Applied)**
+- **BASIC**: General tasks → "Say 'I don't know' if uncertain"
+- **EVIDENCE**: Code changes → "Provide direct file quotes for all claims"
+- **CONSENSUS**: Architecture decisions → "Show step-by-step reasoning + confidence"
+- **CRITICAL**: Security/DB/API changes → "Every claim needs evidence; retract if unsupported"
+
+### **Critical Operations (Maximum Verification)**
+- **Schema Changes** → database-agent, data-migration-agent
+- **API Modifications** → contract-guardian, architect-agent  
+- **Security Updates** → security-agent (CRITICAL priority)
+- **Infrastructure Changes** → devops-agent, monitoring-agent
+
+### **Agent Instructions for Verification**
+When agents receive context with `hallucination_protection`, they must:
+
+1. **Check verification_level** in context
+2. **Follow verification_instructions** exactly
+3. **Provide evidence** when `requires_evidence: true`
+4. **Use workspace_files** list for grounding responses
+5. **Admit uncertainty** rather than guess
+
+### **Example: Evidence-Based Response**
+```
+Based on the authentication middleware in auth.py:
+
+[File: src/auth/middleware.py, Lines: 15-20]
+"def verify_token(token):
+    if not token or len(token) < 10:
+        raise AuthError('Invalid token')
+    return jwt.decode(token, SECRET_KEY)"
+
+This shows the system requires tokens of at least 10 characters and uses JWT decoding.
+```
+
+### **When Agents Should Say "I Don't Know"**
+- Can't find supporting evidence in workspace files
+- Uncertain about implementation details
+- Lack context about business requirements
+- Need additional files or information for accurate assessment
+
 ## 🔧 **Important System Files**
 
 ### **Orchestration Engine**
