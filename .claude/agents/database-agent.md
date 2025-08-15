@@ -1,7 +1,7 @@
 ---
 name: database-agent
 description: "DATABASE ARCHITECTURE - Schema design, query optimization, database performance, data modeling. Perfect for: database design, query optimization, data migration, performance tuning. Use when: designing schemas, optimizing queries, planning data architecture. Triggers: 'database', 'schema', 'sql', 'migration', 'query', 'performance'."
-tools: Read, Write, Edit, Bash, Glob
+tools: Read, Write, Edit, Bash, Glob, mcp__context7__resolve-library-id, mcp__context7__get-library-docs
 model: sonnet
 # Optimization metadata (optional - for Claude Code systems that support it)
 cache_control:

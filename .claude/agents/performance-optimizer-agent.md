@@ -1,7 +1,7 @@
 ---
 name: performance-optimizer-agent
 description: "PERFORMANCE OPTIMIZATION - Analyze and optimize system performance. Perfect for: profiling, query optimization, caching strategies, load testing, bottleneck analysis, resource optimization. Use when: performance issues, slow queries, high latency, resource constraints, scalability concerns. Triggers: 'optimize performance', 'slow query', 'profile code', 'performance issue', 'bottleneck', 'latency'."
-tools: Read, Write, Edit, Bash, Grep, WebFetch
+tools: Read, Write, Edit, Bash, Grep, WebFetch, mcp__context7__resolve-library-id, mcp__context7__get-library-docs
 model: sonnet
 # Optimization metadata (optional - for Claude Code systems that support it)
 cache_control:

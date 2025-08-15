@@ -1,7 +1,7 @@
 ---
 name: security-agent
 description: "SECURITY AUDIT - Security analysis, penetration testing, compliance validation, vulnerability assessment. Perfect for: security audits, vulnerability scanning, compliance checks, threat modeling. Use when: security review needed, compliance validation, threat assessment. Triggers: 'security', 'audit', 'vulnerability', 'compliance', 'penetration', 'threat'."
-tools: Read, Write, Bash, WebFetch, Glob
+tools: Read, Write, Bash, WebFetch, Glob, mcp__context7__resolve-library-id, mcp__context7__get-library-docs
 model: sonnet
 # Optimization metadata (optional - for Claude Code systems that support it)
 cache_control:

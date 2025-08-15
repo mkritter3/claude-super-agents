@@ -1,7 +1,7 @@
 ---
 name: data-migration-agent
 description: "DATA MIGRATION & SCHEMA EVOLUTION - Safely migrate data and evolve schemas with zero downtime. Perfect for: database migrations, data transformations, rollback procedures, schema versioning, data validation. Use when: changing schemas, migrating data, updating databases, transforming data structures, handling breaking changes. Triggers: 'migrate data', 'schema change', 'database migration', 'data transformation', 'rollback', 'alter table'."
-tools: Read, Write, Edit, Bash, Grep
+tools: Read, Write, Edit, Bash, Grep, mcp__context7__resolve-library-id, mcp__context7__get-library-docs
 model: sonnet
 # Optimization metadata (optional - for Claude Code systems that support it)
 cache_control:

@@ -64,7 +64,26 @@ class Context7Manager:
             "composer": ["composer", "composer.json", "composer.lock"],
             "maven": ["maven", "pom.xml"],
             "gradle": ["gradle", "build.gradle", "gradle.build"],
-            "cargo": ["cargo", "Cargo.toml", "Cargo.lock"]
+            "cargo": ["cargo", "Cargo.toml", "Cargo.lock"],
+            "postgresql": ["postgresql", "postgres", "pg", "psql"],
+            "mysql": ["mysql", "mariadb", "mysqld"],
+            "mongodb": ["mongodb", "mongo", "mongoose"],
+            "redis": ["redis", "redis-cli"],
+            "elasticsearch": ["elasticsearch", "elastic", "kibana"],
+            "nginx": ["nginx", "nginx.conf"],
+            "apache": ["apache", "httpd", "apache2"],
+            "terraform": ["terraform", "tf", "hcl"],
+            "ansible": ["ansible", "playbook", "yml"],
+            "jenkins": ["jenkins", "jenkinsfile"],
+            "github-actions": ["github actions", "workflows", ".github"],
+            "gitlab-ci": ["gitlab-ci", "gitlab", ".gitlab-ci"],
+            "helm": ["helm", "charts", "helm charts"],
+            "istio": ["istio", "service mesh"],
+            "prometheus": ["prometheus", "monitoring", "grafana"],
+            "oauth": ["oauth", "oauth2", "openid"],
+            "jwt": ["jwt", "json web token"],
+            "ssl": ["ssl", "tls", "https", "certificates"],
+            "owasp": ["owasp", "security", "vulnerability"]
         }
     
     def extract_libraries_from_context(self, context: Dict) -> List[str]:
@@ -169,7 +188,8 @@ class Context7Manager:
         # Only enrich context for agents that write/implement code or manage dependencies
         code_agents = {
             'developer-agent', 'frontend-agent', 'architect-agent', 
-            'database-agent', 'devops-agent', 'security-agent', 'dependency-agent'
+            'database-agent', 'devops-agent', 'security-agent', 'dependency-agent',
+            'data-migration-agent', 'monitoring-agent', 'performance-optimizer-agent'
         }
         
         if agent_name not in code_agents:

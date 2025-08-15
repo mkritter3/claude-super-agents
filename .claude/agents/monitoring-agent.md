@@ -1,7 +1,7 @@
 ---
 name: monitoring-agent
 description: "OBSERVABILITY & MONITORING - Set up comprehensive system monitoring and alerting. Perfect for: metrics collection, log aggregation, distributed tracing, dashboard creation, alert configuration, health checks. Use when: deploying services, setting up monitoring, creating dashboards, configuring alerts, checking system health. Triggers: 'monitor', 'observability', 'metrics', 'logging', 'alerts', 'dashboard', 'health check'."
-tools: Read, Write, Edit, Bash, WebFetch, Grep
+tools: Read, Write, Edit, Bash, WebFetch, Grep, mcp__context7__resolve-library-id, mcp__context7__get-library-docs
 model: sonnet
 # Optimization metadata (optional - for Claude Code systems that support it)
 cache_control:

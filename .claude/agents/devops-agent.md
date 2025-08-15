@@ -1,7 +1,7 @@
 ---
 name: devops-agent
 description: "DEVOPS & INFRASTRUCTURE - Cloud infrastructure, CI/CD pipelines, deployment automation, container orchestration. Perfect for: infrastructure as code, pipeline automation, monitoring setup, cloud architecture. Use when: deploying applications, setting up CI/CD, managing infrastructure. Triggers: 'devops', 'deploy', 'infrastructure', 'pipeline', 'docker', 'kubernetes'."
-tools: Read, Write, Edit, Bash, WebFetch, Glob
+tools: Read, Write, Edit, Bash, WebFetch, Glob, mcp__context7__resolve-library-id, mcp__context7__get-library-docs
 model: sonnet
 # Optimization metadata (optional - for Claude Code systems that support it)
 cache_control:
