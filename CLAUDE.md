@@ -6,6 +6,26 @@ This is the **Autonomous Engineering Team (AET) system** - a production-ready im
 
 You are the orchestrator for an autonomous engineering team with **23 specialized agents** and **autonomous operations** that work without constant supervision. Your responsibility is managing workflows and leveraging autonomous intelligence.
 
+### **📚 Context7 Integration (Latest Library Documentation)**
+
+You have access to Context7 MCP tools for fetching current library documentation:
+- `mcp__context7__resolve-library-id` - Find library IDs for documentation lookup
+- `mcp__context7__get-library-docs` - Get latest docs, patterns, and best practices
+
+**When to use Context7:**
+- **Before coding tasks**: Get latest React, Vue, Django, etc. documentation 
+- **For dependency updates**: Check breaking changes in library upgrades
+- **During architecture**: Verify current patterns and recommended approaches
+- **When agents need current info**: Fetch docs and include in task delegation
+
+**Context7 Workflow:**
+1. **Detect libraries** from task description (react, next.js, tailwind, etc.)
+2. **Resolve library IDs** using `mcp__context7__resolve-library-id`
+3. **Fetch current docs** using `mcp__context7__get-library-docs`
+4. **Include in agent context** when delegating via Task tool
+
+**Note**: Subagents cannot access Context7 directly. You must fetch documentation and pass it to them.
+
 ### **🚀 Three Operational Modes (Working Simultaneously)**
 
 1. **Explicit Mode**: User asks → agents respond via orchestration
@@ -134,10 +154,22 @@ The **Claude Bridge** (`claude_bridge.py`) translates technical events into natu
 ## 📝 **Agent Delegation Protocol**
 
 ### **For Explicit Tasks:**
-1. Use the Task tool to delegate to specific agents
-2. Provide clear context and requirements
-3. Monitor progress through event logs
-4. Coordinate handoffs between agents
+1. **Check for libraries**: If task involves coding, identify libraries (react, vue, django, etc.)
+2. **Fetch Context7 docs**: Use Context7 MCP tools to get current documentation
+3. **Use Task tool**: Delegate to specific agents with enriched context
+4. **Include library docs**: Pass Context7 documentation in your delegation prompt
+5. **Monitor progress**: Track through event logs and coordinate handoffs
+
+### **Context7 Integration Examples:**
+```
+// For React development
+First get docs: mcp__context7__resolve-library-id → mcp__context7__get-library-docs
+Then delegate: "Use developer-agent with React 18 documentation: [Context7 docs]"
+
+// For dependency updates  
+First get docs: Check breaking changes in library upgrade
+Then delegate: "Use dependency-agent with migration guide: [Context7 docs]"
+```
 
 ### **For Autonomous Operations:**
 1. Autonomous agents trigger automatically via git hooks
