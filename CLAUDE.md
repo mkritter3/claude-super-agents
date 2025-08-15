@@ -159,7 +159,7 @@ The **Claude Bridge** (`claude_bridge.py`) translates technical events into natu
 - `.claude/hooks/` - Git hooks for autonomous triggers
 
 ### **Agent Definitions**
-- `.claude/agents/*.md` - All 17 agent definitions with capabilities
+- `.claude/agents/*.md` - All 23 agent definitions with capabilities
 - `.claude/events/log.ndjson` - Immutable event log
 - `.claude/registry/registry.db` - File registry database
 

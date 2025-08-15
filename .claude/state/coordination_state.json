@@ -51,7 +51,33 @@
         }
       ],
       "initiation_event_id": "evt_1755221593112_0001"
+    },
+    "workflow_TEST-001_1755221929": {
+      "workflow_id": "workflow_TEST-001_1755221929",
+      "workflow_type": "full_stack_feature",
+      "ticket_id": "TEST-001",
+      "requirements": {
+        "feature_name": "Test Feature",
+        "description": "Test workflow coordination",
+        "complexity": "medium"
+      },
+      "status": "EXECUTING_PRODUCT_PLANNING",
+      "current_stage": "product_planning",
+      "completed_stages": [],
+      "failed_stages": [],
+      "agent_results": {},
+      "created_at": 1755221929.10345,
+      "updated_at": 1755221929.104504,
+      "coordination_checkpoints": [
+        {
+          "stage": "product_planning",
+          "timestamp": 1755221929.104504,
+          "status": "started",
+          "agent": "product-agent"
+        }
+      ],
+      "initiation_event_id": "evt_1755221929103_0001"
     }
   },
-  "last_updated": "2025-08-14T18:33:13.113722"
+  "last_updated": "2025-08-14T18:38:49.104507"
 }

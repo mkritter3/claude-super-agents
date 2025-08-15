@@ -17,7 +17,7 @@ cd "$SCRIPT_DIR"
 echo "📁 Setting up directory structure..."
 
 # Create necessary directories
-mkdir -p .claude/{events,workspaces,snapshots,registry,backups,dlq,adr,summaries,commands}
+mkdir -p .claude/{events,workspaces,snapshots,registry,backups,dlq,adr,summaries,commands,logs,state,triggers,ambient,test_reports,monitoring}
 
 echo "✅ Directories created"
 

@@ -38,7 +38,7 @@ check_agents_configured() {
     if [ -d ".claude/agents" ]; then
         # Count agent files
         local agent_count=$(ls -1 .claude/agents/*.md 2>/dev/null | wc -l)
-        if [ "$agent_count" -ge 12 ] && [ "$has_claude_md" = true ]; then
+        if [ "$agent_count" -ge 23 ] && [ "$has_claude_md" = true ]; then
             return 0  # Fully configured
         else
             return 1  # Partially configured (missing agents or CLAUDE.md)
@@ -88,7 +88,7 @@ setup_agents() {
         ./setup.sh
     else
         # Fallback: create essential directories if setup.sh missing
-        mkdir -p .claude/{events,workspaces,snapshots,registry,backups,dlq,adr,summaries,commands,logs}
+        mkdir -p .claude/{events,workspaces,snapshots,registry,backups,dlq,adr,summaries,commands,logs,state,triggers,ambient,test_reports,monitoring}
         touch .claude/events/log.ndjson
         echo "{}" > .claude/snapshots/tasks.json
         
