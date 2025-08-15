@@ -232,19 +232,19 @@ main() {
             WILD_MODE=true
             ;;
         --help)
-            echo "super-agents - Project-level AET system manager"
+            echo "super-agents - Autonomous Engineering Team launcher"
             echo ""
             echo "Usage:"
-            echo "  super-agents                    Setup agents (if needed) and launch Claude"
+            echo "  super-agents                    Auto-initialize AET system and launch Claude"
             echo "  super-agents --upgrade          Upgrade existing agents to latest version"
             echo "  super-agents --stop             Stop the Knowledge Manager"
             echo "  super-agents --wild             Launch Claude with --dangerously-skip-permissions"
             echo "  super-agents --help             Show this help message"
             echo ""
-            echo "This command:"
-            echo "  1. Sets up AET agents in the current project (if not present)"
+            echo "This command automatically:"
+            echo "  1. Initializes 23 AET agents (if not present) - no prompts needed"
             echo "  2. Starts the Knowledge Manager service"
-            echo "  3. Launches Claude with the agents available"
+            echo "  3. Launches Claude with full project context and agent awareness"
             echo ""
             echo "Security:"
             echo "  By default, Claude runs with normal permissions for security."
@@ -282,15 +282,8 @@ main() {
             print_warning "Proceeding with partial configuration..."
         fi
     else
-        print_warning "No AET agents found in this project"
-        read -p "Install AET agents here? (y/N) " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            setup_agents
-        else
-            print_error "Cannot proceed without agents. Exiting."
-            exit 1
-        fi
+        print_status "No AET agents found - auto-initializing project..."
+        setup_agents
     fi
     
     # Start Knowledge Manager
