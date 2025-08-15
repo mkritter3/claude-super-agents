@@ -36,16 +36,40 @@ fi
 # Initialize the SQLite database
 echo "🗄️  Initializing database..."
 if [ -f .claude/system/schema.sql ]; then
-    sqlite3 .claude/registry/registry.db < .claude/system/schema.sql 2>/dev/null || true
-    echo "✅ Database initialized"
+    # Check if database exists and is valid first
+    if [ -f .claude/registry/registry.db ]; then
+        if ! sqlite3 .claude/registry/registry.db "SELECT 1 FROM sqlite_master LIMIT 1;" &>/dev/null; then
+            echo "⚠️  Existing database appears corrupted, recreating..."
+            rm -f .claude/registry/registry.db
+        fi
+    fi
+    
+    # Initialize database and capture errors
+    if sqlite3 .claude/registry/registry.db < .claude/system/schema.sql; then
+        echo "✅ Database initialized successfully"
+    else
+        echo "❌ Database initialization failed"
+        echo "   Please check .claude/system/schema.sql for errors"
+        exit 1
+    fi
 else
     echo "⚠️  Schema file not found, skipping database initialization"
 fi
 
 # Make scripts executable
-chmod +x .claude/aet 2>/dev/null || true
-chmod +x .claude/setup.sh 2>/dev/null || true
-chmod +x .claude/system/*.py 2>/dev/null || true
+echo "🔧 Setting script permissions..."
+if [ -f .claude/aet ]; then
+    chmod +x .claude/aet
+fi
+
+if [ -f .claude/setup.sh ]; then
+    chmod +x .claude/setup.sh
+fi
+
+# Make Python scripts executable
+if [ -d .claude/system ]; then
+    find .claude/system -name "*.py" -exec chmod +x {} \;
+fi
 
 echo "✅ Scripts made executable"
 
@@ -85,13 +109,19 @@ echo ""
 echo "📦 Installing Python dependencies..."
 if [ -f requirements-upgrade.txt ]; then
     if command -v pip3 &> /dev/null; then
-        pip3 install -q -r requirements-upgrade.txt 2>/dev/null && echo "✅ Python dependencies installed" || {
-            echo "⚠️  Some dependencies failed to install. Trying with --user flag..."
-            pip3 install -q --user -r requirements-upgrade.txt && echo "✅ Python dependencies installed (user)" || {
+        # Try system-wide installation first
+        if pip3 install -q -r requirements-upgrade.txt; then
+            echo "✅ Python dependencies installed"
+        else
+            # Fallback to user installation
+            echo "⚠️  System-wide install failed. Trying with --user flag..."
+            if pip3 install -q --user -r requirements-upgrade.txt; then
+                echo "✅ Python dependencies installed (user)"
+            else
                 echo "⚠️  Could not install all dependencies. Manual installation may be required."
                 echo "    Run: pip3 install -r requirements-upgrade.txt"
-            }
-        }
+            fi
+        fi
     else
         echo "⚠️  pip3 not found. Please install dependencies manually:"
         echo "    pip3 install -r requirements-upgrade.txt"
@@ -104,9 +134,11 @@ fi
 echo ""
 echo "🚀 Initializing AET system..."
 cd "$SCRIPT_DIR"
-python3 .claude/system/aet.py init 2>/dev/null || {
+if python3 .claude/system/aet.py init; then
+    echo "✅ AET system initialized"
+else
     echo "⚠️  Note: Full initialization will complete on first task creation"
-}
+fi
 
 echo ""
 echo "╔═══════════════════════════════════════════════════════════╗"

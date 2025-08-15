@@ -2,6 +2,7 @@
 
 # Super-Agents Command - Project-level AET system setup and launcher
 # Installs and manages the AET agent system on a per-project basis
+# WITH DYNAMIC PORT ALLOCATION for multiple concurrent projects
 
 set -e
 
@@ -11,8 +12,33 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-# Source location of the AET system
-SOURCE_DIR="/Users/mkr/local-coding/Systems/projects/claude-aet/claude-super-agents"
+# Dynamically determine source location
+# First try to resolve via symlink
+SCRIPT_PATH="$(readlink -f "${BASH_SOURCE[0]}" 2>/dev/null || realpath "${BASH_SOURCE[0]}" 2>/dev/null || echo "${BASH_SOURCE[0]}")"
+SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
+
+# Assuming script is in project root (not in a bin/ subdirectory)
+SOURCE_DIR="$SCRIPT_DIR"
+
+# Validate the source directory
+if [ ! -d "$SOURCE_DIR/.claude" ] || [ ! -f "$SOURCE_DIR/CLAUDE.md" ]; then
+    # Try reading from config file
+    CONFIG_FILE="$HOME/.super-agents-config"
+    if [ -f "$CONFIG_FILE" ]; then
+        READ_SOURCE_DIR="$(cat "$CONFIG_FILE")"
+        if [ -d "$READ_SOURCE_DIR/.claude" ] && [ -f "$READ_SOURCE_DIR/CLAUDE.md" ]; then
+            SOURCE_DIR="$READ_SOURCE_DIR"
+        else
+            echo -e "${RED}✗${NC} Configured source directory '$READ_SOURCE_DIR' is invalid."
+            echo -e "${RED}✗${NC} Please reinstall using install-global.sh"
+            exit 1
+        fi
+    else
+        echo -e "${RED}✗${NC} Could not determine source directory."
+        echo -e "${RED}✗${NC} Please run install-global.sh from the claude-super-agents directory"
+        exit 1
+    fi
+fi
 
 # Function to print colored output
 print_status() {
@@ -25,6 +51,74 @@ print_warning() {
 
 print_error() {
     echo -e "${RED}✗${NC} $1"
+}
+
+# Function to find an available port
+find_available_port() {
+    local base_port=5001
+    local max_port=5100
+    local port=$base_port
+    
+    while [ $port -le $max_port ]; do
+        if ! lsof -Pi :$port -sTCP:LISTEN -t >/dev/null 2>&1; then
+            echo $port
+            return 0
+        fi
+        port=$((port + 1))
+    done
+    
+    echo 0
+    return 1
+}
+
+# Function to get or assign port for current project
+get_project_port() {
+    local port_file=".claude/km.port"
+    local lock_file=".claude/km.port.lock"
+    
+    # Create lock file if it doesn't exist
+    touch "$lock_file"
+    
+    # Use flock to prevent race conditions
+    (
+        flock -x 200
+        
+        # If port file exists, check if that port is still ours
+        if [ -f "$port_file" ]; then
+            local saved_port=$(cat "$port_file")
+            local saved_pid=""
+            
+            # Check if we have a PID file
+            if [ -f ".claude/km.pid" ]; then
+                saved_pid=$(cat ".claude/km.pid")
+                
+                # Check if our process is still running on that port
+                if kill -0 $saved_pid 2>/dev/null; then
+                    # Our KM is running
+                    echo $saved_port
+                    return 0
+                fi
+            fi
+            
+            # Check if the port is free
+            if ! lsof -Pi :$saved_port -sTCP:LISTEN -t >/dev/null 2>&1; then
+                # Port is free, we can reuse it
+                echo $saved_port
+                return 0
+            fi
+        fi
+        
+        # Need to find a new port
+        local new_port=$(find_available_port)
+        if [ $new_port -eq 0 ]; then
+            print_error "No available ports found (5001-5100)"
+            exit 1
+        fi
+        
+        # Save the new port
+        echo $new_port > "$port_file"
+        echo $new_port
+    ) 200>"$lock_file"
 }
 
 # Function to check if agents are configured
@@ -229,6 +323,12 @@ upgrade_agents() {
         print_status "Backed up existing CLAUDE.md"
     fi
     
+    # Preserve port configuration
+    local saved_port=""
+    if [ -f ".claude/km.port" ]; then
+        saved_port=$(cat .claude/km.port)
+    fi
+    
     # Update all agent definitions
     cp -r "$SOURCE_DIR/.claude/agents" .claude/
     
@@ -247,6 +347,11 @@ upgrade_agents() {
     cp "$SOURCE_DIR/start.sh" . 2>/dev/null || true
     cp "$SOURCE_DIR/stop.sh" . 2>/dev/null || true
     cp "$SOURCE_DIR/requirements-upgrade.txt" . 2>/dev/null || true
+    
+    # Restore port configuration
+    if [ ! -z "$saved_port" ]; then
+        echo "$saved_port" > .claude/km.port
+    fi
     
     # Make scripts executable
     chmod +x setup.sh start.sh stop.sh 2>/dev/null || true
@@ -267,36 +372,107 @@ upgrade_agents() {
     print_status "Backup saved in $backup_dir"
 }
 
+# Function to check Python dependencies
+check_km_dependencies() {
+    local missing_deps=()
+    
+    # Check for required Python packages
+    python3 -c "import flask" 2>/dev/null || missing_deps+=("flask")
+    python3 -c "import sqlite3" 2>/dev/null || missing_deps+=("sqlite3")
+    python3 -c "import numpy" 2>/dev/null || missing_deps+=("numpy")
+    
+    if [ ${#missing_deps[@]} -gt 0 ]; then
+        print_error "Missing Python dependencies for Knowledge Manager:"
+        for dep in "${missing_deps[@]}"; do
+            echo "  - $dep"
+        done
+        print_warning "Install with: pip3 install flask numpy"
+        return 1
+    fi
+    return 0
+}
+
 # Function to start Knowledge Manager
 start_km() {
-    # Check if KM is already running
-    if lsof -Pi :5001 -sTCP:LISTEN -t >/dev/null 2>&1; then
-        print_status "Knowledge Manager already running"
-    else
-        print_status "Starting Knowledge Manager..."
+    # Get port for this project
+    local km_port=$(get_project_port)
+    
+    # Check if KM is already running on our port
+    if [ -f ".claude/km.pid" ]; then
+        local saved_pid=$(cat .claude/km.pid)
+        if kill -0 $saved_pid 2>/dev/null; then
+            print_status "Knowledge Manager already running on port $km_port (PID: $saved_pid)"
+            return 0
+        fi
+    fi
+    
+    # Check dependencies first
+    if ! check_km_dependencies; then
+        print_warning "Knowledge Manager will not start due to missing dependencies"
+        return 1
+    fi
+    
+    print_status "Starting Knowledge Manager on port $km_port..."
+    
+    # Ensure log directory exists
+    mkdir -p .claude/logs
+    
+    # Update km_server.py to use dynamic port (create wrapper)
+    cat > .claude/km_server_wrapper.py << EOF
+#!/usr/bin/env python3
+import sys
+import os
+
+# Add the port as an environment variable
+os.environ['KM_PORT'] = '$km_port'
+
+# Import and run the original server
+sys.path.insert(0, '.claude/system')
+from km_server import app
+
+if __name__ == '__main__':
+    app.run(port=$km_port, debug=False, host='127.0.0.1')
+EOF
+    
+    chmod +x .claude/km_server_wrapper.py
+    
+    # Start KM in background with proper PYTHONPATH
+    if [ -f ".claude/system/km_server.py" ]; then
+        # Set PYTHONPATH to include the system directory
+        export PYTHONPATH="${PWD}/.claude/system:${PYTHONPATH}"
         
-        # Ensure log directory exists
-        mkdir -p .claude/logs
+        # Start the server using the wrapper
+        python3 .claude/km_server_wrapper.py > .claude/logs/km_server.log 2>&1 &
+        local km_pid=$!
         
-        # Start KM in background
-        if [ -f ".claude/system/km_server.py" ]; then
-            cd .claude/system
-            python3 km_server.py > ../logs/km_server.log 2>&1 &
-            local km_pid=$!
-            cd ../..
+        # Wait a moment and check if it started
+        sleep 3
+        if kill -0 $km_pid 2>/dev/null; then
+            echo $km_pid > .claude/km.pid
+            echo $km_port > .claude/km.port
+            print_status "Knowledge Manager started on port $km_port (PID: $km_pid)"
             
-            # Wait a moment and check if it started
-            sleep 2
-            if kill -0 $km_pid 2>/dev/null; then
-                echo $km_pid > .claude/km.pid
-                print_status "Knowledge Manager started (PID: $km_pid)"
-            else
-                print_error "Failed to start Knowledge Manager"
-                print_warning "Check .claude/logs/km_server.log for errors"
+            # Test if it's responding
+            if command -v curl &>/dev/null; then
+                sleep 1
+                if curl -s http://localhost:$km_port/health >/dev/null 2>&1; then
+                    print_status "Knowledge Manager is responding at http://localhost:$km_port"
+                else
+                    print_warning "Knowledge Manager started but not yet responding"
+                fi
             fi
         else
-            print_error "Knowledge Manager not found at .claude/system/km_server.py"
+            print_error "Failed to start Knowledge Manager"
+            print_warning "Check .claude/logs/km_server.log for errors"
+            
+            # Show last few lines of error log if it exists
+            if [ -f ".claude/logs/km_server.log" ]; then
+                echo "Recent error output:"
+                tail -n 5 .claude/logs/km_server.log
+            fi
         fi
+    else
+        print_error "Knowledge Manager not found at .claude/system/km_server.py"
     fi
 }
 
@@ -307,17 +483,29 @@ stop_km() {
         if kill -0 $pid 2>/dev/null; then
             kill $pid
             rm .claude/km.pid
+            
+            # Also remove port file
+            rm -f .claude/km.port
+            
             print_status "Knowledge Manager stopped"
         else
             rm .claude/km.pid
+            rm -f .claude/km.port
             print_warning "Knowledge Manager not running (cleaned up stale PID)"
         fi
     else
-        # Try to find by port
-        local km_pid=$(lsof -ti:5001 2>/dev/null)
-        if [ ! -z "$km_pid" ]; then
-            kill $km_pid
-            print_status "Knowledge Manager stopped"
+        # Try to find by port if we have port file
+        if [ -f ".claude/km.port" ]; then
+            local km_port=$(cat .claude/km.port)
+            local km_pid=$(lsof -ti:$km_port 2>/dev/null)
+            if [ ! -z "$km_pid" ]; then
+                kill $km_pid
+                rm -f .claude/km.port
+                print_status "Knowledge Manager stopped"
+            else
+                rm -f .claude/km.port
+                print_warning "Knowledge Manager not running"
+            fi
         else
             print_warning "Knowledge Manager not running"
         fi
@@ -341,6 +529,95 @@ main() {
             stop_km
             exit 0
             ;;
+        --status)
+            # Show status of current project's KM
+            echo "════════════════════════════════════════════════════════════"
+            echo "  📊 AET System Status"
+            echo "════════════════════════════════════════════════════════════"
+            echo ""
+            echo "Project: $(pwd)"
+            
+            # Check agent configuration
+            check_agents_configured
+            local config_status=$?
+            if [ $config_status -eq 0 ]; then
+                print_status "AET agents: Fully configured (23 agents + CLAUDE.md)"
+            elif [ $config_status -eq 1 ]; then
+                print_warning "AET agents: Partially configured"
+            else
+                print_error "AET agents: Not configured"
+            fi
+            
+            # Check Knowledge Manager status
+            if [ -f ".claude/km.pid" ] && [ -f ".claude/km.port" ]; then
+                local km_pid=$(cat .claude/km.pid)
+                local km_port=$(cat .claude/km.port)
+                if kill -0 $km_pid 2>/dev/null; then
+                    print_status "Knowledge Manager: Running on port $km_port (PID: $km_pid)"
+                    
+                    # Test if responding
+                    if command -v curl &>/dev/null; then
+                        if curl -s --max-time 2 http://localhost:$km_port/health >/dev/null 2>&1; then
+                            print_status "Knowledge Manager: Responding at http://localhost:$km_port/health"
+                        else
+                            print_warning "Knowledge Manager: Running but not responding"
+                        fi
+                    fi
+                else
+                    print_warning "Knowledge Manager: Not running (stale PID file)"
+                fi
+            else
+                print_error "Knowledge Manager: Not running"
+            fi
+            
+            # Show recent autonomous activity
+            if [ -f ".claude/events/log.ndjson" ]; then
+                local event_count=$(wc -l < .claude/events/log.ndjson 2>/dev/null || echo "0")
+                echo ""
+                echo "Autonomous Events: $event_count total"
+                if [ "$event_count" -gt 0 ]; then
+                    echo "Recent activity:"
+                    tail -n 3 .claude/events/log.ndjson | while read line; do
+                        echo "  • $(echo "$line" | python3 -c "import json,sys; d=json.load(sys.stdin); print(f\"{d.get('timestamp','')}: {d.get('event_type','')}\")" 2>/dev/null || echo "Invalid event")"
+                    done
+                fi
+            fi
+            
+            echo ""
+            exit 0
+            ;;
+        --list)
+            # List all projects with KM instances
+            echo "════════════════════════════════════════════════════════════"
+            echo "  📂 All AET Projects with Running KM Instances"
+            echo "════════════════════════════════════════════════════════════"
+            echo ""
+            
+            # Find all projects with running KM by checking ports
+            for port in $(seq 5001 5100); do
+                if lsof -Pi :$port -sTCP:LISTEN -t >/dev/null 2>&1; then
+                    # Try to find project directory by checking for .claude/km.port files
+                    local project_dir=$(find ~ -type f -path "*/.claude/km.port" 2>/dev/null | while read port_file; do
+                        if [ "$(cat "$port_file" 2>/dev/null)" = "$port" ]; then
+                            dirname "$(dirname "$port_file")"
+                            break
+                        fi
+                    done | head -1)
+                    
+                    if [ ! -z "$project_dir" ]; then
+                        echo "  • Port $port: $project_dir"
+                    else
+                        echo "  • Port $port: Unknown project"
+                    fi
+                fi
+            done
+            
+            echo ""
+            echo "To stop a specific project's KM:"
+            echo "  cd <project-dir> && super-agents --stop"
+            echo ""
+            exit 0
+            ;;
         --wild)
             WILD_MODE=true
             ;;
@@ -350,14 +627,21 @@ main() {
             echo "Usage:"
             echo "  super-agents                    Auto-initialize AET system and launch Claude"
             echo "  super-agents --upgrade          Upgrade existing agents to latest version"
+            echo "  super-agents --status           Show status of current project's AET system"
+            echo "  super-agents --list             List all projects with running KM instances"
             echo "  super-agents --stop             Stop the Knowledge Manager"
             echo "  super-agents --wild             Launch Claude with --dangerously-skip-permissions"
             echo "  super-agents --help             Show this help message"
             echo ""
             echo "This command automatically:"
             echo "  1. Initializes 23 AET agents (if not present) - no prompts needed"
-            echo "  2. Starts the Knowledge Manager service"
+            echo "  2. Starts the Knowledge Manager service (on dynamic port per project)"
             echo "  3. Launches Claude with full project context and agent awareness"
+            echo ""
+            echo "Multi-Project Support:"
+            echo "  • Each project gets its own KM instance on a unique port (5001-5100)"
+            echo "  • Port assignments are saved in .claude/km.port"
+            echo "  • Multiple projects can run concurrently without conflicts"
             echo ""
             echo "Security:"
             echo "  By default, Claude runs with normal permissions for security."
@@ -402,18 +686,25 @@ main() {
     # Start Knowledge Manager
     start_km
     
+    # Get the port KM is running on
+    local km_port=5001
+    if [ -f ".claude/km.port" ]; then
+        km_port=$(cat .claude/km.port)
+    fi
+    
     # Launch Claude with agents
     echo ""
     echo "════════════════════════════════════════════════════════════"
     echo "  🚀 Launching Claude with AET agents..."
     echo "════════════════════════════════════════════════════════════"
     echo ""
+    echo "Project: $(pwd)"
+    echo "Knowledge Manager: http://localhost:$km_port/health"
+    echo ""
     echo "Available agents:"
     if [ -d ".claude/agents" ]; then
         ls -1 .claude/agents/*.md 2>/dev/null | xargs -I {} basename {} .md | sed 's/^/  • /'
     fi
-    echo ""
-    echo "Knowledge Manager: http://localhost:5001/health"
     echo ""
     echo "Press Ctrl+C to exit Claude and stop services"
     echo "════════════════════════════════════════════════════════════"
@@ -435,7 +726,8 @@ main() {
     if [[ ! $REPLY =~ ^[Nn]$ ]]; then
         stop_km
     else
-        print_status "Knowledge Manager left running"
+        print_status "Knowledge Manager left running on port $km_port"
+        print_status "Stop later with: super-agents --stop"
     fi
 }
 
