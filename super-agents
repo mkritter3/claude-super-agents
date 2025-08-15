@@ -228,8 +228,8 @@ main() {
             stop_km
             exit 0
             ;;
-        --unsafe)
-            UNSAFE_MODE=true
+        --wild)
+            WILD_MODE=true
             ;;
         --help)
             echo "super-agents - Project-level AET system manager"
@@ -238,7 +238,7 @@ main() {
             echo "  super-agents                    Setup agents (if needed) and launch Claude"
             echo "  super-agents --upgrade          Upgrade existing agents to latest version"
             echo "  super-agents --stop             Stop the Knowledge Manager"
-            echo "  super-agents --unsafe           Launch Claude with --dangerously-skip-permissions"
+            echo "  super-agents --wild             Launch Claude with --dangerously-skip-permissions"
             echo "  super-agents --help             Show this help message"
             echo ""
             echo "This command:"
@@ -248,7 +248,7 @@ main() {
             echo ""
             echo "Security:"
             echo "  By default, Claude runs with normal permissions for security."
-            echo "  Use --unsafe only if you need to bypass permission checks."
+            echo "  Use --wild only if you need to bypass permission checks."
             exit 0
             ;;
         "")
@@ -314,8 +314,8 @@ main() {
     echo ""
     
     # Launch Claude (this will block until Claude exits)
-    if [ "$UNSAFE_MODE" = true ]; then
-        print_warning "Launching Claude with --dangerously-skip-permissions"
+    if [ "$WILD_MODE" = true ]; then
+        print_warning "🐺 Launching Claude in WILD mode (--dangerously-skip-permissions)"
         claude --dangerously-skip-permissions || true
     else
         print_status "Launching Claude with normal security permissions"
