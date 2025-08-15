@@ -228,26 +228,39 @@ main() {
             stop_km
             exit 0
             ;;
+        --unsafe)
+            UNSAFE_MODE=true
+            ;;
         --help)
             echo "super-agents - Project-level AET system manager"
             echo ""
             echo "Usage:"
-            echo "  super-agents          Setup agents (if needed) and launch Claude"
-            echo "  super-agents --upgrade   Upgrade existing agents to latest version"
-            echo "  super-agents --stop      Stop the Knowledge Manager"
-            echo "  super-agents --help      Show this help message"
+            echo "  super-agents                    Setup agents (if needed) and launch Claude"
+            echo "  super-agents --upgrade          Upgrade existing agents to latest version"
+            echo "  super-agents --stop             Stop the Knowledge Manager"
+            echo "  super-agents --unsafe           Launch Claude with --dangerously-skip-permissions"
+            echo "  super-agents --help             Show this help message"
             echo ""
             echo "This command:"
             echo "  1. Sets up AET agents in the current project (if not present)"
             echo "  2. Starts the Knowledge Manager service"
             echo "  3. Launches Claude with the agents available"
+            echo ""
+            echo "Security:"
+            echo "  By default, Claude runs with normal permissions for security."
+            echo "  Use --unsafe only if you need to bypass permission checks."
             exit 0
             ;;
         "")
             # Default behavior - setup/start/launch
             ;;
-        *)
+        --*)
             print_error "Unknown option: $1"
+            echo "Use --help for usage information"
+            exit 1
+            ;;
+        *)
+            print_error "Unknown argument: $1"
             echo "Use --help for usage information"
             exit 1
             ;;
@@ -301,7 +314,13 @@ main() {
     echo ""
     
     # Launch Claude (this will block until Claude exits)
-    claude --dangerously-skip-permissions || true
+    if [ "$UNSAFE_MODE" = true ]; then
+        print_warning "Launching Claude with --dangerously-skip-permissions"
+        claude --dangerously-skip-permissions || true
+    else
+        print_status "Launching Claude with normal security permissions"
+        claude || true
+    fi
     
     # After Claude exits, ask about stopping KM
     echo ""
