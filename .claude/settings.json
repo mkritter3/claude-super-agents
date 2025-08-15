@@ -7,5 +7,7 @@
         "@upstash/context7"
       ]
     }
-  }
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": ["context7"]
 }

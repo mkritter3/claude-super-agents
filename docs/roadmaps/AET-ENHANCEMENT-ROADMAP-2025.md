@@ -24,27 +24,36 @@ Systematically enhance the Autonomous Engineering Team (AET) system to become th
 ## Phase 1: Stability & Robustness (Q1 2025)
 **Goal**: Harden the existing system for production use at scale
 
-### 1.1 Parallel Architecture: Batch + MCP 🆕 CRITICAL
-**Goal**: Enable parallel operation of batch (async, high-volume) and MCP (real-time) agents
+### 1.1 Parallel Architecture: Local Concurrency + MCP 🆕 REVISED
+**Goal**: Enable parallel agent execution using local process pools and async operations
 
-#### Batch Processing Lane (Async, Cost-Optimized)
-- [ ] Implement Claude Batch API for bulk operations (100K requests/batch, 256MB limit)
-- [ ] Create batch queue for test suites, docs generation, analysis
-- [ ] Leverage 50% cost reduction for non-urgent operations
-- [ ] Implement 1-hour cache duration for shared context (optimal for batch)
-- [ ] Add batch result streaming with 29-day retention handling
+#### Local Process Pool (Parallel Execution Without Batch API)
+- [ ] Implement multiprocessing.Pool for concurrent agent execution
+- [ ] Create async task queue using Python's asyncio for non-blocking operations
+- [ ] Use ThreadPoolExecutor for I/O-bound agent operations
+- [ ] Implement job queue with Redis/SQLite for persistent task management
+- [ ] Add task prioritization (Critical, High, Normal, Low)
+- [ ] Create worker processes (2-8 based on CPU cores) for parallel execution
 
-#### MCP Real-time Lane (Synchronous, Immediate)
-- [ ] Maintain MCP agents for critical path operations (pre-commit hooks)
-- [ ] Ensure contract-guardian, security-agent remain real-time blocking
-- [ ] Keep incident-response on MCP for sub-second response
-- [ ] Preserve file-system triggers for autonomous real-time events
+#### Concurrent Agent Orchestration
+- [ ] Run multiple agents simultaneously using subprocess.Popen
+- [ ] Implement fan-out/fan-in pattern for parallel agent coordination
+- [ ] Add agent dependency graph for smart parallel execution
+- [ ] Create shared memory IPC for fast inter-agent communication
+- [ ] Use file locks (flock) for safe concurrent file access
 
-#### Smart Routing Logic
-- [ ] Implement task router to decide batch vs MCP execution
-- [ ] Add priority lanes: Critical (MCP) vs Bulk (Batch)
-- [ ] Create unified result aggregation from both processing paths
-- [ ] Ensure file-system message bus handles both streams
+#### Smart Task Distribution
+- [ ] Implement round-robin task distribution across worker processes
+- [ ] Add CPU/memory-aware task scheduling
+- [ ] Create task batching for similar operations (group by agent type)
+- [ ] Implement result aggregation from parallel executions
+- [ ] Add circuit breaker pattern for failing agents
+
+#### Future Batch API Integration (When Available)
+- [ ] Design system to easily integrate Batch API when access granted
+- [ ] Keep task queue abstraction that can switch between local/batch
+- [ ] Prepare batch-compatible request format for future migration
+- [ ] Document cost savings potential (50% with Batch API)
 
 ### 1.2 Global Installation & Multi-Project Support ✅ IMMEDIATE PRIORITY
 **Critical**: Fix the original issues - run from any directory, support multiple independent projects
@@ -127,11 +136,12 @@ Systematically enhance the Autonomous Engineering Team (AET) system to become th
 - **Global installation working from ANY directory** ✅
 - **Multiple concurrent projects with dynamic ports** ✅
 - **No more hardcoded paths or ports** ✅
-- Parallel batch + MCP architecture operational
-- Smart routing between async batch and real-time MCP
+- Local parallel processing with multiprocessing pools
+- Concurrent agent execution without Batch API dependency
 - Model-optimized agent selection with fallbacks
 - Zero-downtime deployments
 - Complete error visibility
+- Future-ready for Batch API integration
 
 ---
 
@@ -270,23 +280,31 @@ Systematically enhance the Autonomous Engineering Team (AET) system to become th
 - [ ] Add Slack/Discord notifications via webhooks
 - [ ] Create Jenkins plugin
 - [ ] Implement Azure DevOps integration
-- [ ] Leverage Claude's batch API for CI/CD workflows
+- [ ] Leverage parallel processing for CI/CD workflows
 
-### 4.3 Batch Processing at Scale 🆕 CRITICAL
-**Validated**: Batch API supports all features including tool use, vision, system messages
+### 4.3 Scalable Processing Architecture 🆕 REVISED
+**Goal**: Achieve batch-like scale using local parallelization and smart queuing
 
-#### CI/CD Integration
-- [ ] Implement batch queue for CI/CD pipelines (100K requests max)
-- [ ] Add batch orchestration for test suites (respect 256MB limit)
-- [ ] Handle 24-hour batch expiration gracefully
-- [ ] Manage 29-day result retention window
+#### Local Scale Optimization
+- [ ] Implement distributed task queue (Celery/RQ style) for scale
+- [ ] Add horizontal scaling with multiple worker machines
+- [ ] Create job persistence layer for crash recovery
+- [ ] Implement checkpointing for long-running tasks
+- [ ] Add progress tracking for large job sets
 
-#### Optimization & Recovery
-- [ ] Implement 1-hour prompt caching for shared context
-- [ ] Mix request types within single batch (tests + docs + analysis)
-- [ ] Add batch failure recovery (expired vs errored vs canceled)
-- [ ] Monitor rate limits for batch queue processing
-- [ ] Leverage 50% cost savings across all agent operations
+#### CI/CD Integration (Without Batch API)
+- [ ] Use process pools for parallel test execution
+- [ ] Implement test sharding across workers
+- [ ] Add incremental processing (only changed files)
+- [ ] Create local caching layer for repeated operations
+- [ ] Build pipeline orchestration with dependency graphs
+
+#### Future Batch API Migration Path
+- [ ] Design abstraction layer for easy Batch API adoption
+- [ ] Document potential 50% cost savings when available
+- [ ] Prepare batch-compatible request formatting
+- [ ] Keep local execution as fallback option
+- [ ] Monitor for Batch API availability updates
 
 ### 4.4 AI Enhancements ✅ Priority  
 - [ ] Add agent learning from successful patterns
@@ -312,10 +330,11 @@ Systematically enhance the Autonomous Engineering Team (AET) system to become th
 
 **Deliverables**:
 - MCP-compliant remote agent support (HTTP/SSE/OAuth)
-- Batch processing at scale (100K requests, 50% cost reduction)
-- Seamless CI/CD integration with batch orchestration
+- Scalable local parallel processing with process pools
+- Seamless CI/CD integration with parallel orchestration
 - Intelligent agent selection and routing
-- 10x productivity gains through batch + MCP
+- 10x productivity gains through parallelization + MCP
+- Future-ready architecture for Batch API when available
 
 ---
 
@@ -348,24 +367,35 @@ PROJECT LAYER (Many Independent Projects):
 Each project is COMPLETELY ISOLATED - like separate git repositories
 ```
 
-## Parallel Architecture Design
+## Parallel Architecture Design (Revised - No Batch API Dependency)
 
-### How Batch and MCP Work Together
+### How Local Concurrency and MCP Work Together
 
-The AET system operates two parallel processing lanes that work simultaneously without blocking each other:
+The AET system operates parallel processing using local resources without requiring Batch API access:
 
-#### 1. **Batch Processing Lane** (Async, High-Volume, 50% Cost)
-- **Technology**: Claude Batch API
-- **Capacity**: 100K requests per batch, 256MB size limit
-- **Timing**: Up to 24 hours completion, typically under 1 hour
+#### 1. **Local Process Pool** (Parallel Execution, CPU-Optimized)
+- **Technology**: Python multiprocessing.Pool + asyncio
+- **Capacity**: 2-8 worker processes based on CPU cores
+- **Timing**: Concurrent execution, typically seconds to minutes
 - **Use Cases**:
-  - CI/CD test suites (thousands of tests)
-  - Bulk documentation generation
-  - Large-scale code analysis
-  - Performance benchmarking
-- **Agents**: test-executor, documentation-agent, performance-optimizer
+  - Running multiple agents simultaneously
+  - Parallel test execution across files
+  - Concurrent documentation generation
+  - Multi-file code analysis
+- **Implementation**: ProcessPoolExecutor for CPU-bound, ThreadPoolExecutor for I/O-bound
 
-#### 2. **MCP Real-time Lane** (Sync, Immediate Response, Full Cost)
+#### 2. **Async Task Queue** (Non-Blocking Operations)
+- **Technology**: asyncio + SQLite/Redis queue
+- **Capacity**: Hundreds of queued tasks
+- **Timing**: Asynchronous processing with priorities
+- **Use Cases**:
+  - Background documentation updates
+  - Non-critical analysis tasks
+  - Deferred optimization runs
+  - Batch-like operations without Batch API
+- **Agents**: documentation-agent, performance-optimizer, test-executor (non-blocking)
+
+#### 3. **MCP Real-time Lane** (Sync, Immediate Response)
 - **Technology**: MCP Protocol (HTTP/SSE for remote, STDIO for local)
 - **Capacity**: Individual requests, sub-second response
 - **Timing**: Immediate blocking operations
@@ -376,23 +406,31 @@ The AET system operates two parallel processing lanes that work simultaneously w
   - Live development assistance
 - **Agents**: contract-guardian, security-agent, incident-response
 
-#### 3. **Smart Routing Decision Tree**
+#### 4. **Smart Task Distribution**
 ```
 Request arrives → Is it blocking/critical?
   ├─ YES → MCP Real-time Lane
   │   └─ Examples: pre-commit hooks, security scans
-  ├─ NO → Can it wait? Volume > 100?
-  │   ├─ YES → Batch Processing Lane
-  │   │   └─ Examples: test suites, bulk docs
-  │   └─ NO → MCP Real-time Lane (default)
+  ├─ NO → Can it be parallelized?
+  │   ├─ YES → Local Process Pool
+  │   │   └─ Examples: multi-file analysis, parallel tests
+  │   └─ NO → Async Task Queue
+  │       └─ Examples: background docs, deferred tasks
 ```
 
-#### 4. **File System Message Bus**
-Both lanes write to the same event log (`.claude/events/log.ndjson`), enabling:
+#### 5. **Unified Message Bus**
+All execution paths write to the same event log (`.claude/events/log.ndjson`):
 - Unified audit trail
-- Cross-lane coordination
-- State synchronization
-- Result aggregation
+- Cross-process coordination via file locks
+- State synchronization through shared SQLite
+- Result aggregation from all workers
+
+#### 6. **Future Batch API Integration Path**
+When Batch API access becomes available:
+- Task queue abstraction allows easy migration
+- Replace ProcessPool with Batch API calls
+- Achieve 50% cost reduction on bulk operations
+- Maintain local fallback for development
 
 ## Implementation Strategy
 

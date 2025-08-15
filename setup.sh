@@ -92,6 +92,17 @@ if command -v pip3 &> /dev/null; then
             echo "⚠️  Could not install cryptography. Security features may be limited."
         }
     fi
+    
+    # Check if parallel execution dependencies are installed (Phase 1.1)
+    echo "Installing dependencies for parallel execution..."
+    for package in networkx matplotlib aiofiles aiosqlite; do
+        if ! python3 -c "import $package" 2>/dev/null; then
+            echo "  Installing $package..."
+            pip3 install -q $package 2>/dev/null || pip3 install -q --user $package 2>/dev/null || {
+                echo "  ⚠️  Could not install $package. Some parallel features may be limited."
+            }
+        fi
+    done
 fi
 
 # Check Python installation

@@ -660,6 +660,64 @@ main() {
             fi
             exit 0
             ;;
+        --parallel)
+            # Start parallel executor (Phase 1.1)
+            echo "════════════════════════════════════════════════════════════"
+            echo "  ⚡ AET Parallel Executor (Phase 1.1)"
+            echo "════════════════════════════════════════════════════════════"
+            echo ""
+            
+            if [ -f ".claude/system/parallel_executor.py" ]; then
+                echo "Starting parallel executor with optimal worker count..."
+                python3 .claude/system/parallel_executor.py --start
+            else
+                print_error "Parallel executor not found"
+            fi
+            exit 0
+            ;;
+        --submit)
+            # Submit task for parallel execution
+            if [ -z "$2" ]; then
+                print_error "Usage: super-agents --submit AGENT:TASK"
+                echo "Example: super-agents --submit developer-agent:implement_feature"
+                exit 1
+            fi
+            
+            if [ -f ".claude/system/parallel_executor.py" ]; then
+                python3 .claude/system/parallel_executor.py --submit "$2"
+            else
+                print_error "Parallel executor not found"
+            fi
+            exit 0
+            ;;
+        --queue-stats)
+            # Show parallel queue statistics
+            echo "════════════════════════════════════════════════════════════"
+            echo "  📊 Parallel Queue Statistics"
+            echo "════════════════════════════════════════════════════════════"
+            echo ""
+            
+            if [ -f ".claude/system/parallel_executor.py" ]; then
+                python3 .claude/system/parallel_executor.py --stats
+            else
+                print_error "Parallel executor not found"
+            fi
+            exit 0
+            ;;
+        --task)
+            # Check task status
+            if [ -z "$2" ]; then
+                print_error "Usage: super-agents --task TASK_ID"
+                exit 1
+            fi
+            
+            if [ -f ".claude/system/parallel_executor.py" ]; then
+                python3 .claude/system/parallel_executor.py --status "$2"
+            else
+                print_error "Parallel executor not found"
+            fi
+            exit 0
+            ;;
         --list)
             echo "════════════════════════════════════════════════════════════"
             echo "  📂 All AET Projects with Running KM Instances"
@@ -708,6 +766,13 @@ main() {
             echo "  super-agents --validate         Validate system integrity (Phase 1.6)"
             echo "  super-agents --security         Security audit and management (Phase 1.5)"
             echo "  super-agents --optimize         Model optimization matrix (Phase 1.7)"
+            echo ""
+            echo "  Parallel Execution (Phase 1.1 - NEW!):"
+            echo "  super-agents --parallel         Start parallel executor with worker pool"
+            echo "  super-agents --submit AGENT:TASK  Submit task for parallel execution"
+            echo "  super-agents --queue-stats      Show parallel queue statistics"
+            echo "  super-agents --task TASK_ID     Check status of specific task"
+            echo ""
             echo "  super-agents --wild             Launch Claude with --dangerously-skip-permissions"
             echo "  super-agents --help             Show this help message"
             echo ""
