@@ -632,6 +632,34 @@ main() {
             fi
             exit 0
             ;;
+        --security)
+            # Security audit and management
+            echo "════════════════════════════════════════════════════════════"
+            echo "  🔒 AET Security Manager"
+            echo "════════════════════════════════════════════════════════════"
+            echo ""
+            
+            if [ -f ".claude/system/security_manager.py" ]; then
+                python3 .claude/system/security_manager.py --audit-report
+            else
+                print_error "Security manager not found"
+            fi
+            exit 0
+            ;;
+        --optimize)
+            # Model optimization matrix
+            echo "════════════════════════════════════════════════════════════"
+            echo "  🎯 AET Model Optimizer"
+            echo "════════════════════════════════════════════════════════════"
+            echo ""
+            
+            if [ -f ".claude/system/model_optimizer.py" ]; then
+                python3 .claude/system/model_optimizer.py --matrix
+            else
+                print_error "Model optimizer not found"
+            fi
+            exit 0
+            ;;
         --list)
             echo "════════════════════════════════════════════════════════════"
             echo "  📂 All AET Projects with Running KM Instances"
@@ -678,6 +706,8 @@ main() {
             echo "  super-agents --recover          Run error recovery system (Phase 1.3)"
             echo "  super-agents --monitor          Monitor process health (Phase 1.4)"
             echo "  super-agents --validate         Validate system integrity (Phase 1.6)"
+            echo "  super-agents --security         Security audit and management (Phase 1.5)"
+            echo "  super-agents --optimize         Model optimization matrix (Phase 1.7)"
             echo "  super-agents --wild             Launch Claude with --dangerously-skip-permissions"
             echo "  super-agents --help             Show this help message"
             echo ""

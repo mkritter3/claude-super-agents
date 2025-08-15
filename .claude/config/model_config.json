@@ -1,0 +1,25 @@
+{
+  "available_models": {
+    "claude-3-5-haiku-20241022": {
+      "available": true,
+      "rate_limit": 5000,
+      "cost_per_1k": 0.00025,
+      "latency_ms": 200
+    },
+    "claude-3-5-sonnet-20241022": {
+      "available": true,
+      "rate_limit": 1000,
+      "cost_per_1k": 0.003,
+      "latency_ms": 500
+    },
+    "claude-3-opus-20240229": {
+      "available": true,
+      "rate_limit": 100,
+      "cost_per_1k": 0.015,
+      "latency_ms": 2000
+    }
+  },
+  "rate_limit_buffer": 0.8,
+  "max_retries": 3,
+  "retry_delay": 1.0
+}

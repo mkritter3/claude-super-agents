@@ -73,15 +73,23 @@ fi
 
 echo "✅ Scripts made executable"
 
-# Install psutil for process management (Phase 1.4)
+# Install enhanced dependencies (Phase 1.4, 1.5)
 echo ""
 echo "📦 Checking Python dependencies for enhanced features..."
 if command -v pip3 &> /dev/null; then
-    # Check if psutil is installed
+    # Check if psutil is installed (Phase 1.4)
     if ! python3 -c "import psutil" 2>/dev/null; then
         echo "Installing psutil for process management..."
         pip3 install -q psutil 2>/dev/null || pip3 install -q --user psutil 2>/dev/null || {
             echo "⚠️  Could not install psutil. Process management features may be limited."
+        }
+    fi
+    
+    # Check if cryptography is installed (Phase 1.5)
+    if ! python3 -c "import cryptography" 2>/dev/null; then
+        echo "Installing cryptography for secure credential storage..."
+        pip3 install -q cryptography 2>/dev/null || pip3 install -q --user cryptography 2>/dev/null || {
+            echo "⚠️  Could not install cryptography. Security features may be limited."
         }
     fi
 fi
