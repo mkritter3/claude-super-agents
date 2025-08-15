@@ -1,0 +1,16 @@
+{
+  "agent": "documentation-agent", 
+  "trigger_event": {
+    "type": "CODE_COMMITTED",
+    "commit": "e96ddbe41725dd09ecbbb5e44550fc27d58e78ec",
+    "files_changed": ["clean_test.py"]
+  },
+  "context": {
+    "commit_message": "Test: clean file should pass secret detection",
+    "changed_files": ["clean_test.py"],
+    "documentation_trigger": "code_changes_detected"
+  },
+  "created_at": "2025-08-14T17:26:45-07:00",
+  "priority": "low",
+  "automation_level": "full"
+}

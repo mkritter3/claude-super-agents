@@ -1,0 +1,17 @@
+{
+  "agent": "test-executor",
+  "trigger_event": {
+    "type": "CODE_CHANGES_NEED_TESTING",
+    "commit": "e96ddbe41725dd09ecbbb5e44550fc27d58e78ec",
+    "test_relevant_files": ["clean_test.py"]
+  },
+  "context": {
+    "commit_message": "Test: clean file should pass secret detection",
+    "changed_files": ["clean_test.py"],
+    "test_trigger": "quality_gate_validation",
+    "test_scope": "relevant_to_changes"
+  },
+  "created_at": "2025-08-14T17:26:45-07:00",
+  "priority": "high",
+  "automation_level": "full"
+}

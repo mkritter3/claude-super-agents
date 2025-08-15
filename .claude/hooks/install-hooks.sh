@@ -58,6 +58,7 @@ install_hook() {
 # Install all hooks
 echo "Installing operational hooks..."
 
+install_hook "pre-commit"
 install_hook "post-commit"
 install_hook "post-merge" 
 install_hook "pre-push"
@@ -93,7 +94,7 @@ fi
 echo
 echo "Verifying hook installation..."
 
-for hook in post-commit post-merge pre-push post-receive; do
+for hook in pre-commit post-commit post-merge pre-push post-receive; do
     target_file="$HOOK_TARGET_DIR/$hook"
     if [ -f "$target_file" ] && [ -x "$target_file" ]; then
         echo -e "${GREEN}✓ $hook installed and executable${NC}"
@@ -106,10 +107,12 @@ echo
 echo -e "${GREEN}Autonomous operational hooks installation complete!${NC}"
 echo 
 echo "These hooks will now automatically:"
-echo "• Monitor code commits for operational triggers"
-echo "• Detect schema changes and trigger migrations"
-echo "• Set up monitoring for new deployments"
-echo "• Update documentation when code changes"
-echo "• Trigger performance analysis on relevant changes"
+echo "• Scan commits for secrets and credentials (pre-commit)"
+echo "• Monitor code commits for operational triggers (post-commit)"
+echo "• Detect schema changes and trigger migrations (post-commit)"
+echo "• Set up monitoring for new deployments (post-merge)"
+echo "• Update documentation when code changes (post-commit)"
+echo "• Trigger performance analysis on relevant changes (post-commit)"
 echo
 echo "The operational agents will now work autonomously based on your git activity."
+echo "Secret detection will prevent credential leaks before they enter the repository."
