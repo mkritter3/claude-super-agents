@@ -18,13 +18,35 @@ class TaskOrchestrator:
         
         # State transitions
         self.transitions = {
+            # Original backend-focused workflow
             "CREATED": ("pm-agent", "PLANNING"),
             "PLANNING": ("architect-agent", "DESIGNING"),
             "DESIGNING": ("developer-agent", "IMPLEMENTING"),
             "IMPLEMENTING": ("reviewer-agent", "REVIEWING"),
-            "REVIEWING": ("qa-agent", "TESTING"),
+            "REVIEWING": ("test-executor", "TESTING"),
             "TESTING": ("integrator-agent", "INTEGRATING"),
-            "INTEGRATING": (None, "COMPLETED")
+            "INTEGRATING": (None, "COMPLETED"),
+            
+            # Full-stack workflow transitions
+            "PRODUCT_PLANNING": ("product-agent", "UX_DESIGN"),
+            "UX_DESIGN": ("ux-agent", "ARCHITECTURE"),
+            "ARCHITECTURE": ("architect-agent", "FRONTEND_DEV"),
+            "FRONTEND_DEV": ("frontend-agent", "BACKEND_DEV"),
+            "BACKEND_DEV": ("developer-agent", "DATABASE_DESIGN"),
+            "DATABASE_DESIGN": ("database-agent", "SECURITY_REVIEW"),
+            "SECURITY_REVIEW": ("security-agent", "TESTING"),
+            "DEVOPS_PREP": ("devops-agent", "INTEGRATION"),
+            "INTEGRATION": ("integrator-agent", "COMPLETED"),
+            
+            # Specialized workflows
+            "FRONTEND_ONLY": ("frontend-agent", "UX_VALIDATION"),
+            "UX_VALIDATION": ("ux-agent", "TESTING"),
+            "DATABASE_ONLY": ("database-agent", "MIGRATION_PLANNING"),
+            "MIGRATION_PLANNING": ("data-migration-agent", "TESTING"),
+            "SECURITY_ONLY": ("security-agent", "COMPLIANCE_CHECK"),
+            "COMPLIANCE_CHECK": ("contract-guardian", "COMPLETED"),
+            "DEVOPS_ONLY": ("devops-agent", "MONITORING_SETUP"),
+            "MONITORING_SETUP": ("monitoring-agent", "COMPLETED")
         }
     
     def load_snapshots(self) -> Dict[str, Dict]:

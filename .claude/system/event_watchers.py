@@ -33,7 +33,7 @@ class AmbientEventWatcher:
     TRIGGER_RULES = {
         "CODE_MERGED": ["monitoring-agent", "documentation-agent", "test-executor"],
         "CODE_COMMITTED": ["monitoring-agent", "documentation-agent", "test-executor"],
-        "SCHEMA_CHANGED": ["data-migration-agent", "contract-guardian"],
+        "SCHEMA_CHANGED": ["data-migration-agent", "database-agent", "contract-guardian"],
         "API_CONTRACT_CHANGED": ["contract-guardian", "monitoring-agent", "documentation-agent"],
         "CONTRACT_CHANGES_DETECTED": ["contract-guardian"],
         "CODE_CHANGES_NEED_TESTING": ["test-executor"],
@@ -48,7 +48,26 @@ class AmbientEventWatcher:
         "INCIDENT_DETECTED": ["incident-response-agent"],
         "PERFORMANCE_BASELINE_NEEDED": ["performance-optimizer-agent"],
         "BREAKING_CHANGE_DETECTED": ["contract-guardian", "incident-response-agent"],
-        "SECURITY_VULNERABILITY_FOUND": ["contract-guardian", "incident-response-agent"]
+        "SECURITY_VULNERABILITY_FOUND": ["contract-guardian", "incident-response-agent"],
+        
+        # New full-stack triggers
+        "FRONTEND_CHANGED": ["frontend-agent", "ux-agent"],
+        "UX_VALIDATION_REQUIRED": ["ux-agent"],
+        "FRONTEND_REVIEW_REQUIRED": ["frontend-agent"],
+        "DATABASE_DESIGN_REVIEW": ["database-agent", "data-migration-agent"],
+        "INFRASTRUCTURE_CHANGED": ["devops-agent", "security-agent"],
+        "INFRASTRUCTURE_REVIEW": ["devops-agent"],
+        "SECURITY_AUDIT_REQUIRED": ["security-agent"],
+        "SECURITY_SENSITIVE_CHANGED": ["security-agent"],
+        "PRODUCT_REQUIREMENTS_CHANGED": ["product-agent", "ux-agent"],
+        
+        # Coordinated full-stack workflows
+        "FULL_STACK_FEATURE": ["product-agent", "architect-agent", "frontend-agent", "developer-agent"],
+        "DEPLOYMENT_PIPELINE": ["devops-agent", "security-agent", "monitoring-agent"],
+        "DATABASE_MIGRATION": ["database-agent", "data-migration-agent", "contract-guardian"],
+        "UI_COMPONENT_CHANGES": ["frontend-agent", "ux-agent", "test-executor"],
+        "SECURITY_COMPLIANCE_CHECK": ["security-agent", "contract-guardian"],
+        "PRODUCT_FEATURE_REQUEST": ["product-agent", "ux-agent", "architect-agent"]
     }
     
     def __init__(self):

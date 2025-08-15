@@ -1,0 +1,276 @@
+{
+  "test_suite": "Full-Stack Transformation",
+  "timestamp": "2025-08-14T18:33:13.134204",
+  "summary": {
+    "total_tests": 35,
+    "passed_tests": 35,
+    "failed_tests": 0,
+    "success_rate": 100.0,
+    "total_duration": 0.26423001289367676
+  },
+  "test_results": [
+    {
+      "test": "Agent file exists: frontend-agent",
+      "passed": true,
+      "details": "Found at .claude/agents/frontend-agent.md",
+      "duration": 4.887580871582031e-05,
+      "timestamp": 1755221592.8700008
+    },
+    {
+      "test": "Agent definition format: frontend-agent",
+      "passed": true,
+      "details": "All required sections present",
+      "duration": 9.489059448242188e-05,
+      "timestamp": 1755221592.8701062
+    },
+    {
+      "test": "Agent file exists: ux-agent",
+      "passed": true,
+      "details": "Found at .claude/agents/ux-agent.md",
+      "duration": 3.600120544433594e-05,
+      "timestamp": 1755221592.8701482
+    },
+    {
+      "test": "Agent definition format: ux-agent",
+      "passed": true,
+      "details": "All required sections present",
+      "duration": 6.389617919921875e-05,
+      "timestamp": 1755221592.8702168
+    },
+    {
+      "test": "Agent file exists: product-agent",
+      "passed": true,
+      "details": "Found at .claude/agents/product-agent.md",
+      "duration": 2.5272369384765625e-05,
+      "timestamp": 1755221592.870246
+    },
+    {
+      "test": "Agent definition format: product-agent",
+      "passed": true,
+      "details": "All required sections present",
+      "duration": 5.507469177246094e-05,
+      "timestamp": 1755221592.8703082
+    },
+    {
+      "test": "Agent file exists: devops-agent",
+      "passed": true,
+      "details": "Found at .claude/agents/devops-agent.md",
+      "duration": 2.288818359375e-05,
+      "timestamp": 1755221592.870336
+    },
+    {
+      "test": "Agent definition format: devops-agent",
+      "passed": true,
+      "details": "All required sections present",
+      "duration": 6.4849853515625e-05,
+      "timestamp": 1755221592.8704052
+    },
+    {
+      "test": "Agent file exists: database-agent",
+      "passed": true,
+      "details": "Found at .claude/agents/database-agent.md",
+      "duration": 2.2649765014648438e-05,
+      "timestamp": 1755221592.870431
+    },
+    {
+      "test": "Agent definition format: database-agent",
+      "passed": true,
+      "details": "All required sections present",
+      "duration": 5.817413330078125e-05,
+      "timestamp": 1755221592.870493
+    },
+    {
+      "test": "Agent file exists: security-agent",
+      "passed": true,
+      "details": "Found at .claude/agents/security-agent.md",
+      "duration": 2.3126602172851562e-05,
+      "timestamp": 1755221592.870519
+    },
+    {
+      "test": "Agent definition format: security-agent",
+      "passed": true,
+      "details": "All required sections present",
+      "duration": 7.700920104980469e-05,
+      "timestamp": 1755221592.8706
+    },
+    {
+      "test": "Trigger pattern: test.tsx",
+      "passed": true,
+      "details": "Expected agents: frontend-agent, ux-agent",
+      "duration": 0.01558232307434082,
+      "timestamp": 1755221592.8862212
+    },
+    {
+      "test": "Trigger pattern: component.jsx",
+      "passed": true,
+      "details": "Expected agents: frontend-agent, ux-agent",
+      "duration": 0.014948129653930664,
+      "timestamp": 1755221592.9013708
+    },
+    {
+      "test": "Trigger pattern: styles.scss",
+      "passed": true,
+      "details": "Expected agents: frontend-agent, ux-agent",
+      "duration": 0.01563286781311035,
+      "timestamp": 1755221592.9172359
+    },
+    {
+      "test": "Trigger pattern: schema.sql",
+      "passed": true,
+      "details": "Expected agents: database-agent, data-migration-agent, contract-guardian",
+      "duration": 0.014732122421264648,
+      "timestamp": 1755221592.9321759
+    },
+    {
+      "test": "Trigger pattern: migration.sql",
+      "passed": true,
+      "details": "Expected agents: database-agent, data-migration-agent, contract-guardian",
+      "duration": 0.014935970306396484,
+      "timestamp": 1755221592.9473212
+    },
+    {
+      "test": "Trigger pattern: model.prisma",
+      "passed": true,
+      "details": "Expected agents: database-agent, data-migration-agent, contract-guardian",
+      "duration": 0.015366792678833008,
+      "timestamp": 1755221592.962899
+    },
+    {
+      "test": "Trigger pattern: Dockerfile",
+      "passed": true,
+      "details": "Expected agents: devops-agent, security-agent",
+      "duration": 0.015928983688354492,
+      "timestamp": 1755221592.9790468
+    },
+    {
+      "test": "Trigger pattern: docker-compose.yml",
+      "passed": true,
+      "details": "Expected agents: devops-agent, security-agent",
+      "duration": 0.0163729190826416,
+      "timestamp": 1755221592.995641
+    },
+    {
+      "test": "Trigger pattern: deploy.tf",
+      "passed": true,
+      "details": "Expected agents: devops-agent, security-agent",
+      "duration": 0.015699148178100586,
+      "timestamp": 1755221593.011565
+    },
+    {
+      "test": "Trigger pattern: .env.example",
+      "passed": true,
+      "details": "Expected agents: security-agent",
+      "duration": 0.016461849212646484,
+      "timestamp": 1755221593.02828
+    },
+    {
+      "test": "Trigger pattern: auth.config.js",
+      "passed": true,
+      "details": "Expected agents: security-agent",
+      "duration": 0.017139911651611328,
+      "timestamp": 1755221593.0456681
+    },
+    {
+      "test": "Trigger pattern: ssl.cert",
+      "passed": true,
+      "details": "Expected agents: security-agent",
+      "duration": 0.016443967819213867,
+      "timestamp": 1755221593.062342
+    },
+    {
+      "test": "Trigger pattern: requirements.md",
+      "passed": true,
+      "details": "Expected agents: product-agent, ux-agent",
+      "duration": 0.01553797721862793,
+      "timestamp": 1755221593.078086
+    },
+    {
+      "test": "Trigger pattern: user-stories.md",
+      "passed": true,
+      "details": "Expected agents: product-agent, ux-agent",
+      "duration": 0.016614913940429688,
+      "timestamp": 1755221593.09493
+    },
+    {
+      "test": "Trigger pattern: features.json",
+      "passed": true,
+      "details": "Expected agents: product-agent, ux-agent",
+      "duration": 0.015362977981567383,
+      "timestamp": 1755221593.110512
+    },
+    {
+      "test": "Orchestrator state transitions",
+      "passed": true,
+      "details": "All 6 new transitions present",
+      "duration": 0.0009429454803466797,
+      "timestamp": 1755221593.1119528
+    },
+    {
+      "test": "Workflow coordinator creation",
+      "passed": true,
+      "details": "FullStackCoordinator instantiated successfully",
+      "duration": 0.0006132125854492188,
+      "timestamp": 1755221593.112582
+    },
+    {
+      "test": "Workflow definitions",
+      "passed": true,
+      "details": "All 3 workflows defined",
+      "duration": 2.1457672119140625e-06,
+      "timestamp": 1755221593.112588
+    },
+    {
+      "test": "Workflow initiation",
+      "passed": true,
+      "details": "Created workflow: workflow_TEST-001_1755221593",
+      "duration": 0.001622915267944336,
+      "timestamp": 1755221593.114219
+    },
+    {
+      "test": "Agent count verification",
+      "passed": true,
+      "details": "Found 23 agents (expected 23)",
+      "duration": 0.0004899501800537109,
+      "timestamp": 1755221593.114728
+    },
+    {
+      "test": "Event watcher integration",
+      "passed": true,
+      "details": "All 6 new trigger rules present",
+      "duration": 0.010154962539672852,
+      "timestamp": 1755221593.124896
+    },
+    {
+      "test": "System initialization performance",
+      "passed": true,
+      "details": "Initialized in 0.00s (under 5s target)",
+      "duration": 0.0006341934204101562,
+      "timestamp": 1755221593.12556
+    },
+    {
+      "test": "Memory usage",
+      "passed": true,
+      "details": "Using 23.9MB (under 512MB)",
+      "duration": 0.008508920669555664,
+      "timestamp": 1755221593.134083
+    }
+  ],
+  "system_info": {
+    "agent_count": 23,
+    "new_agents": [
+      "frontend-agent",
+      "ux-agent",
+      "product-agent",
+      "devops-agent",
+      "database-agent",
+      "security-agent"
+    ],
+    "test_patterns": [
+      "frontend",
+      "database",
+      "devops",
+      "security",
+      "product"
+    ]
+  }
+}
