@@ -30,115 +30,65 @@ Before installing, make sure you have:
 3. **Claude Code** (optional but recommended)
    - Download from Anthropic if you have access
 
-## 🚀 Super Simple Installation
-
-### Step 1: Download This Project
-
-Open Terminal (Mac/Linux) or Command Prompt (Windows) and run:
+## 🚀 One-Command Installation
 
 ```bash
-# Go to your home directory
-cd ~
-
-# Download the project
+# Clone and install
 git clone https://github.com/yourusername/super-agents.git
-
-# Enter the project folder
 cd super-agents
+pip install -e .
 ```
 
-### Step 2: Install Python Dependencies
-
-```bash
-# Install the required libraries
-python3 -m pip install requests flask
-
-# That's it for dependencies!
-```
-
-### Step 3: Install Super-Agents
-
-```bash
-# Go back to the super-agents folder
-cd ~/super-agents
-
-# Install super-agents globally
-./install.sh
-```
-
-When it asks for your password (sudo), enter your computer's login password.
-
-### Step 4: Verify Installation
-
-```bash
-# Check if it worked
-super-agents help
-```
+That's it! No sudo, no complex setup, no dependency management needed.
 
 ## 🎯 How to Use It
 
-### Setting Up a Project (Do This Once Per Project)
+### Initialize Any Project (One Command)
 
-1. Go to your project folder:
-   ```bash
-   cd /path/to/your/project
-   ```
+```bash
+cd /path/to/your/project
+super-agents init
+```
 
-2. Set up the AI agents:
-   ```bash
-   super-agents
-   ```
-   
-   This creates a `.claude/` folder with everything needed.
+This sets up the complete AET system with 23 agents in your project.
 
-3. Start the Knowledge Manager server:
-   ```bash
-   super-agents start
-   ```
+### Launch Claude with AET Agents
 
-4. Check if it's working:
-   ```bash
-   super-agents status
-   ```
+```bash
+super-agents
+```
 
-### Daily Use
+This starts the Knowledge Manager and launches Claude Code with all agents ready.
 
-Once set up:
-1. Start the server when you begin work: `super-agents start`
-2. Open Claude Code in that project
-3. The AI agents work automatically when you make git commits
-4. Stop the server when done: `super-agents stop`
+### Daily Workflow
+
+1. **Initialize once per project**: `super-agents init`
+2. **Start when coding**: `super-agents` (launches Claude)
+3. **Agents work automatically** when you make git commits
+4. **Stop when done**: `super-agents stop`
 
 ## 🛠️ Troubleshooting
 
 ### "command not found"
 
-If you get "command not found" errors:
+If `super-agents` command not found:
 
-1. Make sure you reopened Terminal after installation
-2. Check if it's in /usr/local/bin:
-   ```bash
-   ls -la /usr/local/bin/super-agents
-   ```
-3. Try running with full path:
-   ```bash
-   /usr/local/bin/super-agents help
-   ```
-
-### "No module named requests"
-
-Install the requests library:
 ```bash
-python3 -m pip install requests
+# Make sure you're in the right directory
+cd super-agents
+pip install -e .
+
+# Or check where it was installed
+pip show super-agents
 ```
 
-### "Permission denied"
+### Missing Dependencies
 
-Make files executable:
-```bash
-chmod +x ~/super-agents/install.sh
-chmod +x ~/super-agents/super-agents
-```
+All dependencies are automatically installed with `pip install -e .`
+
+### Permission Issues
+
+No sudo needed! The new system installs to your user directory only.
 
 ### Can't find the project
 

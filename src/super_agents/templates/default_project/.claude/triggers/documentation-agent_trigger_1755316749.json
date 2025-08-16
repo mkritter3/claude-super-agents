@@ -1,0 +1,21 @@
+{
+  "agent": "documentation-agent", 
+  "trigger_event": {
+    "type": "CODE_COMMITTED",
+    "commit": "0363a7e5fee52578d4cab7b9f0ff12810ed83d6c",
+    "files_changed": [".claude/triggers/documentation-agent_trigger_1755316409.json",".claude/triggers/performance-optimizer-agent_trigger_1755316409.json",".claude/triggers/product-agent_trigger_1755316409.json",".claude/triggers/test-executor_trigger_1755316409.json","src/super_agents/cli.py"]
+  },
+  "context": {
+    "commit_message": "Add robustness improvements to CLI
+
+- Add error handling for agent listing
+- Check if claude command exists before launching
+- Provide helpful error message if Claude Code not installed
+- Add shutil import for which() function",
+    "changed_files": [".claude/triggers/documentation-agent_trigger_1755316409.json",".claude/triggers/performance-optimizer-agent_trigger_1755316409.json",".claude/triggers/product-agent_trigger_1755316409.json",".claude/triggers/test-executor_trigger_1755316409.json","src/super_agents/cli.py"],
+    "documentation_trigger": "code_changes_detected"
+  },
+  "created_at": "2025-08-15T20:59:09-07:00",
+  "priority": "low",
+  "automation_level": "full"
+}

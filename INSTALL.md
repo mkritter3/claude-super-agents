@@ -1,38 +1,44 @@
-# Installation Guide
+# Super Agents Installation
+
+## Quick Install (One Command)
+
+```bash
+pip install -e .
+```
 
 ## Prerequisites
 
-- Python 3.8 or higher
-- pip (Python package manager)
-- Git (for development installation)
+- Python 3.8+
+- Git (for autonomous operations)  
+- Claude Code (optional but recommended)
 
-## Recommended Installation Methods
+## Installation Steps
 
-### Method 1: User Installation (Recommended)
+1. **Clone and install:**
+   ```bash
+   git clone https://github.com/yourusername/super-agents.git
+   cd super-agents
+   pip install -e .
+   ```
 
-Install super-agents for your user account without requiring administrator privileges:
+2. **Initialize any project:**
+   ```bash
+   cd /path/to/your/project
+   super-agents init
+   ```
 
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/super-agents.git
-cd super-agents
+3. **Start the system:**
+   ```bash
+   super-agents
+   ```
+   This launches Claude Code with all 23 AET agents ready to go!
 
-# Install for current user
-pip install .
-```
+## What You Get
 
-This installs the package to `~/.local/` on Linux/macOS or `%APPDATA%\Python` on Windows.
-
-**Note:** You may need to add `~/.local/bin` to your PATH:
-```bash
-# For bash
-echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
-source ~/.bashrc
-
-# For zsh (macOS default)
-echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
-source ~/.zshrc
-```
+- ✅ **23 Specialized Agents** - Complete autonomous engineering team
+- ✅ **Local Knowledge Manager** - Per-project isolation with dynamic ports
+- ✅ **Event System** - Full autonomous operations with git hooks
+- ✅ **Claude Code Integration** - Seamless AI-powered development
 
 ### Method 2: Virtual Environment (Best Practice)
 

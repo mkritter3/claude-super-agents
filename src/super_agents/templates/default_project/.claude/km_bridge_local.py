@@ -1,64 +1,30 @@
 #!/usr/bin/env python3
-"""
-Simple Knowledge Manager MCP Bridge
-Just looks for a local KM server in the current directory
-"""
-
 import sys
 import json
 import os
 import requests
 from typing import Dict, Any
 
-class KMBridge:
+class LocalKMBridge:
     def __init__(self):
-        # Look for local server port file
-        port_file = "./.claude/km_server/port"
-        
-        if os.path.exists(port_file):
-            try:
-                with open(port_file, 'r') as f:
-                    port = int(f.read().strip())
+        config_file = os.path.join(os.path.dirname(__file__), "mcp_config.json")
+        if os.path.exists(config_file):
+            with open(config_file) as f:
+                config = json.load(f)
+                port = config.get("local_km_port", 5002)
                 self.base_url = f"http://localhost:{port}"
                 self.session = requests.Session()
-                
-                # Quick health check
-                response = self.session.get(f"{self.base_url}/health", timeout=1)
-                if response.status_code == 200:
-                    data = response.json()
-                    if data.get("service") == "knowledge-manager":
-                        sys.stderr.write(f"✓ Connected to local KM server on port {port}\n")
-                        sys.stderr.flush()
-                        return
-            except Exception as e:
-                sys.stderr.write(f"Local KM server not responding: {e}\n")
+                sys.stderr.write(f"✓ Connected to local KM on port {port}\n")
                 sys.stderr.flush()
-        
-        # No local server found
-        sys.stderr.write("✗ No local KM server found in ./.claude/km_server/\n")
-        sys.stderr.write("Run 'super-agents --wild' in this directory to start one\n")
-        sys.stderr.flush()
-        self.base_url = None
-        self.session = None
+        else:
+            sys.stderr.write("✗ No local KM config found\n")
+            sys.stderr.flush()
+            self.base_url = None
+            self.session = None
     
     def handle_request(self, request: Dict[str, Any]) -> Dict[str, Any]:
-        """Process JSON-RPC request and return response"""
-        
-        # If no server, return error for all requests except initialize
         if not self.base_url:
-            if request.get("method") == "initialize":
-                return {
-                    "protocolVersion": "1.0.0",
-                    "serverName": "knowledge-manager",
-                    "capabilities": {"tools": False},
-                    "error": "No local KM server running"
-                }
-            return {
-                "error": {
-                    "code": -32000,
-                    "message": "No local KM server. Run 'super-agents --wild' in project directory"
-                }
-            }
+            return {"error": {"code": -32000, "message": "No local KM server"}}
         
         try:
             method = request.get("method", "")
@@ -66,7 +32,7 @@ class KMBridge:
             if method == "initialize":
                 return {
                     "protocolVersion": "1.0.0",
-                    "serverName": "knowledge-manager",
+                    "serverName": "knowledge-manager-local",
                     "capabilities": {"tools": True}
                 }
             
@@ -82,7 +48,6 @@ class KMBridge:
                         "description": tool.get("description", ""),
                         "parameters": tool.get("parameters", [])
                     })
-                
                 return {"tools": tools}
             
             elif method == "tools/call":
@@ -113,25 +78,12 @@ class KMBridge:
                 }
             
             else:
-                return {
-                    "error": {
-                        "code": -32601,
-                        "message": f"Method not found: {method}"
-                    }
-                }
+                return {"error": {"code": -32601, "message": f"Method not found: {method}"}}
                 
         except Exception as e:
-            return {
-                "error": {
-                    "code": -32603,
-                    "message": f"Internal error: {str(e)}"
-                }
-            }
+            return {"error": {"code": -32603, "message": f"Internal error: {str(e)}"}}
     
     def run(self):
-        """Main loop: read stdin, process, write stdout"""
-        
-        # Process requests
         for line in sys.stdin:
             try:
                 request = json.loads(line.strip())
@@ -153,10 +105,7 @@ class KMBridge:
             except json.JSONDecodeError as e:
                 error_response = {
                     "jsonrpc": "2.0",
-                    "error": {
-                        "code": -32700,
-                        "message": f"Parse error: {str(e)}"
-                    }
+                    "error": {"code": -32700, "message": f"Parse error: {str(e)}"}
                 }
                 sys.stdout.write(json.dumps(error_response) + "\n")
                 sys.stdout.flush()
@@ -165,5 +114,5 @@ class KMBridge:
                 sys.stderr.flush()
 
 if __name__ == "__main__":
-    bridge = KMBridge()
+    bridge = LocalKMBridge()
     bridge.run()
