@@ -34,13 +34,26 @@ class LocalKMBridge:
                 port = config.get("local_km_port", 5002)
                 self.base_url = f"http://localhost:{port}"
                 self.session = requests.Session()
-                logging.info(f"Successfully connected to local KM on port {port}")
-                sys.stderr.write(f"✓ Connected to local KM on port {port}\n")
-                sys.stderr.flush()
+                
+                # Test connection before declaring success
+                try:
+                    response = self.session.get(f"{self.base_url}/health", timeout=5)
+                    if response.status_code == 200:
+                        logging.info(f"Successfully connected to local KM on port {port}")
+                        self.connection_status = "ready"
+                    else:
+                        logging.error(f"KM health check failed with status {response.status_code}")
+                        self.connection_status = "failed"
+                        self.base_url = None
+                        self.session = None
+                except Exception as e:
+                    logging.error(f"Failed to connect to KM on port {port}: {e}")
+                    self.connection_status = "failed"
+                    self.base_url = None
+                    self.session = None
         else:
             logging.error("Config file NOT found. This is likely the cause of the failure.")
-            sys.stderr.write("✗ No local KM config found\n")
-            sys.stderr.flush()
+            self.connection_status = "no_config"
             self.base_url = None
             self.session = None
     
@@ -52,10 +65,21 @@ class LocalKMBridge:
             method = request.get("method", "")
             
             if method == "initialize":
+                # Report connection status in server info
+                status_info = f"KM Bridge ({self.connection_status})"
+                if self.connection_status == "ready":
+                    status_info += f" - Connected to {self.base_url}"
+                
                 return {
-                    "protocolVersion": "1.0.0",
-                    "serverName": "knowledge-manager-local",
-                    "capabilities": {"tools": True}
+                    "protocolVersion": "2024-11-05",
+                    "capabilities": {
+                        "tools": {"listChanged": True} if self.base_url else {}
+                    },
+                    "serverInfo": {
+                        "name": "knowledge-manager-local",
+                        "version": "1.0.0",
+                        "status": status_info
+                    }
                 }
             
             elif method == "tools/list":
