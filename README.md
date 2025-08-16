@@ -2,6 +2,18 @@
 
 Transform Claude Code into an autonomous engineering team with 23 specialized AI agents.
 
+## ⚡ Quick Local Setup (Recommended)
+
+Each project gets its own isolated AET system. No complexity.
+
+```bash
+# In any project directory:
+./super-agents-local        # Setup local AET
+./super-agents-local status # Check status
+```
+
+Install globally: `./install.sh`
+
 ## Quick Install
 
 ```bash
