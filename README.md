@@ -1,402 +1,379 @@
-# Claude Super-Agents 🤖 - Autonomous Engineering Team
-
-**Transform Claude Code into a fully autonomous engineering team with 17 specialized AI agents, autonomous operations, and comprehensive safety nets**
+# Super-Agents 🤖 - Autonomous Engineering Team
 
 [![GitHub](https://img.shields.io/github/license/mkritter3/claude-super-agents)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.8%2B-blue)](https://python.org)
+[![Version](https://img.shields.io/badge/version-1.0.0-green)](https://github.com/mkritter3/claude-super-agents)
 
-## 🌟 What is Claude Super-Agents?
+**Transform Claude Code into a fully autonomous engineering team with 23 specialized AI agents, autonomous operations, and comprehensive safety nets**
 
-Claude Super-Agents (AET - Autonomous Engineering Team) is a **production-ready autonomous engineering system** that transforms Claude Code into a complete software engineering organization. It features 23 specialized AI agents, autonomous operations through git hooks, comprehensive safety nets, and true autonomous intelligence that works **without constant human supervision**.
+## 🚀 Quick Start
 
-### 🎯 **Core Innovation: True Autonomy**
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/super-agents.git
+cd super-agents
+
+# Install globally (one-time setup)
+./install.sh
+
+# Now use from ANY directory!
+cd ~/my-project
+super-agents              # Auto-init + launch Claude with agents
+super-agents --wild       # Launch with --dangerously-skip-permissions
+```
+
+## 🌟 What is Super-Agents?
+
+Super-Agents (AET - Autonomous Engineering Team) is a **production-ready autonomous engineering system** that transforms Claude Code into a complete software engineering organization. It features:
+
+- **23 Specialized AI Agents** - Complete engineering team coverage
+- **True Autonomous Operations** - Works without constant supervision
+- **Universal Portability** - Install once, use anywhere
+- **Comprehensive Safety Nets** - Prevents production issues automatically
+- **Dynamic Multi-Project Support** - Run multiple projects simultaneously
+
+### 🎯 Core Innovation: True Autonomy
 
 Unlike traditional automation, this system achieves **true autonomy** through:
-- **File System as Message Bus**: Agents communicate through structured file events
-- **Hooks as Daemon Substitutes**: Git hooks trigger autonomous operations
-- **Natural Language as Control Plane**: AI translates technical events into actionable prompts
+- **File System as Message Bus** - Agents communicate through structured events
+- **Git Hooks as Daemon Substitutes** - Autonomous triggers without background services
+- **Natural Language Control Plane** - AI translates technical events into actions
 
-## 🚀 **Three Operational Modes Working Simultaneously**
+## 📦 Installation
+
+### One-Time Global Installation
+
+```bash
+# Clone and install
+git clone https://github.com/yourusername/super-agents.git
+cd super-agents
+./install.sh
+
+# Choose installation type:
+# 1. Global (recommended) - Available system-wide
+# 2. User - No sudo required, installs in ~/.local/bin
+# 3. Development - For contributors
+```
+
+### Requirements
+
+- Python 3.8 or higher
+- pip package manager
+- Git (for autonomous operations)
+
+## 🎮 Usage
+
+Once installed, `super-agents` works from ANY directory:
+
+### Basic Commands
+
+```bash
+# Initialize a new project
+super-agents init
+
+# Launch Claude with agents
+super-agents
+
+# Launch in wild mode (skip permissions)
+super-agents --wild
+
+# Upgrade existing project
+super-agents upgrade
+```
+
+### Management Commands
+
+```bash
+super-agents status       # Show project status
+super-agents stop         # Stop Knowledge Manager
+super-agents list         # List all running instances
+super-agents --help       # Show all commands
+```
+
+### Advanced Commands
+
+```bash
+super-agents recover      # Run error recovery
+super-agents monitor      # Monitor process health
+super-agents validate     # Validate system integrity
+super-agents security     # Security audit
+super-agents optimize     # Model optimization
+super-agents parallel     # Start parallel executor
+```
+
+## 🤖 Three Operational Modes (Working Simultaneously)
 
 ### 1. **Explicit Mode** - User asks → agents respond
 ```bash
-user: "Deploy the user service"
+user: "Build user authentication with OAuth2"
 → pm-agent plans → architect-agent designs → developer-agent implements
 ```
 
 ### 2. **Implicit Mode** - User acts → agents infer needs  
 ```bash
 user: git commit -m "Fix authentication bug"
-→ Hooks detect code changes → test-executor runs tests → documentation-agent updates docs
+→ Hooks trigger → test-executor runs tests → documentation-agent updates docs
 ```
 
 ### 3. **Ambient Mode** - System self-monitors → self-heals
 ```bash
-Error rate spike detected → incident-response-agent investigates → Auto-rollback if needed
+Error rate spike detected
+→ incident-response-agent investigates → Auto-rollback if needed
 ```
 
-## 🛡️ **Autonomous Safety Net**
+## 🛡️ Autonomous Safety Net
 
-The system includes **6 operational agents** that work autonomously to prevent production issues:
+Six operational agents work autonomously to prevent issues:
 
-- **🔒 contract-guardian**: Prevents API/schema breaking changes before they reach production
-- **🧪 test-executor**: Automatic quality gates and test execution  
-- **📊 monitoring-agent**: Auto-configures observability for deployments
-- **📚 documentation-agent**: Maintains documentation automatically
-- **🔄 data-migration-agent**: Safe schema evolution and migrations
-- **⚡ performance-optimizer-agent**: Continuous performance analysis
+| Agent | Role | Priority |
+|-------|------|----------|
+| 🔒 **contract-guardian** | Prevents API/schema breaking changes | CRITICAL |
+| 🧪 **test-executor** | Automatic quality gates and testing | HIGH |
+| 📊 **monitoring-agent** | Auto-configures observability | HIGH |
+| 📚 **documentation-agent** | Maintains documentation automatically | MEDIUM |
+| 🔄 **data-migration-agent** | Safe schema evolution | HIGH |
+| ⚡ **performance-optimizer** | Continuous performance analysis | MEDIUM |
 
-## 🤖 **Complete Agent Team (23 Specialists)**
+## 👥 Complete Agent Team (23 Specialists)
 
-### **Core Engineering Agents**
-| Agent | Model | Responsibility |
-|-------|-------|----------------|
-| **pm-agent** | Sonnet | Project planning and task decomposition |
-| **architect-agent** | Sonnet | System design and technical architecture |
-| **developer-agent** | Sonnet | Code implementation |
-| **reviewer-agent** | Sonnet | Code review and quality assurance |
-| **integrator-agent** | Sonnet | Safe merging and integration |
+### Core Engineering Agents
+- **pm-agent** - Project planning and task decomposition
+- **architect-agent** - System design and technical architecture
+- **developer-agent** - Code implementation
+- **reviewer-agent** - Code review and quality assurance
+- **integrator-agent** - Safe merging and integration
 
-### **Operational Agents (Autonomous)**
-| Agent | Model | Triggers | Purpose |
-|-------|-------|----------|---------|
-| **contract-guardian** | Sonnet | Schema/API changes | Prevent breaking changes |
-| **test-executor** | Sonnet | Code commits | Quality gate automation |
-| **monitoring-agent** | Sonnet | Deployments | Auto-observability setup |
-| **documentation-agent** | Sonnet | Code changes | Maintain documentation |
-| **data-migration-agent** | Sonnet | Schema changes | Safe data evolution |
-| **performance-optimizer-agent** | Sonnet | Performance issues | Continuous optimization |
-| **incident-response-agent** | Haiku | Error spikes | Autonomous incident handling |
+### Operational Agents (Autonomous)
+- **contract-guardian** - API/schema protection
+- **test-executor** - Quality gates
+- **monitoring-agent** - Observability setup
+- **documentation-agent** - Documentation maintenance
+- **data-migration-agent** - Schema migrations
+- **performance-optimizer-agent** - Performance tuning
+- **incident-response-agent** - Incident handling
 
-### **Infrastructure Agents**
-| Agent | Model | Responsibility |
-|-------|-------|----------------|
-| **builder-agent** | Sonnet | AET system implementation |
-| **dependency-agent** | Sonnet | Package and dependency management |
-| **filesystem-guardian** | Haiku | Security and path validation |
-| **integration-tester** | Haiku | Cross-package testing |
-| **verifier-agent** | Haiku | Consistency auditing |
+### Infrastructure Agents
+- **builder-agent** - AET system implementation
+- **dependency-agent** - Package management
+- **filesystem-guardian** - Security validation
+- **integration-tester** - Cross-package testing
+- **verifier-agent** - Consistency auditing
 
-### **Full-Stack Development Agents**
-| Agent | Model | Responsibility |
-|-------|-------|----------------|
-| **frontend-agent** | Sonnet | React/Vue/Angular UI implementation, component libraries |
-| **ux-agent** | Sonnet | User experience design, accessibility, responsive design |
-| **product-agent** | Sonnet | Product strategy, feature prioritization, requirements |
-| **devops-agent** | Sonnet | Cloud infrastructure, CI/CD pipelines, deployment automation |
-| **database-agent** | Sonnet | Database architecture, schema design, query optimization |
-| **security-agent** | Sonnet | Security audits, penetration testing, compliance validation |
+### Full-Stack Development Agents
+- **frontend-agent** - UI/UX implementation
+- **ux-agent** - User experience design
+- **product-agent** - Product strategy
+- **devops-agent** - Infrastructure automation
+- **database-agent** - Database architecture
+- **security-agent** - Security auditing
 
-## 🏗️ **Autonomous Architecture**
+## 🔒 Safety Features
 
-### **Event-Sourced Core**
+### File Protection
+- Never silently overwrites existing files
+- Prompts with options: backup, skip, or cancel
+- Timestamped backups during upgrades
+
+### Manifest Tracking
+- `.super_agents_manifest.json` tracks all created files
+- Enables safe upgrades and clean uninstalls
+- Preserves user configurations
+
+### Pre-commit Security
+- Automatic secret detection (only blocking hook)
+- Prevents commits with API keys, passwords, credentials
+- Clear error messages with actionable fixes
+
+## 🌍 Universal Portability
+
+### How It Works
+1. **Package Distribution** - All files bundled in Python package
+2. **Template System** - Uses `importlib.resources` for file access
+3. **Dynamic Ports** - Each project gets unique port (5001-5100)
+4. **Manifest Tracking** - Safe upgrades with file tracking
+
+### Cross-Platform Support
+- ✅ macOS (11.0+)
+- ✅ Ubuntu (20.04+)
+- ✅ Windows (with WSL)
+- ✅ Any Unix-like system with Python
+
+## 📊 Architecture
+
+### System Structure
 ```
-Event Stream (.claude/events/log.ndjson)
-├── All agent actions logged immutably
-├── Complete audit trail and replay capability  
-└── State recovery from any point in time
-
-File System Message Bus
-├── .claude/triggers/ → Agent trigger files
-├── .claude/state/ → Shared operational state
-└── .claude/ambient/ → Continuous monitoring state
+super-agents/
+├── src/super_agents/       # Python package
+│   ├── cli.py             # Main CLI (Click-based)
+│   ├── commands/          # Command implementations
+│   └── templates/         # Bundled agent files
+├── .claude/               # Agent system (copied to projects)
+│   ├── agents/           # 23 agent definitions
+│   ├── system/           # Core Python systems
+│   └── hooks/            # Git hooks for autonomy
+└── install.sh            # Installation script
 ```
 
-### **Autonomous Integration Points**
+### Autonomous Trigger System
 ```
-Git Hooks (Daemon Substitutes)
-├── pre-commit → Secret detection (security)
-├── post-commit → Operational triggers (quality/docs/monitoring)
-└── post-merge → Deployment readiness validation
-
-Ambient Operations Framework
-├── 8 intelligent rules for self-monitoring
-├── Performance degradation detection
-└── Error spike response automation
-
-Claude Bridge (Natural Language Control)
-├── Technical event → Natural language translation
-├── Operational context injection
-└── Proactive prompt generation
+Git Operation → Hook Activation → Event Creation → Agent Trigger → Action
 ```
 
-## 🚀 **Quick Install & Usage**
+Example flow:
+1. User: `git commit -m "Add user model"`
+2. Hook: Detects Python file changes
+3. Event: Creates test trigger
+4. Agent: test-executor runs tests
+5. Result: Quality gate enforced
 
-### **Option 1: Global Command (Recommended)**
+## 🔧 Advanced Features
+
+### Multi-Project Support
+```bash
+# Project A on port 5001
+cd ~/project-a
+super-agents  # Starts on 5001
+
+# Project B on port 5002
+cd ~/project-b
+super-agents  # Starts on 5002
+
+# List all running projects
+super-agents list
+```
+
+### Parallel Processing (Phase 1.1)
+```bash
+# Start parallel executor
+super-agents parallel
+
+# Submit tasks
+super-agents submit developer-agent:implement_auth
+super-agents submit test-executor:run_tests
+
+# Check status
+super-agents queue-stats
+```
+
+### Context7 Integration
+- Automatic library documentation fetching
+- Current patterns and best practices
+- Integrated with Task delegation
+
+## 🔄 Upgrading
+
+### Package Upgrade
+```bash
+# From source
+cd super-agents
+git pull
+./install.sh
+```
+
+### Project Upgrade
+```bash
+# Upgrade specific project
+cd ~/my-project
+super-agents upgrade  # Creates backup, preserves configs
+```
+
+## 🗑️ Uninstallation
 
 ```bash
-# Clone and install globally
-git clone https://github.com/mkritter3/claude-super-agents.git
-cd claude-super-agents
-sudo ./install-global.sh
+# Complete uninstall
+cd super-agents
+./uninstall.sh
 
-# Use from ANY project directory
-super-agents              # Sets up agents and autonomous operations
-super-agents --upgrade    # Upgrade existing installation
-super-agents --help       # Show all options
+# Manual uninstall
+pip uninstall super-agents
+rm ~/.super-agents-config  # Optional
 ```
 
-### **Option 2: Project-Specific Setup**
+## 🤝 Contributing
 
+### Development Setup
 ```bash
-# Clone into your project
-git clone https://github.com/mkritter3/claude-super-agents.git
-cd claude-super-agents
+# Clone repo
+git clone https://github.com/yourusername/super-agents.git
+cd super-agents
 
-# Setup and start
-./setup.sh              # Install dependencies and configure
-./start.sh              # Start autonomous operations
-./.claude/hooks/install-hooks.sh  # Install git hooks for autonomy
+# Install in development mode
+./install.sh  # Choose option 3
+
+# Make changes - they reflect immediately!
 ```
 
-## 🎯 **Usage Examples**
+### Adding New Agents
+1. Add agent file to `src/super_agents/templates/default_project/.claude/agents/`
+2. Update agent count checks if needed
+3. Test with `super-agents init` in a new directory
 
-### **Explicit Mode: Direct Task Management**
+## 📈 Roadmap
+
+### Phase 1: Foundation ✅
+- [x] 23 specialized agents
+- [x] Autonomous operations
+- [x] Universal portability
+- [x] Safety nets
+
+### Phase 2: Enhancement (In Progress)
+- [ ] PyPI publishing for `pip install super-agents`
+- [ ] Cloud sync for configurations
+- [ ] Web UI dashboard
+- [ ] Agent marketplace
+
+### Phase 3: Scale
+- [ ] Distributed agent execution
+- [ ] Cloud-native deployment
+- [ ] Enterprise features
+- [ ] Custom agent SDK
+
+## 🆘 Troubleshooting
+
+### Command Not Found
 ```bash
-# Create complex tasks
-./.claude/aet create "Build user authentication with OAuth2 and JWT"
-./.claude/aet create "Optimize database queries in payment service"
+# Check installation
+pip3 show super-agents
 
-# Process tasks
-./.claude/aet process           # Process all pending tasks
-./.claude/aet process --parallel # Parallel execution
-./.claude/aet process --simple   # Lightweight mode
-
-# Monitor
-./.claude/aet status            # System status
-./.claude/aet health            # Health monitoring
-./.claude/aet metrics           # Performance metrics
+# Add to PATH for user installs
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
 ```
 
-### **Implicit Mode: Autonomous Git Operations**
+### Port Conflicts
 ```bash
-# These git actions automatically trigger agents:
+# List all instances
+super-agents list
 
-git commit -m "Add user profile API"
-# → test-executor runs relevant tests
-# → documentation-agent updates API docs  
-# → monitoring-agent prepares observability
-
-git commit -m "ALTER TABLE users ADD COLUMN email"
-# → contract-guardian validates schema changes
-# → data-migration-agent creates migration scripts
-# → Critical safety checks prevent breaking changes
-
-git merge feature/payment-system  
-# → monitoring-agent sets up comprehensive monitoring
-# → documentation-agent updates deployment guides
-# → performance-optimizer-agent establishes baselines
+# Stop specific project
+cd project-dir
+super-agents stop
 ```
 
-### **Ambient Mode: Autonomous Self-Healing**
+### Missing Dependencies
 ```bash
-# These happen automatically without user input:
-
-# Error rate spike detected
-# → incident-response-agent investigates automatically
-# → Provides rollback recommendations if needed
-# → Updates status page and generates incident report
-
-# 5+ commits without documentation updates
-# → documentation-agent silently updates docs after 24 hours
-# → No user interruption, just keeps docs current
-
-# Performance degradation detected  
-# → performance-optimizer-agent analyzes bottlenecks
-# → Provides optimization recommendations
-# → Tracks trends and establishes new baselines
+pip3 install click rich colorama flask numpy
 ```
 
-## 🛡️ **Security & Safety Features**
+## 📚 Documentation
 
-### **Pre-commit Security (The Only Blocking Hook)**
-- **Secret Detection**: Prevents API keys, passwords, credentials from entering repository
-- **Comprehensive Patterns**: AWS keys, database URLs, JWT tokens, private keys
-- **Developer Friendly**: Clear error messages with fix suggestions
-- **Bypass Option**: `git commit --no-verify` for false positives
+- [Architecture Guide](docs/AUTONOMOUS_INTEGRATION_ARCHITECTURE.md)
+- [Implementation Roadmap](docs/IMPLEMENTATION_ROADMAP.md)
+- [Agent Specifications](docs/AGENT-UPGRADES.md)
+- [Phase Completions](docs/phase-completions/)
 
-### **Autonomous Safety Nets**
-- **Breaking Change Prevention**: contract-guardian blocks unsafe API/schema changes
-- **Quality Gates**: test-executor ensures code quality before integration
-- **Observability**: monitoring-agent auto-configures alerts and dashboards
-- **Data Safety**: data-migration-agent prevents data loss during schema changes
+## 📝 License
 
-### **Production Safeguards**
-- **Circuit Breakers**: Fault tolerance with graceful degradation
-- **Resource Management**: CPU/memory limits and intelligent queuing
-- **Rollback System**: Complete state recovery from any point
-- **Audit Trail**: Immutable event log for compliance and debugging
+MIT License - See [LICENSE](LICENSE) file for details
 
-## 🎈 **How It Works (Simple Explanation)**
+## 🙏 Acknowledgments
 
-Imagine you're managing a software company, but instead of hiring 17 different specialists, you have AI agents that work 24/7:
-
-### **The Engineering Team**
-- **🎯 Project Manager** plans your features
-- **🏗️ Architect** designs the system  
-- **👨‍💻 Developer** writes the code
-- **🔍 Code Reviewer** checks quality
-- **🧪 Tester** validates everything works
-
-### **The Operations Team (Always Working)**
-- **🛡️ Security Guard** prevents credential leaks and breaking changes
-- **📊 Monitoring Specialist** sets up alerts and dashboards automatically
-- **📚 Documentation Manager** keeps docs updated without being asked
-- **🚨 Incident Responder** handles problems automatically
-- **⚡ Performance Engineer** optimizes your code continuously
-
-### **The Magic**
-1. **You work normally** - Write code, commit changes, merge branches
-2. **Agents work automatically** - Every git action triggers helpful agents
-3. **Problems get prevented** - Safety nets catch issues before production
-4. **System self-improves** - Continuous monitoring and optimization
-5. **Everything is recorded** - Complete audit trail of all actions
-
-## 🔧 **Configuration & Customization**
-
-### **System Configuration**
-- `.claude/config.json` - System settings and model preferences
-- `CLAUDE.md` - Orchestration instructions for the current project
-- `.claude/agents/*.md` - Individual agent definitions and capabilities
-
-### **Autonomous Operations**
-- `.claude/hooks/` - Git hooks for autonomous triggers
-- `.claude/system/ambient_operations.py` - Self-monitoring rules
-- `.claude/system/event_watchers.py` - Event processing and triggers
-- `.claude/system/claude_bridge.py` - Natural language translation layer
-
-### **Customization Examples**
-```bash
-# Adjust autonomous rules
-nano .claude/system/ambient_operations.py
-
-# Modify trigger patterns  
-nano .claude/hooks/post-commit
-
-# Configure agent models
-nano .claude/agents/developer-agent.md
-```
-
-## 📊 **Cost Optimizations**
-
-### **Advanced Cost Management**
-- **70-80% cost reduction** through intelligent prompt caching
-- **Smart Model Selection**: Haiku for simple tasks, Sonnet for complex reasoning
-- **Batch Processing**: Parallel agent execution for efficiency
-- **Context Optimization**: Intelligent file loading within token budgets
-
-### **Performance Features**
-- **Extended Thinking**: 30,000-50,000 token budgets for complex reasoning
-- **Streaming Support**: Real-time feedback for long operations  
-- **Prompt Caching**: 1-hour TTL for stable agent prompts
-- **Resource Limits**: CPU/memory management prevents runaway processes
-
-## 📚 **Comprehensive Documentation**
-
-### **Architecture & Implementation**
-- [Autonomous Integration Architecture](AUTONOMOUS_INTEGRATION_ARCHITECTURE.md) - How autonomy works
-- [Operational Agents Roadmap](OPERATIONAL_AGENTS_ROADMAP.md) - Operational agent details
-- [Natural Language Triggers](NATURAL_LANGUAGE_TRIGGERS.md) - Event translation system
-- [Implementation Roadmap](IMPLEMENTATION_ROADMAP.md) - Development phases
-
-### **Technical Details**
-- [Directory Structure](DIRECTORY-STRUCTURE.md) - System organization
-- [Optimizations](OPTIMIZATIONS.md) - Performance and cost optimization
-- [Upgrade Status](UPGRADE-STATUS.md) - Current implementation status
-
-## 🧪 **Testing & Validation**
-
-### **Comprehensive Test Suites**
-```bash
-# Test autonomous operations
-python3 .claude/system/integration_test.py
-
-# Test specific components
-python3 .claude/tests/run_all_tests.py
-
-# Validate hooks system
-./.claude/hooks/install-hooks.sh  # Includes validation
-```
-
-### **Real-World Validation**
-The system includes **comprehensive integration testing** with 88.9% success rate across:
-- File system message bus functionality
-- Event watcher triggers and processing
-- Claude bridge natural language translation
-- Git hooks autonomous operation triggers
-- Ambient operations self-monitoring
-- End-to-end workflow validation
-
-## 🛠️ **Requirements**
-
-### **System Requirements**
-- **Python 3.8+** with pip
-- **Git** (hooks system requires git repository)
-- **SQLite3** (for file registry and state management)
-- **Claude Code CLI** (for agent execution)
-
-### **Python Dependencies** (auto-installed)
-```
-structlog>=23.2.0          # Structured logging
-psutil>=5.9.0              # Resource monitoring  
-prometheus-client>=0.19.0  # Metrics collection
-opentelemetry-api>=1.20.0  # Distributed tracing
-gunicorn>=21.2.0           # Production server
-```
-
-## 🎁 **What You Get**
-
-### **Immediate Benefits**
-✅ **17 AI specialists** working as your engineering team  
-✅ **Autonomous operations** that prevent production issues  
-✅ **Comprehensive safety nets** for quality and security  
-✅ **Complete audit trail** of all engineering activities  
-✅ **Production-ready architecture** with fault tolerance  
-✅ **70-80% cost savings** through intelligent optimizations  
-
-### **Long-term Value**
-🚀 **Faster development** with specialized expert agents  
-🛡️ **Higher quality** through automated review and testing  
-📈 **Better observability** with automatic monitoring setup  
-🔄 **Continuous improvement** through performance optimization  
-🎯 **Reduced cognitive load** - agents handle operational details  
-
-## 🤝 **Contributing**
-
-We welcome contributions! This system represents a breakthrough in autonomous AI operations. Areas for contribution:
-
-- **New Operational Agents**: Additional safety nets and automation
-- **Enhanced Triggers**: More intelligent event detection patterns
-- **Integration Improvements**: Better toolchain integrations
-- **Performance Optimizations**: Further cost and speed improvements
-
-## 📜 **License**
-
-MIT License - see LICENSE file for details
-
-## 🙏 **Acknowledgments**
-
-Built with **Claude Code** by the Anthropic team and enhanced through iterative development with Claude. This system represents a collaboration between human engineering insight and AI capability to create truly autonomous operations.
+- Built for the Claude Code community
+- Inspired by autonomous systems research
+- Powered by Anthropic's Claude AI
 
 ---
 
-## 🚀 **Ready to Deploy Your Autonomous Engineering Team?**
+**Ready to orchestrate your autonomous engineering team from anywhere!** 🤖✨
 
-```bash
-# One command to transform your development workflow
-git clone https://github.com/mkritter3/claude-super-agents.git && cd claude-super-agents && sudo ./install-global.sh
-
-# Then from any project directory
-super-agents
-```
-
-**Experience the future of autonomous software engineering** 🤖✨
-
-### **What Happens Next?**
-1. **Instant Setup**: 17 AI agents deployed and configured
-2. **Autonomous Operations**: Git hooks enable autonomous triggers  
-3. **Safety Nets Active**: Protection against breaking changes and credential leaks
-4. **Self-Monitoring**: Ambient operations watch your system 24/7
-5. **Production Ready**: Full observability, audit trails, and fault tolerance
-
-**Transform your development workflow from manual to autonomous in minutes** 🎯
+For support, issues, or contributions, visit [GitHub Issues](https://github.com/yourusername/super-agents/issues)

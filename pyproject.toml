@@ -1,0 +1,70 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "super-agents"
+version = "1.0.0"
+authors = [
+  { name="AET Team", email="aet@example.com" },
+]
+description = "Autonomous Engineering Team (AET) - A production-ready multi-agent orchestration system"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "click>=8.0",
+    "flask>=2.0",
+    "numpy>=1.20",
+    "colorama>=0.4",
+    "rich>=10.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "black>=22.0",
+    "mypy>=0.950",
+]
+
+[project.scripts]
+super-agents = "super_agents.cli:main"
+
+[project.urls]
+"Homepage" = "https://github.com/yourusername/super-agents"
+"Bug Tracker" = "https://github.com/yourusername/super-agents/issues"
+
+[tool.setuptools]
+packages = ["super_agents", "super_agents.commands"]
+package-dir = {"" = "src"}
+
+[tool.setuptools.package-data]
+super_agents = [
+    "templates/**/*",
+    "templates/**/.claude/**/*",
+    "templates/**/.claude/agents/*.md",
+    "templates/**/.claude/system/*.py",
+    "templates/**/.claude/hooks/*",
+]
+
+[tool.setuptools.exclude-package-data]
+"*" = [
+    "*.pyc",
+    "__pycache__",
+    ".DS_Store",
+    "*.log",
+    "*.pid",
+    "*.port",
+]

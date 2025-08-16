@@ -61,3 +61,22 @@ temp/
 build/
 dist/
 *.egg-info/
+src/*.egg-info/
+.eggs/
+
+# Package installation
+*.whl
+*.tar.gz
+
+# Knowledge Manager runtime
+.claude/km.pid
+.claude/km.port
+.claude/km.port.lock
+.claude/km_server_wrapper.py
+
+# User manifest
+.super_agents_manifest.json
+
+# Backup directories
+.super_agents_backup_*/
+.claude.backup.*/
