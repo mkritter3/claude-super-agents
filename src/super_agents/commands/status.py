@@ -211,10 +211,13 @@ def show_status():
         events_table.add_column("Agent", width=20)
         
         for event in event_stats["recent_events"]:
+            timestamp = event.get("timestamp", "Unknown")
+            if isinstance(timestamp, (int, float)):
+                timestamp = str(timestamp)
             events_table.add_row(
-                event["timestamp"][-8:] if event["timestamp"] else "Unknown",
-                event["type"],
-                event["agent"] if event["agent"] else "System"
+                timestamp[-8:] if timestamp and timestamp != "Unknown" else "Unknown",
+                event.get("type", "Unknown"),
+                event.get("agent", "System")
             )
         
         console.print(events_table)
