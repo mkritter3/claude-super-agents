@@ -1,97 +1,216 @@
-# Super-Agents 🤖
+# Super-Agents 🤖 - AI Team for Your Code
 
-Transform Claude Code into an autonomous engineering team with 23 specialized AI agents.
+This gives you 23 AI agents that help you write, review, and manage code. Each project gets its own isolated setup.
 
-## ⚡ Quick Local Setup (Recommended)
+## 📋 Prerequisites (What You Need First)
 
-Each project gets its own isolated AET system. No complexity.
+Before installing, make sure you have:
+
+1. **Python 3** - Check if you have it:
+   ```bash
+   python3 --version
+   ```
+   Should show something like `Python 3.9.6` or higher.
+   
+   If not installed:
+   - Mac: Python 3 comes pre-installed
+   - Windows: Download from [python.org](https://python.org)
+   - Linux: `sudo apt install python3`
+
+2. **Git** - Check if you have it:
+   ```bash
+   git --version
+   ```
+   
+   If not installed:
+   - Mac: `brew install git` or download from [git-scm.com](https://git-scm.com)
+   - Windows: Download from [git-scm.com](https://git-scm.com)
+   - Linux: `sudo apt install git`
+
+3. **Claude Code** (optional but recommended)
+   - Download from Anthropic if you have access
+
+## 🚀 Super Simple Installation
+
+### Step 1: Download This Project
+
+Open Terminal (Mac/Linux) or Command Prompt (Windows) and run:
 
 ```bash
-# In any project directory:
-./super-agents-local        # Setup local AET
-./super-agents-local status # Check status
+# Go to your home directory
+cd ~
+
+# Download the project
+git clone https://github.com/yourusername/super-agents.git
+
+# Enter the project folder
+cd super-agents
 ```
 
-Install globally: `./install.sh`
-
-## Quick Install
+### Step 2: Install Python Dependencies
 
 ```bash
-# 1. Clone this repository
-git clone https://github.com/yourusername/super-agents.git
-cd super-agents
+# Install the requests library (needed for network communication)
+python3 -m pip install requests
 
-# 2. Install pipx (a tool for installing Python apps)
+# Install pipx (helps manage Python applications)
 python3 -m pip install --user pipx
+python3 -m pipx ensurepath
+```
 
-# 3. Install super-agents
+**Important**: After running these commands, close and reopen your Terminal/Command Prompt.
+
+### Step 3: Install Super-Agents
+
+```bash
+# Go back to the super-agents folder
+cd ~/super-agents
+
+# Install the main super-agents command
 python3 -m pipx install .
 
-# 4. Reload your terminal or run:
-source ~/.zshrc  # Mac
-source ~/.bashrc # Linux
+# Install the local version (recommended)
+./install.sh
 ```
 
-That's it! Now you can use `super-agents` from any folder.
+When it asks for your password (sudo), enter your computer's login password.
 
-## Usage
+### Step 4: Verify Installation
 
 ```bash
-# Initialize a project with AI agents
-super-agents init
-
-# Launch Claude with agents
-super-agents
-
-# Launch with special permissions
-super-agents --wild
-
-# Check status
-super-agents status
+# Check if it worked
+super-agents --version
+super-agents-local help
 ```
 
-## Upgrading
+## 🎯 How to Use It
 
-When you pull new changes:
+### Setting Up a Project (Do This Once Per Project)
+
+1. Go to your project folder:
+   ```bash
+   cd /path/to/your/project
+   ```
+
+2. Set up the AI agents:
+   ```bash
+   super-agents-local
+   ```
+   
+   This creates a `.claude/` folder with everything needed.
+
+3. Check if it's working:
+   ```bash
+   super-agents-local status
+   ```
+
+### Daily Use
+
+Once set up, the AI agents work automatically when you:
+- Open Claude Code in that project
+- Make git commits
+- Run various commands
+
+## 🛠️ Troubleshooting
+
+### "command not found"
+
+If you get "command not found" errors:
+
+1. Make sure you reopened Terminal after installation
+2. Try running directly:
+   ```bash
+   python3 -m pipx run super-agents
+   ```
+3. Check your PATH:
+   ```bash
+   echo $PATH
+   ```
+   Should include something like `/Users/yourname/.local/bin`
+
+### "No module named requests"
+
+Install the requests library:
 ```bash
-cd super-agents
-git pull
-python3 -m pipx reinstall super-agents
+python3 -m pip install requests
 ```
 
-## Uninstalling
+### "Permission denied"
 
+Make files executable:
+```bash
+chmod +x ~/super-agents/install.sh
+chmod +x ~/super-agents/super-agents-local
+```
+
+### Can't find the project
+
+Make sure you're in the right folder:
+```bash
+pwd  # Shows current directory
+ls   # Lists files in current directory
+```
+
+## 📁 What Gets Installed Where
+
+- **Your project**: Gets a `.claude/` folder with AI agents
+- **Your computer**: 
+  - `/usr/local/bin/super-agents-local` - Global command
+  - `~/.local/bin/super-agents` - Main super-agents command
+  - No system files are modified
+
+## 🗑️ Uninstalling
+
+To remove from a project:
+```bash
+super-agents-local clean
+```
+
+To remove from your computer:
 ```bash
 python3 -m pipx uninstall super-agents
+sudo rm /usr/local/bin/super-agents-local
 ```
 
-## What This Does
+## 💡 Tips for Beginners
 
-Gives you 23 specialized AI agents that work with Claude:
-- Writes code
-- Reviews pull requests  
-- Fixes bugs
-- Manages deployments
-- And much more!
+1. **Terminal Basics**:
+   - `cd foldername` - Enter a folder
+   - `cd ..` - Go back one folder
+   - `ls` - List files in current folder
+   - `pwd` - Show current folder path
+   - `Tab` key - Auto-complete file/folder names
 
-## Requirements
+2. **Copy-Paste in Terminal**:
+   - Mac: Cmd+C to copy, Cmd+V to paste
+   - Windows: Right-click to paste
+   - Linux: Ctrl+Shift+C to copy, Ctrl+Shift+V to paste
 
-- Python 3.8 or newer (check with `python3 --version`)
-- Git
-- Claude Code (optional, for launching Claude)
+3. **File Paths**:
+   - `~` means your home directory
+   - `.` means current directory
+   - `..` means parent directory
 
-## Troubleshooting
+## 🆘 Getting Help
 
-If `super-agents` command not found:
-```bash
-# Make sure pipx is in your PATH
-python3 -m pipx ensurepath
-source ~/.zshrc  # or ~/.bashrc on Linux
+If you're stuck:
 
-# Or just run directly with Python
-python3 -m pipx run super-agents
-```
+1. Check you're in the right folder: `pwd`
+2. Check the file exists: `ls`
+3. Check Python is installed: `python3 --version`
+4. Try running with full path: `~/super-agents/super-agents-local`
 
-## License
+## 📝 What This Actually Does
 
-MIT
+When you run `super-agents-local` in a project, it:
+
+1. Creates `.claude/agents/` with 23 AI agent configurations
+2. Sets up a local Knowledge Manager server
+3. Configures event tracking and automation
+4. Installs git hooks for automatic operations
+
+Each project is completely independent - no conflicts between projects.
+
+## 🎉 You're Done!
+
+Once installed, just run `super-agents-local` in any project folder to set up AI agents for that project. It's that simple!
