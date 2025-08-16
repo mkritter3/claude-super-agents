@@ -23,13 +23,12 @@ console = Console()
 
 
 @click.group(invoke_without_command=True)
-@click.option('--wild', is_flag=True, help="Run Claude with '--dangerously-skip-permissions'")
 @click.option('--stop', is_flag=True, help="Stop the Knowledge Manager")
 @click.option('--status', is_flag=True, help="Show status of current project's AET system")
 @click.option('--list', is_flag=True, help="List all projects with running KM instances")
 @click.version_option(version=__version__)
 @click.pass_context
-def main(ctx, wild, stop, status, list):
+def main(ctx, stop, status, list):
     """
     Super Agents - Autonomous Engineering Team (AET) System
     
@@ -52,11 +51,11 @@ def main(ctx, wild, stop, status, list):
     
     # If no command specified, run default behavior
     if ctx.invoked_subcommand is None:
-        # Default behavior: init if needed, start KM, launch Claude
-        run_default(wild)
+        # Default behavior: init if needed, start KM
+        run_default()
 
 
-def run_default(wild=False):
+def run_default():
     """Default behavior when no subcommand is given"""
     from super_agents.commands.init import check_project_initialized
     
@@ -77,12 +76,13 @@ def run_default(wild=False):
         console.print("[red]Failed to start Knowledge Manager[/red]")
         sys.exit(1)
     
-    # Launch Claude
+    # Show system status
     console.print("\n" + "═" * 60)
-    console.print("  🚀 Launching Claude with AET agents...")
+    console.print("  📊 AET System Ready")
     console.print("═" * 60)
     console.print(f"\nProject: {os.getcwd()}")
-    console.print(f"Knowledge Manager: http://localhost:{km_port}/health\n")
+    console.print(f"Knowledge Manager: http://localhost:{km_port}/health")
+    console.print(f"MCP Configuration: Ready for Claude Code integration\n")
     
     # Show available agents
     try:
@@ -98,37 +98,11 @@ def run_default(wild=False):
     except Exception as e:
         console.print(f"[yellow]Warning: Could not list agents: {e}[/yellow]")
     
-    console.print("\nPress Ctrl+C to exit Claude and stop services")
-    console.print("═" * 60 + "\n")
-    
-    # Launch Claude
-    try:
-        # Check if claude command exists
-        claude_path = shutil.which("claude")
-        if not claude_path:
-            console.print("[red]Error: 'claude' command not found![/red]")
-            console.print("[yellow]Please ensure Claude Code is installed and in your PATH[/yellow]")
-            console.print("[dim]Visit: https://claude.ai/code for installation instructions[/dim]")
-            return
-            
-        if wild:
-            console.print("[yellow]🐺 Launching Claude in WILD mode (--dangerously-skip-permissions)[/yellow]")
-            subprocess.run(["claude", "--dangerously-skip-permissions"], check=False)
-        else:
-            console.print("[green]Launching Claude with normal security permissions[/green]")
-            subprocess.run(["claude"], check=False)
-    except KeyboardInterrupt:
-        pass
-    except Exception as e:
-        console.print(f"[red]Error launching Claude: {e}[/red]")
-    
-    # After Claude exits, ask about stopping KM
-    console.print("")
-    if click.confirm("Stop Knowledge Manager?", default=True):
-        km.stop()
-    else:
-        console.print(f"[green]Knowledge Manager left running on port {km_port}[/green]")
-        console.print("[dim]Stop later with: super-agents --stop[/dim]")
+    console.print("\nNext steps:")
+    console.print("  • Run 'claude' in this directory to start Claude Code with MCP integration")
+    console.print("  • Use 'super-agents --stop' to stop the Knowledge Manager")
+    console.print("  • Use 'super-agents status' to check system health")
+    console.print("═" * 60)
 
 
 @main.command()

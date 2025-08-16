@@ -1,0 +1,32 @@
+{
+  "agent": "test-executor",
+  "trigger_event": {
+    "type": "CODE_CHANGES_NEED_TESTING",
+    "commit": "75a2619eb70eb797a2b48ee321ea5327b5149a3c",
+    "test_relevant_files": [".claude/km_mcp_bridge.py",".claude/triggers/test-executor_trigger_1755322570.json","km_stdio_bridge.py"]
+  },
+  "context": {
+    "commit_message": "Fix KM MCP integration with dynamic port discovery
+
+- Install requests module for correct Python interpreter
+- Implement automatic port discovery for Knowledge Manager
+- Prioritize less common ports (5002-5009, 8002-8009) to avoid conflicts
+- Support KM_PORT environment variable for manual override
+- Remove dependency on static port files
+- Add health check verification to confirm Knowledge Manager service
+- Update Claude Desktop config to use correct Python path
+
+This allows the MCP bridge to automatically find and connect to any
+running Knowledge Manager instance without manual configuration.
+
+🤖 Generated with Claude Code
+
+Co-Authored-By: Claude <noreply@anthropic.com>",
+    "changed_files": [".claude/km_mcp_bridge.py",".claude/triggers/test-executor_trigger_1755322570.json","km_stdio_bridge.py"],
+    "test_trigger": "quality_gate_validation",
+    "test_scope": "relevant_to_changes"
+  },
+  "created_at": "2025-08-16T00:44:56-07:00",
+  "priority": "high",
+  "automation_level": "full"
+}

@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "km": {
+      "command": "/Users/michaelritter/.local/pipx/venvs/super-agents/bin/python",
+      "args": [".claude/km_bridge_local.py"]
+    }
+  }
+}

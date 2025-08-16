@@ -216,6 +216,47 @@ def copy_template_files(source_path: Path, dest_path: Path, force: bool = False)
     return files_created
 
 
+def setup_mcp_configuration() -> None:
+    """Setup MCP configuration for the Knowledge Manager"""
+    console.print("[cyan]Setting up MCP configuration...[/cyan]")
+    
+    # Update mcp_config.json with current project directory
+    mcp_config_file = Path(".claude/mcp_config.json")
+    if mcp_config_file.exists():
+        try:
+            with open(mcp_config_file, 'r') as f:
+                config = json.load(f)
+            
+            # Replace placeholder with actual project directory
+            config['project_dir'] = str(Path.cwd())
+            
+            with open(mcp_config_file, 'w') as f:
+                json.dump(config, f, indent=2)
+            
+            console.print("[green]✓[/green] MCP configuration updated")
+        except Exception as e:
+            console.print(f"[yellow]Warning: Could not update MCP config: {e}[/yellow]")
+    
+    # Create .mcp.json for Claude Code integration (project root)
+    mcp_file = Path(".mcp.json")
+    if not mcp_file.exists():
+        mcp_config = {
+            "mcpServers": {
+                "km": {
+                    "command": "python3",
+                    "args": [".claude/km_bridge_local.py"]
+                }
+            }
+        }
+        
+        with open(mcp_file, 'w') as f:
+            json.dump(mcp_config, f, indent=2)
+        
+        console.print("[green]✓[/green] Claude Code MCP configuration created")
+    else:
+        console.print("[dim]MCP configuration already exists[/dim]")
+
+
 def setup_context7_integration() -> None:
     """Setup Context7 documentation integration hooks"""
     console.print("[cyan]Setting up Context7 documentation integration...[/cyan]")
@@ -386,6 +427,9 @@ def initialize_project(force: bool = False) -> bool:
         
         # Initialize database
         initialize_database()
+        
+        # Setup MCP configuration
+        setup_mcp_configuration()
         
         # Setup Context7 integration
         setup_context7_integration()

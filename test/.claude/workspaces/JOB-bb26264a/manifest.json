@@ -1,0 +1,12 @@
+{
+  "job_id": "JOB-bb26264a",
+  "ticket_id": "TEST-001",
+  "status": "INITIALIZED",
+  "created_at": "2025-08-14T23:05:27.311413",
+  "updated_at": "2025-08-14T23:05:27.311453",
+  "original_prompt": "Use developer-agent to build a React component with TypeScript",
+  "current_agent": "",
+  "last_event_id": "",
+  "git_head": "",
+  "artifacts": []
+}
