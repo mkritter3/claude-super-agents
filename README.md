@@ -50,12 +50,8 @@ cd super-agents
 ### Step 2: Install Python Dependencies
 
 ```bash
-# Install the requests library (needed for network communication)
-python3 -m pip install requests
-
-# Optional: Install Knowledge Manager for the server
-# (Only needed if you want to use 'super-agents start')
-pip install knowledge-manager
+# Install the required libraries
+python3 -m pip install requests flask
 
 # That's it for dependencies!
 ```
