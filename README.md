@@ -2,93 +2,82 @@
 
 Transform Claude Code into an autonomous engineering team with 23 specialized AI agents.
 
-## Installation
-
-### Recommended: Using pipx (Clean & Isolated)
+## Quick Install
 
 ```bash
-# Install pipx if you don't have it
+# 1. Clone this repository
+git clone https://github.com/yourusername/super-agents.git
+cd super-agents
+
+# 2. Install pipx (a tool for installing Python apps)
 python3 -m pip install --user pipx
-python3 -m pipx ensurepath
 
-# Install super-agents
-pipx install git+https://github.com/yourusername/super-agents.git
+# 3. Install super-agents
+python3 -m pipx install .
+
+# 4. Reload your terminal or run:
+source ~/.zshrc  # Mac
+source ~/.bashrc # Linux
 ```
 
-### Alternative: Using pip
-
-```bash
-# Install from repository
-python3 -m pip install --user git+https://github.com/yourusername/super-agents.git
-```
-
-**Note:** You may need to add `~/.local/bin` to your PATH.
+That's it! Now you can use `super-agents` from any folder.
 
 ## Usage
 
-After installation, use from ANY directory:
-
 ```bash
-# Initialize project with AET agents
+# Initialize a project with AI agents
 super-agents init
 
 # Launch Claude with agents
 super-agents
 
-# Launch with --dangerously-skip-permissions
+# Launch with special permissions
 super-agents --wild
 
-# Show status
+# Check status
 super-agents status
 ```
 
 ## Upgrading
 
+When you pull new changes:
 ```bash
-# With pipx
-pipx upgrade super-agents
-
-# With pip
-python3 -m pip install --user --upgrade git+https://github.com/yourusername/super-agents.git
+cd super-agents
+git pull
+python3 -m pipx reinstall super-agents
 ```
 
 ## Uninstalling
 
 ```bash
-# With pipx
-pipx uninstall super-agents
-
-# With pip
-python3 -m pip uninstall super-agents
+python3 -m pipx uninstall super-agents
 ```
 
-## What You Get
+## What This Does
 
-- **23 Specialized Agents**: Complete engineering team coverage
-- **Autonomous Operations**: Git hooks trigger agents automatically
-- **Universal Command**: Works from any directory after installation
-- **Dynamic Ports**: Multiple projects can run simultaneously (ports 5001-5100)
+Gives you 23 specialized AI agents that work with Claude:
+- Writes code
+- Reviews pull requests  
+- Fixes bugs
+- Manages deployments
+- And much more!
 
 ## Requirements
 
-- Python 3.8+
+- Python 3.8 or newer (check with `python3 --version`)
 - Git
 - Claude Code (optional, for launching Claude)
 
-## Development
+## Troubleshooting
 
-For contributors:
-
+If `super-agents` command not found:
 ```bash
-# Clone repository
-git clone https://github.com/yourusername/super-agents.git
-cd super-agents
+# Make sure pipx is in your PATH
+python3 -m pipx ensurepath
+source ~/.zshrc  # or ~/.bashrc on Linux
 
-# Install in development mode
-pip install -e .
-
-# Install dev dependencies
-pip install -r requirements-dev.txt
+# Or just run directly with Python
+python3 -m pipx run super-agents
 ```
 
 ## License
