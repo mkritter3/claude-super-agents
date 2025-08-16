@@ -1,8 +1,264 @@
-#!/Library/Developer/CommandLineTools/usr/bin/python3
-# -*- coding: utf-8 -*-
-import re
-import sys
-from super_agents.cli import main
-if __name__ == '__main__':
-    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
-    sys.exit(main())
+#!/bin/bash
+# Super-agents - THE main command for local AET setup per directory
+
+set -e
+
+# Get the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(pwd)"
+CLAUDE_DIR="$PROJECT_DIR/.claude"
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Function to setup local AET
+setup_local_aet() {
+    echo -e "${GREEN}🚀 Setting up AET system in $PROJECT_DIR${NC}"
+    
+    # Check if super-agents is installed globally
+    if ! command -v super-agents >/dev/null 2>&1; then
+        echo -e "${RED}✗ super-agents not found. Install with: pipx install super-agents${NC}"
+        exit 1
+    fi
+    
+    # Initialize AET if needed
+    if [ ! -d "$CLAUDE_DIR/agents" ]; then
+        echo "Initializing AET agents..."
+        super-agents init --force
+    else
+        echo -e "${GREEN}✓${NC} AET agents already initialized"
+    fi
+    
+    # Setup local KM server
+    setup_km_server
+    
+    # Create local MCP bridge
+    create_mcp_bridge
+    
+    # Setup status checker
+    create_status_checker
+    
+    # Update CLAUDE.md
+    update_claude_md
+    
+    echo -e "\n${GREEN}✅ AET system ready!${NC}"
+    echo -e "Run '${YELLOW}super-agents status${NC}' to check system health"
+}
+
+# Function to setup KM server
+setup_km_server() {
+    echo "Setting up local Knowledge Manager..."
+    
+    # Find available port
+    PORT=5002
+    while lsof -Pi :$PORT -sTCP:LISTEN -t >/dev/null 2>&1; do
+        PORT=$((PORT + 1))
+    done
+    
+    mkdir -p "$CLAUDE_DIR/km_server"
+    echo $PORT > "$CLAUDE_DIR/km_server/port"
+    
+    # Create KM data directory
+    export KM_DATA_DIR="$CLAUDE_DIR/km_server/data"
+    mkdir -p "$KM_DATA_DIR"
+    
+    echo -e "${GREEN}✓${NC} Knowledge Manager configured on port $PORT"
+}
+
+# Function to create MCP bridge
+create_mcp_bridge() {
+    cat > "$CLAUDE_DIR/mcp_bridge.py" <<'EOF'
+#!/usr/bin/env python3
+import sys, json, os, requests
+from typing import Dict, Any
+
+class LocalKMBridge:
+    def __init__(self):
+        port_file = os.path.join(os.path.dirname(__file__), "km_server/port")
+        if os.path.exists(port_file):
+            with open(port_file) as f:
+                self.port = int(f.read().strip())
+                self.base_url = f"http://localhost:{self.port}"
+                self.session = requests.Session()
+        else:
+            self.base_url = None
+            self.session = None
+    
+    def handle_request(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        if not self.base_url:
+            return {"error": {"code": -32000, "message": "No local KM server"}}
+        
+        method = request.get("method", "")
+        
+        if method == "initialize":
+            return {"protocolVersion": "1.0.0", "serverName": "km-local", "capabilities": {"tools": True}}
+        elif method == "tools/list":
+            response = self.session.get(f"{self.base_url}/mcp/spec")
+            spec = response.json()
+            tools = [{"name": f"km__{t.get('tool_name', t.get('name'))}", 
+                     "description": t.get("description", ""),
+                     "parameters": t.get("parameters", [])} for t in spec.get("tools", [])]
+            return {"tools": tools}
+        elif method == "tools/call":
+            params = request.get("params", {})
+            tool_name = params.get("name", "").replace("km__", "")
+            response = self.session.post(f"{self.base_url}/mcp",
+                json={"jsonrpc": "2.0", "method": tool_name, 
+                      "params": params.get("arguments", {}), "id": request.get("id")})
+            result = response.json()
+            return {"content": [{"type": "text", "text": json.dumps(result.get("result", result))}]}
+        else:
+            return {"error": {"code": -32601, "message": f"Method not found: {method}"}}
+    
+    def run(self):
+        for line in sys.stdin:
+            try:
+                request = json.loads(line.strip())
+                result = self.handle_request(request)
+                response = {"jsonrpc": "2.0", "id": request.get("id")}
+                if "error" in result:
+                    response["error"] = result["error"]
+                else:
+                    response["result"] = result
+                sys.stdout.write(json.dumps(response) + "\n")
+                sys.stdout.flush()
+            except Exception as e:
+                sys.stderr.write(f"Error: {e}\n")
+                sys.stderr.flush()
+
+if __name__ == "__main__":
+    LocalKMBridge().run()
+EOF
+    chmod +x "$CLAUDE_DIR/mcp_bridge.py"
+    echo -e "${GREEN}✓${NC} MCP bridge created"
+}
+
+# Function to create status checker
+create_status_checker() {
+    cat > "$CLAUDE_DIR/status.sh" <<'EOF'
+#!/bin/bash
+echo "=== AET System Status ==="
+CLAUDE_DIR="$(dirname "$0")"
+
+# Check agents
+if [ -d "$CLAUDE_DIR/agents" ]; then
+    AGENT_COUNT=$(ls -1 "$CLAUDE_DIR/agents"/*.md 2>/dev/null | wc -l)
+    echo "✓ $AGENT_COUNT agents configured"
+else
+    echo "✗ No agents found"
+fi
+
+# Check KM server port
+if [ -f "$CLAUDE_DIR/km_server/port" ]; then
+    PORT=$(cat "$CLAUDE_DIR/km_server/port")
+    echo "✓ Knowledge Manager configured for port $PORT"
+else
+    echo "✗ Knowledge Manager not configured"
+fi
+
+# Check events
+if [ -f "$CLAUDE_DIR/events/log.ndjson" ]; then
+    EVENT_COUNT=$(wc -l < "$CLAUDE_DIR/events/log.ndjson")
+    echo "✓ Event system ($EVENT_COUNT events)"
+else
+    echo "✗ Event system not initialized"
+fi
+
+echo ""
+echo "Project: $(pwd)"
+EOF
+    chmod +x "$CLAUDE_DIR/status.sh"
+}
+
+# Function to update CLAUDE.md
+update_claude_md() {
+    if [ ! -f "$PROJECT_DIR/CLAUDE.md" ]; then
+        cat > "$PROJECT_DIR/CLAUDE.md" <<'EOF'
+# Local AET System
+
+This project has a complete local AET system in `.claude/`
+
+## Quick Commands
+
+- `super-agents` - Setup/verify AET system
+- `super-agents status` - Check system health
+- `super-agents clean` - Remove local AET
+
+## Components
+
+- 23 specialized agents in `.claude/agents/`
+- Local Knowledge Manager in `.claude/km_server/`
+- Event system in `.claude/events/`
+- MCP bridge in `.claude/mcp_bridge.py`
+
+The system runs entirely locally in this directory.
+EOF
+        echo -e "${GREEN}✓${NC} Created CLAUDE.md"
+    fi
+}
+
+# Function to show status
+show_status() {
+    if [ -f "$CLAUDE_DIR/status.sh" ]; then
+        "$CLAUDE_DIR/status.sh"
+    else
+        echo -e "${YELLOW}AET not initialized. Run 'super-agents' to set up.${NC}"
+    fi
+}
+
+# Function to clean local AET
+clean_aet() {
+    echo -e "${YELLOW}Removing local AET system...${NC}"
+    if [ -d "$CLAUDE_DIR" ]; then
+        # Keep important files
+        mv "$CLAUDE_DIR/events/log.ndjson" "$CLAUDE_DIR/events.backup.ndjson" 2>/dev/null || true
+        
+        # Remove AET files
+        rm -rf "$CLAUDE_DIR/agents" "$CLAUDE_DIR/km_server" "$CLAUDE_DIR/mcp_bridge.py" "$CLAUDE_DIR/status.sh"
+        
+        echo -e "${GREEN}✓${NC} Local AET system removed"
+        echo "Event log backed up to .claude/events.backup.ndjson"
+    else
+        echo "No AET system found in this directory"
+    fi
+}
+
+# Main command handling
+case "${1:-setup}" in
+    setup|init|"")
+        setup_local_aet
+        ;;
+    status)
+        show_status
+        ;;
+    clean|remove)
+        clean_aet
+        ;;
+    help|--help|-h)
+        echo "super-agents - Local AET system manager"
+        echo ""
+        echo "Usage:"
+        echo "  super-agents [command]"
+        echo ""
+        echo "Commands:"
+        echo "  setup    Initialize AET in current directory (default)"
+        echo "  status   Show AET system status"
+        echo "  clean    Remove local AET system"
+        echo "  help     Show this help message"
+        echo ""
+        echo "Each directory gets its own isolated AET system."
+        ;;
+    *)
+        # Pass through to original super-agents
+        if command -v super-agents >/dev/null 2>&1; then
+            super-agents "$@"
+        else
+            echo -e "${RED}Unknown command: $1${NC}"
+            echo "Run 'super-agents help' for usage"
+            exit 1
+        fi
+        ;;
+esac

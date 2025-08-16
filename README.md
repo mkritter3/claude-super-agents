@@ -53,12 +53,8 @@ cd super-agents
 # Install the requests library (needed for network communication)
 python3 -m pip install requests
 
-# Install pipx (helps manage Python applications)
-python3 -m pip install --user pipx
-python3 -m pipx ensurepath
+# That's it for dependencies!
 ```
-
-**Important**: After running these commands, close and reopen your Terminal/Command Prompt.
 
 ### Step 3: Install Super-Agents
 
@@ -66,10 +62,7 @@ python3 -m pipx ensurepath
 # Go back to the super-agents folder
 cd ~/super-agents
 
-# Install the main super-agents command
-python3 -m pipx install .
-
-# Install the local version (recommended)
+# Install super-agents globally
 ./install.sh
 ```
 
