@@ -7,6 +7,8 @@ import json
 import shutil
 import fcntl
 import time
+import subprocess
+import sys
 from pathlib import Path
 from datetime import datetime
 from typing import Optional, Dict, List
@@ -15,6 +17,47 @@ from rich.console import Console
 from rich.prompt import Confirm
 
 console = Console()
+
+
+def detect_python_executable() -> str:
+    """
+    Detect the correct Python executable that has required dependencies.
+    Returns the full path to a working Python executable.
+    """
+    candidates = [
+        # Try pipx super-agents environment first (preferred)
+        "/Users/michaelritter/.local/pipx/venvs/super-agents/bin/python",
+        # Try user's local Python installations
+        os.path.expanduser("~/.local/pipx/venvs/super-agents/bin/python"),
+        # Try system Python with brew
+        "/opt/homebrew/bin/python3",
+        "/usr/local/bin/python3",
+        # Current Python interpreter
+        sys.executable,
+        # Fallback to system python3
+        "python3",
+    ]
+    
+    for python_path in candidates:
+        if python_path.startswith("/") and not os.path.exists(python_path):
+            continue
+            
+        try:
+            # Test if this Python has the requests module
+            result = subprocess.run([
+                python_path, "-c", "import requests; print('OK')"
+            ], capture_output=True, text=True, timeout=5)
+            
+            if result.returncode == 0:
+                console.print(f"[dim]Using Python: {python_path}[/dim]")
+                return python_path
+        except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+            continue
+    
+    # If no Python with requests found, warn user and use system Python
+    console.print("[yellow]Warning: No Python installation with 'requests' module found.[/yellow]")
+    console.print("[yellow]You may need to install dependencies: pip install requests[/yellow]")
+    return "python3"
 
 
 def check_project_initialized() -> bool:
@@ -106,7 +149,7 @@ def create_manifest(files_created: List[str]) -> None:
         pass
 
 
-def copy_template_files(source_path: Path, dest_path: Path, force: bool = False) -> List[str]:
+def copy_template_files(source_path: Path, dest_path: Path, force: bool = False, python_executable: str = None) -> List[str]:
     """
     Copy template files from package to destination with safety checks and robust error handling
     Returns list of created files for manifest
@@ -211,7 +254,24 @@ def copy_template_files(source_path: Path, dest_path: Path, force: bool = False)
                 continue
             
             try:
-                shutil.copy2(src_file, dest_file)
+                # Handle template files with substitution
+                if file_name == '.mcp.json' and python_executable:
+                    # Read template content and substitute Python executable
+                    with open(src_file, 'r') as f:
+                        content = f.read()
+                    
+                    # Substitute the Python executable placeholder
+                    content = content.replace('{{PYTHON_EXECUTABLE}}', python_executable)
+                    
+                    # Write the processed content
+                    with open(dest_file, 'w') as f:
+                        f.write(content)
+                    
+                    console.print(f"[dim]Processed template: {dest_file.relative_to(dest_path)} (Python: {python_executable})[/dim]")
+                else:
+                    # Regular file copy
+                    shutil.copy2(src_file, dest_file)
+                
                 files_created.append(str(dest_file.relative_to(dest_path)))
                 
                 # Make scripts executable
@@ -250,13 +310,16 @@ def setup_mcp_configuration() -> None:
         except Exception as e:
             console.print(f"[yellow]Warning: Could not update MCP config: {e}[/yellow]")
     
-    # Create .mcp.json for Claude Code integration (project root)
+    # Check if .mcp.json was created from template, if not create it
     mcp_file = Path(".mcp.json")
     if not mcp_file.exists():
+        # This should normally be created from template, but create as fallback
+        python_executable = detect_python_executable()
+        
         mcp_config = {
             "mcpServers": {
                 "km": {
-                    "command": "python3",
+                    "command": python_executable,
                     "args": [".claude/km_bridge_local.py"]
                 }
             }
@@ -265,9 +328,9 @@ def setup_mcp_configuration() -> None:
         with open(mcp_file, 'w') as f:
             json.dump(mcp_config, f, indent=2)
         
-        console.print("[green]✓[/green] Claude Code MCP configuration created")
+        console.print(f"[green]✓[/green] Claude Code MCP configuration created (using {python_executable})")
     else:
-        console.print("[dim]MCP configuration already exists[/dim]")
+        console.print("[green]✓[/green] Claude Code MCP configuration ready")
 
 
 def setup_context7_integration() -> None:
@@ -351,6 +414,9 @@ def initialize_project(force: bool = False) -> bool:
         
         dest_path = Path.cwd()
         
+        # Detect the correct Python executable for MCP bridge
+        python_executable = detect_python_executable()
+        
         # Access template files from package
         import super_agents
         package_dir = Path(super_agents.__file__).parent
@@ -360,7 +426,7 @@ def initialize_project(force: bool = False) -> bool:
         if (package_dir / "templates").exists():
             # Running from source
             template_path = package_dir / "templates" / "default_project"
-            files_created = copy_template_files(template_path, dest_path, force)
+            files_created = copy_template_files(template_path, dest_path, force, python_executable)
         else:
             # Try to use importlib.resources (Python 3.9+)
             try:
@@ -387,7 +453,7 @@ def initialize_project(force: bool = False) -> bool:
                         template_path = template_dest
                     
                     # Copy template files
-                    files_created = copy_template_files(template_path, dest_path, force)
+                    files_created = copy_template_files(template_path, dest_path, force, python_executable)
                     
             except (ImportError, AttributeError):
                 # Python < 3.9 fallback
@@ -399,7 +465,7 @@ def initialize_project(force: bool = False) -> bool:
                     console.print("[red]Template files not found. Please reinstall the package.[/red]")
                     return False
                 
-                files_created = copy_template_files(template_path, dest_path, force)
+                files_created = copy_template_files(template_path, dest_path, force, python_executable)
         
         if not files_created and not force:
             return False
