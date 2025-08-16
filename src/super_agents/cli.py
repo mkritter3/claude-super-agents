@@ -7,6 +7,7 @@ import click
 import os
 import sys
 import subprocess
+import shutil
 from pathlib import Path
 from rich.console import Console
 from rich.panel import Panel
@@ -84,19 +85,30 @@ def run_default(wild=False):
     console.print(f"Knowledge Manager: http://localhost:{km_port}/health\n")
     
     # Show available agents
-    agents_dir = Path(".claude/agents")
-    if agents_dir.exists():
-        agent_files = list(agents_dir.glob("*.md"))
-        if agent_files:
-            console.print("Available agents:")
-            for agent_file in sorted(agent_files):
-                console.print(f"  • {agent_file.stem}")
+    try:
+        agents_dir = Path(".claude/agents")
+        if agents_dir.exists():
+            agent_files = list(agents_dir.glob("*.md"))
+            if agent_files:
+                console.print("Available agents:")
+                for agent_file in sorted(agent_files):
+                    console.print(f"  • {agent_file.stem}")
+    except Exception as e:
+        console.print(f"[yellow]Warning: Could not list agents: {e}[/yellow]")
     
     console.print("\nPress Ctrl+C to exit Claude and stop services")
     console.print("═" * 60 + "\n")
     
     # Launch Claude
     try:
+        # Check if claude command exists
+        claude_path = shutil.which("claude")
+        if not claude_path:
+            console.print("[red]Error: 'claude' command not found![/red]")
+            console.print("[yellow]Please ensure Claude Code is installed and in your PATH[/yellow]")
+            console.print("[dim]Visit: https://claude.ai/code for installation instructions[/dim]")
+            return
+            
         if wild:
             console.print("[yellow]🐺 Launching Claude in WILD mode (--dangerously-skip-permissions)[/yellow]")
             subprocess.run(["claude", "--dangerously-skip-permissions"], check=False)
