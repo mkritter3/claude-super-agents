@@ -32,14 +32,16 @@ def load_manifest() -> Optional[Dict]:
 
 def create_backup(backup_dir: Optional[str] = None) -> Path:
     """
-    Create a backup of existing project files
+    Create a backup of existing project files in organized archive directory
     Returns the backup directory path
     """
     if backup_dir:
         backup_path = Path(backup_dir)
     else:
+        # Use organized archive directory structure
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        backup_path = Path(f".super_agents_backup_{timestamp}")
+        backup_base = Path("archived_files")
+        backup_path = backup_base / f"super_agents_upgrade_{timestamp}"
     
     backup_path.mkdir(parents=True, exist_ok=True)
     

@@ -77,6 +77,8 @@ src/*.egg-info/
 # User manifest
 .super_agents_manifest.json
 
-# Backup directories
+# Backup and archive directories
 .super_agents_backup_*/
 .claude.backup.*/
+archived_files/
+!src/super_agents/templates/default_project/archived_files/

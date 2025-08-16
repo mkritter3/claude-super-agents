@@ -156,10 +156,11 @@ def copy_template_files(source_path: Path, dest_path: Path, force: bool = False)
             console.print("[red]Initialization cancelled[/red]")
             return []
         elif choice == "1":
-            # Create backup
-            backup_dir = Path(f".super_agents_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}")
-            backup_dir.mkdir(exist_ok=True)
-            console.print(f"[green]Creating backup in {backup_dir}[/green]")
+            # Create organized backup in single directory
+            backup_base = Path("archived_files")
+            backup_dir = backup_base / f"super_agents_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            backup_dir.mkdir(parents=True, exist_ok=True)
+            console.print(f"[green]Creating organized backup in {backup_dir}[/green]")
             
             for conflict in conflicts:
                 try:
@@ -170,6 +171,18 @@ def copy_template_files(source_path: Path, dest_path: Path, force: bool = False)
                 except (PermissionError, OSError) as e:
                     console.print(f"[yellow]Warning: Could not backup {conflict}: {e}[/yellow]")
             
+            # Create a backup manifest for easy reference
+            manifest = {
+                "backup_created": datetime.now().isoformat(),
+                "original_location": str(dest_path),
+                "files_backed_up": conflicts,
+                "backup_reason": "super-agents initialization conflict resolution"
+            }
+            
+            with open(backup_dir / "backup_manifest.json", 'w') as f:
+                json.dump(manifest, f, indent=2)
+            
+            console.print(f"[dim]Backup manifest created: {backup_dir}/backup_manifest.json[/dim]")
             force = True  # Now we can overwrite
         # Choice 2 means we skip existing files (force remains False)
     
