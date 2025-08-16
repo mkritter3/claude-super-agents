@@ -185,4 +185,3 @@ if [ -f "/usr/local/bin/super-agents" ] && [ "$INSTALL_TYPE" != "global" ]; then
 fi
 
 echo "════════════════════════════════════════════════════════════"
-echo "

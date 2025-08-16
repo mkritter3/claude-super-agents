@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "super-agents"
+name = "super_agents"
 version = "1.0.0"
 authors = [
   { name="AET Team", email="aet@example.com" },
@@ -40,15 +40,17 @@ dev = [
 ]
 
 [project.scripts]
-super-agents = "super_agents.cli:main"
+"super-agents" = "super_agents.cli:main"
 
 [project.urls]
 "Homepage" = "https://github.com/yourusername/super-agents"
 "Bug Tracker" = "https://github.com/yourusername/super-agents/issues"
 
 [tool.setuptools]
-packages = ["super_agents", "super_agents.commands"]
 package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.setuptools.package-data]
 super_agents = [

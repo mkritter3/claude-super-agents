@@ -219,9 +219,11 @@ def initialize_project(force: bool = False) -> bool:
         package_dir = Path(super_agents.__file__).parent
         
         # Check if we're running from source (development) or installed package
+        files_created = []
         if (package_dir / "templates").exists():
             # Running from source
             template_path = package_dir / "templates" / "default_project"
+            files_created = copy_template_files(template_path, dest_path, force)
         else:
             # Try to use importlib.resources (Python 3.9+)
             try:
