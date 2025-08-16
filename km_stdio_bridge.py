@@ -19,6 +19,48 @@ class KMBridge:
     
     def find_km_server(self) -> int:
         """Find an available Knowledge Manager server by checking ports in priority order"""
+        import hashlib
+        
+        # Try to determine project context
+        project_id = os.environ.get("CLAUDE_PROJECT_ID", "")
+        project_path = os.environ.get("CLAUDE_PROJECT_PATH", os.getcwd())
+        
+        # Canonicalize the project path
+        if project_path:
+            project_path = os.path.realpath(project_path)
+        
+        if not project_id and project_path:
+            # Generate a project ID from the canonicalized path
+            project_id = hashlib.md5(project_path.encode()).hexdigest()[:8]
+            sys.stderr.write(f"Project context: {project_path} (ID: {project_id})\n")
+            sys.stderr.flush()
+        
+        # If we have a project context, ONLY connect to that project's server
+        if project_id:
+            port_file = os.path.expanduser(f"~/.claude/km_ports/{project_id}.port")
+            if os.path.exists(port_file):
+                try:
+                    with open(port_file, 'r') as f:
+                        port = int(f.read().strip())
+                        if self.check_km_server(port):
+                            sys.stderr.write(f"✓ Connected to project-specific KM on port {port} (project: {project_id})\n")
+                            sys.stderr.flush()
+                            return port
+                        else:
+                            sys.stderr.write(f"✗ KM server for project {project_id} is not running on port {port}\n")
+                            sys.stderr.flush()
+                except (ValueError, IOError) as e:
+                    sys.stderr.write(f"✗ Error reading port file for project {project_id}: {e}\n")
+                    sys.stderr.flush()
+            
+            # FAIL-FAST: Don't fall back to other servers when project context is set
+            sys.stderr.write(f"✗ ERROR: Could not connect to KM server for project {project_id}\n")
+            sys.stderr.write(f"Please start the project's KM instance:\n")
+            sys.stderr.write(f"  cd {project_path}\n")
+            sys.stderr.write(f"  super-agents --wild\n")
+            sys.stderr.flush()
+            return 0  # Signal failure
+        
         # Priority order: less common ports first, then common ones
         priority_ports = [
             # Less common ports (preferred)
@@ -34,17 +76,27 @@ class KMBridge:
             *range(8010, 8100),
         ]
         
-        # First, try to find running KM servers
-        for port in priority_ports:
-            if self.check_km_server(port):
-                sys.stderr.write(f"Found Knowledge Manager on port {port}\n")
-                sys.stderr.flush()
-                return port
-        
-        # If no server found, return default
-        sys.stderr.write("No Knowledge Manager server found, using default port 5002\n")
+        # Only scan for servers if no project context (backward compatibility)
+        sys.stderr.write("No project context found. Scanning for any available KM server...\n")
         sys.stderr.flush()
-        return 5002
+        
+        found_servers = []
+        for port in priority_ports[:30]:  # Check first 30 ports for performance
+            if self.check_km_server(port):
+                found_servers.append(port)
+        
+        if found_servers:
+            port = found_servers[0]
+            sys.stderr.write(f"✓ Found Knowledge Manager on port {port} (shared instance)\n")
+            sys.stderr.write("⚠️  WARNING: Using shared KM instance. For project isolation, run from project directory.\n")
+            sys.stderr.flush()
+            return port
+        
+        # If no server found, fail
+        sys.stderr.write("✗ No Knowledge Manager server found\n")
+        sys.stderr.write("Please start Knowledge Manager with: super-agents --wild\n")
+        sys.stderr.flush()
+        return 0  # Signal failure
     
     def check_km_server(self, port: int) -> bool:
         """Check if a Knowledge Manager server is running on the given port"""
