@@ -24,5 +24,32 @@ export CLAUDE_PROJECT_ID=$(echo "$PROJECT_PATH" | md5sum | cut -c1-8 2>/dev/null
 
 echo "KM Bridge starting for project: $PROJECT_PATH (ID: $CLAUDE_PROJECT_ID)" >&2
 
+# Check if KM is running for this project, if not, start it
+PORT_FILE="$HOME/.claude/km_ports/${CLAUDE_PROJECT_ID}.port"
+if [ ! -f "$PORT_FILE" ]; then
+    echo "No KM server for project $CLAUDE_PROJECT_ID, starting one..." >&2
+    
+    # Try to use the project manager if available
+    PROJECT_MANAGER="$(dirname "$0")/km_project_manager.py"
+    if [ -x "$PROJECT_MANAGER" ]; then
+        "$PYTHON_BIN" "$PROJECT_MANAGER" start --project "$PROJECT_PATH" >&2
+    else
+        # Fallback: just ensure super-agents is running
+        echo "Please start Knowledge Manager for this project:" >&2
+        echo "  cd '$PROJECT_PATH'" >&2
+        echo "  super-agents --wild" >&2
+    fi
+elif [ -f "$PORT_FILE" ]; then
+    PORT=$(cat "$PORT_FILE")
+    # Quick check if server is actually running
+    if ! curl -s "http://localhost:$PORT/health" >/dev/null 2>&1; then
+        echo "KM server for project $CLAUDE_PROJECT_ID not responding, restarting..." >&2
+        PROJECT_MANAGER="$(dirname "$0")/km_project_manager.py"
+        if [ -x "$PROJECT_MANAGER" ]; then
+            "$PYTHON_BIN" "$PROJECT_MANAGER" start --project "$PROJECT_PATH" >&2
+        fi
+    fi
+fi
+
 # Run the bridge with the correct Python and project context
 exec "$PYTHON_BIN" "$BRIDGE_SCRIPT" "$@"

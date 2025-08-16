@@ -1,7 +1,7 @@
-# Knowledge Manager MCP Bridge - Multi-Instance Setup
+# Knowledge Manager MCP Bridge - Project Isolation by Default
 
 ## Overview
-This setup allows multiple Claude Desktop instances to run simultaneously, each connecting to their own Knowledge Manager (KM) server without conflicts.
+Each Claude Desktop instance automatically gets its own isolated Knowledge Manager (KM) server based on the project directory. This prevents knowledge contamination between projects and ensures data isolation.
 
 ## Key Components
 
@@ -22,41 +22,38 @@ This setup allows multiple Claude Desktop instances to run simultaneously, each 
 
 ## How It Works
 
-1. **Single Claude Instance**: Works automatically
-   - Bridge finds first available KM server
-   - No configuration needed
-
-2. **Multiple Claude Instances**: Project isolation
-   - Each Claude instance runs in different directory
+1. **Automatic Project Isolation** (Default)
+   - Each project directory gets its own KM instance
    - Bridge detects working directory as project context
-   - Attempts to connect to project-specific KM instance
-   - Falls back to shared instance if needed
+   - Automatically starts project-specific KM if not running
+   - No shared instances - complete isolation
+
+2. **Multiple Claude Instances**: Full Isolation
+   - Each Claude instance in different directory = different KM server
+   - No knowledge mixing between projects
+   - Automatic server management per project
 
 ## Usage
 
-### Basic (Single Instance)
+### Automatic Mode (Default)
 ```bash
-# Start KM normally
-super-agents --wild
-
-# Claude will automatically connect via MCP bridge
+# Just open Claude in your project directory
+# KM server starts automatically for that project
+# Each project gets its own isolated instance
 ```
 
-### Advanced (Multiple Projects)
+### Manual Management (Optional)
 ```bash
-# Option 1: Manual management
-# Terminal 1 - Project A
-cd /path/to/project-a
-KM_PORT=5002 super-agents --wild
+# Check status of all projects
+./check_km_status.py
 
-# Terminal 2 - Project B  
-cd /path/to/project-b
-KM_PORT=5003 super-agents --wild
-
-# Option 2: Using project manager
+# Manually start/stop specific projects
 ./km_project_manager.py start --project /path/to/project-a
-./km_project_manager.py start --project /path/to/project-b
+./km_project_manager.py stop --project /path/to/project-a
 ./km_project_manager.py list  # See all running instances
+
+# View project status
+./km_project_manager.py status --project /path/to/project
 ```
 
 ## Configuration
@@ -100,8 +97,9 @@ If you see warnings about multiple servers:
 3. Verify port isn't blocked by firewall
 
 ## Benefits
-- **No manual port configuration** - Everything is automatic
-- **Project isolation** - Each project can have its own KM instance
-- **Backwards compatible** - Works with existing single-instance setups
-- **Self-healing** - Automatically finds available servers
-- **Multi-instance safe** - Prevents knowledge mixing between projects
+- **Zero configuration** - Everything is automatic
+- **Complete project isolation** - No knowledge contamination
+- **Auto-start on demand** - KM servers start when needed
+- **Self-healing** - Automatically restarts failed servers
+- **Security by default** - Restrictive permissions, file locking
+- **No manual port management** - Automatic port allocation

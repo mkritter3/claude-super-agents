@@ -76,27 +76,13 @@ class KMBridge:
             *range(8010, 8100),
         ]
         
-        # Only scan for servers if no project context (backward compatibility)
-        sys.stderr.write("No project context found. Scanning for any available KM server...\n")
+        # No project context should never happen in Claude Desktop
+        # But if it does, fail safely rather than risk data contamination
+        sys.stderr.write("✗ ERROR: No project context detected\n")
+        sys.stderr.write("This should not happen when running from Claude Desktop.\n")
+        sys.stderr.write("Please ensure you're running Claude from a project directory.\n")
         sys.stderr.flush()
-        
-        found_servers = []
-        for port in priority_ports[:30]:  # Check first 30 ports for performance
-            if self.check_km_server(port):
-                found_servers.append(port)
-        
-        if found_servers:
-            port = found_servers[0]
-            sys.stderr.write(f"✓ Found Knowledge Manager on port {port} (shared instance)\n")
-            sys.stderr.write("⚠️  WARNING: Using shared KM instance. For project isolation, run from project directory.\n")
-            sys.stderr.flush()
-            return port
-        
-        # If no server found, fail
-        sys.stderr.write("✗ No Knowledge Manager server found\n")
-        sys.stderr.write("Please start Knowledge Manager with: super-agents --wild\n")
-        sys.stderr.flush()
-        return 0  # Signal failure
+        return 0  # Signal failure - don't risk connecting to wrong server
     
     def check_km_server(self, port: int) -> bool:
         """Check if a Knowledge Manager server is running on the given port"""
