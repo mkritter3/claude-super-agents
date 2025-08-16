@@ -1,0 +1,12 @@
+{
+  "last_deployment": {
+    "timestamp": null,
+    "service": "e2e-test-service",
+    "version": "v1.0.0"
+  },
+  "monitoring_state": {},
+  "performance_baselines": {},
+  "incident_count": 0,
+  "automation_level": "full",
+  "test_value": "integration_test"
+}

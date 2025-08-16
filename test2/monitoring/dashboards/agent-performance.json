@@ -1,0 +1,351 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "AET Agent Performance",
+    "tags": ["aet", "agents", "performance"],
+    "style": "dark",
+    "timezone": "browser",
+    "refresh": "30s",
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "templating": {
+      "list": [
+        {
+          "name": "agent",
+          "type": "query",
+          "query": "label_values(aet_agent_requests_total, agent)",
+          "current": {
+            "value": "All",
+            "text": "All"
+          },
+          "includeAll": true,
+          "allValue": ".*"
+        },
+        {
+          "name": "instance",
+          "type": "query",
+          "query": "label_values(aet_agent_requests_total, instance)",
+          "current": {
+            "value": "All",
+            "text": "All"
+          },
+          "includeAll": true,
+          "allValue": ".*"
+        }
+      ]
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "Agent Request Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(aet_agent_requests_total{agent=~\"$agent\", instance=~\"$instance\"}[5m])",
+            "legendFormat": "{{agent}} - {{operation}}",
+            "refId": "A"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Requests/sec",
+            "min": 0
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "id": 2,
+        "title": "Agent Response Time",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, rate(aet_agent_response_seconds_bucket{agent=~\"$agent\", instance=~\"$instance\"}[5m]))",
+            "legendFormat": "{{agent}} - 50th percentile",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.95, rate(aet_agent_response_seconds_bucket{agent=~\"$agent\", instance=~\"$instance\"}[5m]))",
+            "legendFormat": "{{agent}} - 95th percentile",
+            "refId": "B"
+          },
+          {
+            "expr": "histogram_quantile(0.99, rate(aet_agent_response_seconds_bucket{agent=~\"$agent\", instance=~\"$instance\"}[5m]))",
+            "legendFormat": "{{agent}} - 99th percentile",
+            "refId": "C"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Response Time (seconds)",
+            "min": 0
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 0
+        }
+      },
+      {
+        "id": 3,
+        "title": "Agent Success Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(aet_tasks_total{status=\"success\", agent=~\"$agent\", instance=~\"$instance\"}[5m]) / rate(aet_tasks_total{agent=~\"$agent\", instance=~\"$instance\"}[5m]) * 100",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "steps": [
+                {
+                  "color": "red",
+                  "value": 0
+                },
+                {
+                  "color": "yellow",
+                  "value": 80
+                },
+                {
+                  "color": "green",
+                  "value": 95
+                }
+              ]
+            }
+          }
+        },
+        "gridPos": {
+          "h": 4,
+          "w": 6,
+          "x": 0,
+          "y": 8
+        }
+      },
+      {
+        "id": 4,
+        "title": "Average Response Time",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "avg(rate(aet_agent_response_seconds_sum{agent=~\"$agent\", instance=~\"$instance\"}[5m]) / rate(aet_agent_response_seconds_count{agent=~\"$agent\", instance=~\"$instance\"}[5m]))",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s",
+            "decimals": 3
+          }
+        },
+        "gridPos": {
+          "h": 4,
+          "w": 6,
+          "x": 6,
+          "y": 8
+        }
+      },
+      {
+        "id": 5,
+        "title": "Active Tasks by Agent",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum by (agent) (aet_active_tasks{instance=~\"$instance\"})",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short"
+          }
+        },
+        "options": {
+          "reduceOptions": {
+            "values": false,
+            "calcs": ["lastNotNull"],
+            "fields": ""
+          }
+        },
+        "gridPos": {
+          "h": 4,
+          "w": 6,
+          "x": 12,
+          "y": 8
+        }
+      },
+      {
+        "id": 6,
+        "title": "Total Requests",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(aet_agent_requests_total{agent=~\"$agent\", instance=~\"$instance\"})",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short"
+          }
+        },
+        "gridPos": {
+          "h": 4,
+          "w": 6,
+          "x": 18,
+          "y": 8
+        }
+      },
+      {
+        "id": 7,
+        "title": "Agent Error Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(aet_agent_errors_total{agent=~\"$agent\", instance=~\"$instance\"}[5m])",
+            "legendFormat": "{{agent}} - {{error_type}}",
+            "refId": "A"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Errors/sec",
+            "min": 0
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 12
+        }
+      },
+      {
+        "id": 8,
+        "title": "Agent Task Distribution",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "sum by (agent) (rate(aet_tasks_total{agent=~\"$agent\", instance=~\"$instance\"}[5m]))",
+            "legendFormat": "{{agent}}",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 12
+        }
+      },
+      {
+        "id": 9,
+        "title": "Agent Performance Comparison",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "sum by (agent) (rate(aet_agent_requests_total{agent=~\"$agent\", instance=~\"$instance\"}[5m]))",
+            "format": "table",
+            "refId": "A"
+          },
+          {
+            "expr": "avg by (agent) (rate(aet_agent_response_seconds_sum{agent=~\"$agent\", instance=~\"$instance\"}[5m]) / rate(aet_agent_response_seconds_count{agent=~\"$agent\", instance=~\"$instance\"}[5m]))",
+            "format": "table",
+            "refId": "B"
+          },
+          {
+            "expr": "sum by (agent) (rate(aet_agent_errors_total{agent=~\"$agent\", instance=~\"$instance\"}[5m]))",
+            "format": "table",
+            "refId": "C"
+          },
+          {
+            "expr": "rate(aet_tasks_total{status=\"success\", agent=~\"$agent\", instance=~\"$instance\"}[5m]) / rate(aet_tasks_total{agent=~\"$agent\", instance=~\"$instance\"}[5m]) * 100",
+            "format": "table",
+            "refId": "D"
+          }
+        ],
+        "transformations": [
+          {
+            "id": "merge",
+            "options": {}
+          },
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {
+                "Time": true,
+                "__name__": true
+              },
+              "renameByName": {
+                "Value #A": "Requests/sec",
+                "Value #B": "Avg Response Time (s)",
+                "Value #C": "Errors/sec",
+                "Value #D": "Success Rate (%)"
+              }
+            }
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 24,
+          "x": 0,
+          "y": 20
+        }
+      },
+      {
+        "id": 10,
+        "title": "Task Duration by Agent and Mode",
+        "type": "heatmap",
+        "targets": [
+          {
+            "expr": "sum(rate(aet_task_duration_seconds_bucket{agent=~\"$agent\", instance=~\"$instance\"}[5m])) by (le, agent, mode)",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 28
+        }
+      },
+      {
+        "id": 11,
+        "title": "Agent Operation Breakdown",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(aet_agent_requests_total{agent=~\"$agent\", instance=~\"$instance\"}[5m])",
+            "legendFormat": "{{operation}}",
+            "refId": "A"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Requests/sec",
+            "min": 0
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 28
+        }
+      }
+    ]
+  }
+}

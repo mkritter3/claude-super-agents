@@ -1,0 +1,395 @@
+#!/bin/bash
+#
+# Post-commit hook for autonomous operational triggers
+#
+# This hook implements the breakthrough insight: using hooks as daemon substitutes
+# to enable truly autonomous operations within Claude Code's constraints.
+
+# Get the commit hash and message
+COMMIT_HASH=$(git rev-parse HEAD)
+COMMIT_MSG=$(git log -1 --pretty=%B)
+TIMESTAMP=$(date +%s)
+
+# Base paths
+CLAUDE_DIR=".claude"
+TRIGGERS_DIR="$CLAUDE_DIR/triggers"
+EVENTS_DIR="$CLAUDE_DIR/events"
+
+# Ensure directories exist
+mkdir -p "$TRIGGERS_DIR" "$EVENTS_DIR"
+
+# Log the commit event
+echo "{\"event_id\":\"evt_${TIMESTAMP}_commit\",\"type\":\"CODE_COMMITTED\",\"timestamp\":$TIMESTAMP,\"payload\":{\"commit\":\"$COMMIT_HASH\",\"message\":\"$(echo "$COMMIT_MSG" | tr '"' "'")\"}}" >> "$EVENTS_DIR/log.ndjson"
+
+# Analyze changes to determine what agents to trigger
+CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r HEAD)
+
+# Initialize trigger arrays
+MONITORING_NEEDED=false
+DOCUMENTATION_NEEDED=false
+MIGRATION_NEEDED=false
+PERFORMANCE_CHECK_NEEDED=false
+CONTRACT_GUARD_NEEDED=false
+TEST_EXECUTION_NEEDED=false
+# New full-stack triggers
+UX_VALIDATION_NEEDED=false
+FRONTEND_REVIEW_NEEDED=false
+DATABASE_DESIGN_NEEDED=false
+DEVOPS_AUTOMATION_NEEDED=false
+SECURITY_AUDIT_NEEDED=false
+PRODUCT_REQUIREMENTS_NEEDED=false
+
+# Analyze changed files
+while IFS= read -r file; do
+    case "$file" in
+        # Frontend/UI files - Trigger UX validation and frontend review
+        *.tsx|*.jsx|*.vue|*.svelte|*.css|*.scss|*.sass|*.less)
+            UX_VALIDATION_NEEDED=true
+            FRONTEND_REVIEW_NEEDED=true
+            echo "{\"event_id\":\"evt_${TIMESTAMP}_frontend\",\"type\":\"FRONTEND_CHANGED\",\"timestamp\":$TIMESTAMP,\"payload\":{\"file\":\"$file\",\"commit\":\"$COMMIT_HASH\"}}" >> "$EVENTS_DIR/log.ndjson"
+            ;;
+        
+        # Schema/migration files - Enhanced database validation and critical contract changes
+        *.sql|*.migration|*migrations/*|*schema/*|*.prisma|*.sequelize)
+            MIGRATION_NEEDED=true
+            DATABASE_DESIGN_NEEDED=true
+            CONTRACT_GUARD_NEEDED=true
+            echo "{\"event_id\":\"evt_${TIMESTAMP}_schema\",\"type\":\"SCHEMA_CHANGED\",\"timestamp\":$TIMESTAMP,\"payload\":{\"file\":\"$file\",\"commit\":\"$COMMIT_HASH\"}}" >> "$EVENTS_DIR/log.ndjson"
+            ;;
+            
+        # Infrastructure files - DevOps automation and security scanning
+        *Dockerfile*|*.k8s.yaml|*.tf|*.tfvars|*helm/*|*kubernetes/*|*terraform/*)
+            DEVOPS_AUTOMATION_NEEDED=true
+            SECURITY_AUDIT_NEEDED=true
+            echo "{\"event_id\":\"evt_${TIMESTAMP}_infrastructure\",\"type\":\"INFRASTRUCTURE_CHANGED\",\"timestamp\":$TIMESTAMP,\"payload\":{\"file\":\"$file\",\"commit\":\"$COMMIT_HASH\"}}" >> "$EVENTS_DIR/log.ndjson"
+            ;;
+            
+        # Security-sensitive files - Security validation
+        *.env|*.key|*.pem|*secrets/*|*auth/*|*security/*|*ssl/*|*tls/*)
+            SECURITY_AUDIT_NEEDED=true
+            echo "{\"event_id\":\"evt_${TIMESTAMP}_security\",\"type\":\"SECURITY_SENSITIVE_CHANGED\",\"timestamp\":$TIMESTAMP,\"payload\":{\"file\":\"$file\",\"commit\":\"$COMMIT_HASH\"}}" >> "$EVENTS_DIR/log.ndjson"
+            ;;
+            
+        # Product requirements and documentation files - Product strategy
+        *requirements*|*product*|*roadmap*|*user-stories*|*features*|*specs/*)
+            PRODUCT_REQUIREMENTS_NEEDED=true
+            DOCUMENTATION_NEEDED=true
+            echo "{\"event_id\":\"evt_${TIMESTAMP}_product\",\"type\":\"PRODUCT_REQUIREMENTS_CHANGED\",\"timestamp\":$TIMESTAMP,\"payload\":{\"file\":\"$file\",\"commit\":\"$COMMIT_HASH\"}}" >> "$EVENTS_DIR/log.ndjson"
+            ;;
+        
+        # API contract files - Must validate for breaking changes
+        *.proto|*.graphql|*openapi*|*swagger*|*api-spec*|*contracts/*|*api.yaml|*api.yml)
+            CONTRACT_GUARD_NEEDED=true
+            MONITORING_NEEDED=true
+            echo "{\"event_id\":\"evt_${TIMESTAMP}_contract\",\"type\":\"API_CONTRACT_CHANGED\",\"timestamp\":$TIMESTAMP,\"payload\":{\"file\":\"$file\",\"commit\":\"$COMMIT_HASH\"}}" >> "$EVENTS_DIR/log.ndjson"
+            ;;
+        
+        # Configuration files that might affect monitoring
+        docker-compose.yml|Dockerfile|kubernetes/*|k8s/*|*.yaml|*.yml)
+            MONITORING_NEEDED=true
+            ;;
+        
+        # Source code files - Need documentation and testing
+        *.js|*.ts|*.py|*.go|*.rs|*.java|*.php|*.rb|*.cs)
+            DOCUMENTATION_NEEDED=true
+            PERFORMANCE_CHECK_NEEDED=true
+            TEST_EXECUTION_NEEDED=true
+            ;;
+        
+        # Test files - Run related tests
+        *test*|*spec*|*__tests__*|*tests/*|*.test.*|*.spec.*)
+            TEST_EXECUTION_NEEDED=true
+            ;;
+        
+        # API/route definitions - Contract and monitoring concerns
+        *routes*|*api*|*endpoints*)
+            MONITORING_NEEDED=true
+            DOCUMENTATION_NEEDED=true
+            CONTRACT_GUARD_NEEDED=true
+            TEST_EXECUTION_NEEDED=true
+            ;;
+        
+        # Package/dependency files - Security and performance impacts
+        package.json|package-lock.json|requirements.txt|Cargo.toml|go.mod|composer.json)
+            MONITORING_NEEDED=true
+            PERFORMANCE_CHECK_NEEDED=true
+            CONTRACT_GUARD_NEEDED=true
+            ;;
+    esac
+done <<< "$CHANGED_FILES"
+
+# Create trigger files for needed agents
+if [ "$MONITORING_NEEDED" = true ]; then
+    cat > "$TRIGGERS_DIR/monitoring-agent_trigger_${TIMESTAMP}.json" << EOF
+{
+  "agent": "monitoring-agent",
+  "trigger_event": {
+    "type": "CODE_COMMITTED",
+    "commit": "$COMMIT_HASH",
+    "files_changed": $(echo "$CHANGED_FILES" | jq -R -s -c 'split("\n")[:-1]')
+  },
+  "context": {
+    "commit_message": "$COMMIT_MSG",
+    "changed_files": $(echo "$CHANGED_FILES" | jq -R -s -c 'split("\n")[:-1]'),
+    "monitoring_trigger": "post_commit_analysis"
+  },
+  "created_at": "$(date -Iseconds)",
+  "priority": "medium",
+  "automation_level": "full"
+}
+EOF
+fi
+
+if [ "$DOCUMENTATION_NEEDED" = true ]; then
+    cat > "$TRIGGERS_DIR/documentation-agent_trigger_${TIMESTAMP}.json" << EOF
+{
+  "agent": "documentation-agent", 
+  "trigger_event": {
+    "type": "CODE_COMMITTED",
+    "commit": "$COMMIT_HASH",
+    "files_changed": $(echo "$CHANGED_FILES" | jq -R -s -c 'split("\n")[:-1]')
+  },
+  "context": {
+    "commit_message": "$COMMIT_MSG",
+    "changed_files": $(echo "$CHANGED_FILES" | jq -R -s -c 'split("\n")[:-1]'),
+    "documentation_trigger": "code_changes_detected"
+  },
+  "created_at": "$(date -Iseconds)",
+  "priority": "low",
+  "automation_level": "full"
+}
+EOF
+fi
+
+if [ "$MIGRATION_NEEDED" = true ]; then
+    cat > "$TRIGGERS_DIR/data-migration-agent_trigger_${TIMESTAMP}.json" << EOF
+{
+  "agent": "data-migration-agent",
+  "trigger_event": {
+    "type": "SCHEMA_CHANGED", 
+    "commit": "$COMMIT_HASH",
+    "schema_files": $(echo "$CHANGED_FILES" | grep -E '\.(sql|migration)$|migrations/|schema/' | jq -R -s -c 'split("\n")[:-1]')
+  },
+  "context": {
+    "commit_message": "$COMMIT_MSG",
+    "schema_files": $(echo "$CHANGED_FILES" | grep -E '\.(sql|migration)$|migrations/|schema/' | jq -R -s -c 'split("\n")[:-1]'),
+    "migration_trigger": "schema_changes_detected"
+  },
+  "created_at": "$(date -Iseconds)",
+  "priority": "high",
+  "automation_level": "full"
+}
+EOF
+fi
+
+if [ "$PERFORMANCE_CHECK_NEEDED" = true ]; then
+    cat > "$TRIGGERS_DIR/performance-optimizer-agent_trigger_${TIMESTAMP}.json" << EOF
+{
+  "agent": "performance-optimizer-agent",
+  "trigger_event": {
+    "type": "CODE_COMMITTED",
+    "commit": "$COMMIT_HASH", 
+    "performance_relevant_files": $(echo "$CHANGED_FILES" | grep -E '\.(js|ts|py|go|rs|java)$|package\.json|requirements\.txt' | jq -R -s -c 'split("\n")[:-1]')
+  },
+  "context": {
+    "commit_message": "$COMMIT_MSG",
+    "performance_files": $(echo "$CHANGED_FILES" | grep -E '\.(js|ts|py|go|rs|java)$|package\.json|requirements\.txt' | jq -R -s -c 'split("\n")[:-1]'),
+    "performance_trigger": "code_changes_analysis"
+  },
+  "created_at": "$(date -Iseconds)",
+  "priority": "low",
+  "automation_level": "full"
+}
+EOF
+fi
+
+# Contract Guardian trigger - Critical for preventing breaking changes
+if [ "$CONTRACT_GUARD_NEEDED" = true ]; then
+    cat > "$TRIGGERS_DIR/contract-guardian_trigger_${TIMESTAMP}.json" << EOF
+{
+  "agent": "contract-guardian",
+  "trigger_event": {
+    "type": "CONTRACT_CHANGES_DETECTED",
+    "commit": "$COMMIT_HASH",
+    "contract_files": $(echo "$CHANGED_FILES" | grep -E '\.(sql|proto|graphql|yaml|yml)$|migrations/|schema/|contracts/|openapi|swagger|api-spec' | jq -R -s -c 'split("\n")[:-1]')
+  },
+  "context": {
+    "commit_message": "$COMMIT_MSG",
+    "contract_files": $(echo "$CHANGED_FILES" | grep -E '\.(sql|proto|graphql|yaml|yml)$|migrations/|schema/|contracts/|openapi|swagger|api-spec' | jq -R -s -c 'split("\n")[:-1]'),
+    "contract_trigger": "breaking_change_prevention",
+    "critical_safety_check": true
+  },
+  "created_at": "$(date -Iseconds)",
+  "priority": "critical",
+  "automation_level": "full"
+}
+EOF
+fi
+
+# Test Executor trigger - Quality gates for code changes
+if [ "$TEST_EXECUTION_NEEDED" = true ]; then
+    cat > "$TRIGGERS_DIR/test-executor_trigger_${TIMESTAMP}.json" << EOF
+{
+  "agent": "test-executor",
+  "trigger_event": {
+    "type": "CODE_CHANGES_NEED_TESTING",
+    "commit": "$COMMIT_HASH",
+    "test_relevant_files": $(echo "$CHANGED_FILES" | grep -E '\.(js|ts|py|go|rs|java|php|rb|cs)$|test|spec' | jq -R -s -c 'split("\n")[:-1]')
+  },
+  "context": {
+    "commit_message": "$COMMIT_MSG",
+    "changed_files": $(echo "$CHANGED_FILES" | grep -E '\.(js|ts|py|go|rs|java|php|rb|cs)$|test|spec' | jq -R -s -c 'split("\n")[:-1]'),
+    "test_trigger": "quality_gate_validation",
+    "test_scope": "relevant_to_changes"
+  },
+  "created_at": "$(date -Iseconds)",
+  "priority": "high",
+  "automation_level": "full"
+}
+EOF
+fi
+
+# Frontend/UX triggers
+if [ "$UX_VALIDATION_NEEDED" = true ]; then
+    cat > "$TRIGGERS_DIR/ux-agent_trigger_${TIMESTAMP}.json" << EOF
+{
+  "agent": "ux-agent",
+  "trigger_event": {
+    "type": "UX_VALIDATION_REQUIRED",
+    "commit": "$COMMIT_HASH",
+    "ui_files": $(echo "$CHANGED_FILES" | grep -E '\.(tsx|jsx|vue|svelte|css|scss|sass|less)$' | jq -R -s -c 'split("\n")[:-1]')
+  },
+  "context": {
+    "commit_message": "$COMMIT_MSG",
+    "ui_files": $(echo "$CHANGED_FILES" | grep -E '\.(tsx|jsx|vue|svelte|css|scss|sass|less)$' | jq -R -s -c 'split("\n")[:-1]'),
+    "ux_trigger": "ui_changes_detected",
+    "validation_type": "accessibility_and_usability"
+  },
+  "created_at": "$(date -Iseconds)",
+  "priority": "high",
+  "automation_level": "full"
+}
+EOF
+fi
+
+if [ "$FRONTEND_REVIEW_NEEDED" = true ]; then
+    cat > "$TRIGGERS_DIR/frontend-agent_trigger_${TIMESTAMP}.json" << EOF
+{
+  "agent": "frontend-agent",
+  "trigger_event": {
+    "type": "FRONTEND_REVIEW_REQUIRED",
+    "commit": "$COMMIT_HASH",
+    "frontend_files": $(echo "$CHANGED_FILES" | grep -E '\.(tsx|jsx|vue|svelte|css|scss|sass|less)$' | jq -R -s -c 'split("\n")[:-1]')
+  },
+  "context": {
+    "commit_message": "$COMMIT_MSG",
+    "frontend_files": $(echo "$CHANGED_FILES" | grep -E '\.(tsx|jsx|vue|svelte|css|scss|sass|less)$' | jq -R -s -c 'split("\n")[:-1]'),
+    "frontend_trigger": "component_changes_detected",
+    "review_type": "code_quality_and_performance"
+  },
+  "created_at": "$(date -Iseconds)",
+  "priority": "medium",
+  "automation_level": "full"
+}
+EOF
+fi
+
+# Database triggers  
+if [ "$DATABASE_DESIGN_NEEDED" = true ]; then
+    cat > "$TRIGGERS_DIR/database-agent_trigger_${TIMESTAMP}.json" << EOF
+{
+  "agent": "database-agent",
+  "trigger_event": {
+    "type": "DATABASE_DESIGN_REVIEW",
+    "commit": "$COMMIT_HASH",
+    "database_files": $(echo "$CHANGED_FILES" | grep -E '\.(sql|prisma|sequelize)$|migrations/|schema/' | jq -R -s -c 'split("\n")[:-1]')
+  },
+  "context": {
+    "commit_message": "$COMMIT_MSG",
+    "database_files": $(echo "$CHANGED_FILES" | grep -E '\.(sql|prisma|sequelize)$|migrations/|schema/' | jq -R -s -c 'split("\n")[:-1]'),
+    "database_trigger": "schema_design_review",
+    "review_type": "performance_and_optimization"
+  },
+  "created_at": "$(date -Iseconds)",
+  "priority": "high",
+  "automation_level": "full"
+}
+EOF
+fi
+
+# DevOps triggers
+if [ "$DEVOPS_AUTOMATION_NEEDED" = true ]; then
+    cat > "$TRIGGERS_DIR/devops-agent_trigger_${TIMESTAMP}.json" << EOF
+{
+  "agent": "devops-agent",
+  "trigger_event": {
+    "type": "INFRASTRUCTURE_REVIEW",
+    "commit": "$COMMIT_HASH",
+    "infrastructure_files": $(echo "$CHANGED_FILES" | grep -E 'Dockerfile|\.tf$|\.tfvars$|helm/|kubernetes/|terraform/' | jq -R -s -c 'split("\n")[:-1]')
+  },
+  "context": {
+    "commit_message": "$COMMIT_MSG",
+    "infrastructure_files": $(echo "$CHANGED_FILES" | grep -E 'Dockerfile|\.tf$|\.tfvars$|helm/|kubernetes/|terraform/' | jq -R -s -c 'split("\n")[:-1]'),
+    "devops_trigger": "infrastructure_changes_detected",
+    "automation_type": "deployment_and_monitoring"
+  },
+  "created_at": "$(date -Iseconds)",
+  "priority": "high",
+  "automation_level": "full"
+}
+EOF
+fi
+
+# Security triggers
+if [ "$SECURITY_AUDIT_NEEDED" = true ]; then
+    cat > "$TRIGGERS_DIR/security-agent_trigger_${TIMESTAMP}.json" << EOF
+{
+  "agent": "security-agent",
+  "trigger_event": {
+    "type": "SECURITY_AUDIT_REQUIRED",
+    "commit": "$COMMIT_HASH",
+    "security_files": $(echo "$CHANGED_FILES" | grep -E '\.env|\.key|\.pem|secrets/|auth/|security/|ssl/|tls/' | jq -R -s -c 'split("\n")[:-1]')
+  },
+  "context": {
+    "commit_message": "$COMMIT_MSG",
+    "security_files": $(echo "$CHANGED_FILES" | grep -E '\.env|\.key|\.pem|secrets/|auth/|security/|ssl/|tls/' | jq -R -s -c 'split("\n")[:-1]'),
+    "security_trigger": "security_sensitive_changes",
+    "audit_type": "comprehensive_security_review"
+  },
+  "created_at": "$(date -Iseconds)",
+  "priority": "critical",
+  "automation_level": "full"
+}
+EOF
+fi
+
+# Product strategy triggers
+if [ "$PRODUCT_REQUIREMENTS_NEEDED" = true ]; then
+    cat > "$TRIGGERS_DIR/product-agent_trigger_${TIMESTAMP}.json" << EOF
+{
+  "agent": "product-agent",
+  "trigger_event": {
+    "type": "PRODUCT_REQUIREMENTS_CHANGED",
+    "commit": "$COMMIT_HASH",
+    "product_files": $(echo "$CHANGED_FILES" | grep -E 'requirements|product|roadmap|user-stories|features|specs/' | jq -R -s -c 'split("\n")[:-1]')
+  },
+  "context": {
+    "commit_message": "$COMMIT_MSG",
+    "product_files": $(echo "$CHANGED_FILES" | grep -E 'requirements|product|roadmap|user-stories|features|specs/' | jq -R -s -c 'split("\n")[:-1]'),
+    "product_trigger": "requirements_changes_detected",
+    "strategy_type": "feature_prioritization_and_planning"
+  },
+  "created_at": "$(date -Iseconds)",
+  "priority": "medium",
+  "automation_level": "full"
+}
+EOF
+fi
+
+# Log trigger creation summary
+TRIGGERS_CREATED=$(find "$TRIGGERS_DIR" -name "*_trigger_${TIMESTAMP}.json" | wc -l)
+if [ "$TRIGGERS_CREATED" -gt 0 ]; then
+    echo "{\"event_id\":\"evt_${TIMESTAMP}_triggers\",\"type\":\"TRIGGERS_CREATED\",\"timestamp\":$TIMESTAMP,\"payload\":{\"count\":$TRIGGERS_CREATED,\"commit\":\"$COMMIT_HASH\"}}" >> "$EVENTS_DIR/log.ndjson"
+fi
+
+exit 0

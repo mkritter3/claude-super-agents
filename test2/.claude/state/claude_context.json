@@ -1,0 +1,32 @@
+{
+  "active_incidents": [],
+  "recent_deployments": [
+    {
+      "service": "test-service",
+      "version": "v1.0.0",
+      "timestamp": 1755212481.931741,
+      "status": "completed"
+    },
+    {
+      "service": "e2e-test-service",
+      "version": "v1.0.0",
+      "timestamp": 1755212481.9357991,
+      "status": "completed"
+    },
+    {
+      "service": "test-service",
+      "version": "v1.0.0",
+      "timestamp": 1755213908.3498921,
+      "status": "completed"
+    },
+    {
+      "service": "e2e-test-service",
+      "version": "v1.0.0",
+      "timestamp": 1755213908.354453,
+      "status": "completed"
+    }
+  ],
+  "performance_issues": [],
+  "pending_operations": [],
+  "automation_level": "full"
+}

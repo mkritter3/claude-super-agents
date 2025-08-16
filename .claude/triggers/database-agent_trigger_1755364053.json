@@ -1,0 +1,33 @@
+{
+  "agent": "database-agent",
+  "trigger_event": {
+    "type": "DATABASE_DESIGN_REVIEW",
+    "commit": "46b4960c8e45603920fb726abb9a8bbcc08070ad",
+    "database_files": ["src/super_agents/templates/default_project/system/schema.sql","test/.claude/system/schema.sql"]
+  },
+  "context": {
+    "commit_message": "♻️ Streamline super-agents command - remove Claude launching
+
+• Remove automatic Claude launching from super-agents command
+• Remove --wild flag (no longer needed)
+• Now shows clear status and next steps for users
+• Update templates with latest MCP bridge improvements
+• Verified MCP configuration works with Knowledge Manager
+
+The super-agents command now:
+1. Initializes project if needed
+2. Starts Knowledge Manager
+3. Shows system status and clear next steps
+4. Tells user to run 'claude' separately for MCP integration
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",
+    "database_files": ["src/super_agents/templates/default_project/system/schema.sql","test/.claude/system/schema.sql"],
+    "database_trigger": "schema_design_review",
+    "review_type": "performance_and_optimization"
+  },
+  "created_at": "2025-08-16T10:07:34-07:00",
+  "priority": "high",
+  "automation_level": "full"
+}

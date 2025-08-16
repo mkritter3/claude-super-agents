@@ -1,0 +1,33 @@
+{
+  "agent": "product-agent",
+  "trigger_event": {
+    "type": "PRODUCT_REQUIREMENTS_CHANGED",
+    "commit": "46b4960c8e45603920fb726abb9a8bbcc08070ad",
+    "product_files": [".claude/triggers/product-agent_trigger_1755360275.json","src/super_agents/templates/default_project/agents/product-agent.md","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755310226.json","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755315650.json","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755316409.json","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755316749.json","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755319240.json","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755320792.json","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755322570.json","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755330296.json","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755330920.json","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755331091.json","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755332320.json","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755333071.json","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755333208.json","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755333744.json","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755335365.json","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755335491.json","test/.claude/agents/product-agent.md","test/.claude/triggers/product-agent_trigger_1755310226.json","test/.claude/triggers/product-agent_trigger_1755315650.json","test/.claude/triggers/product-agent_trigger_1755316409.json","test/.claude/triggers/product-agent_trigger_1755316749.json","test/.claude/triggers/product-agent_trigger_1755319240.json","test/.claude/triggers/product-agent_trigger_1755320792.json","test/.claude/triggers/product-agent_trigger_1755322570.json","test/.claude/triggers/product-agent_trigger_1755330296.json","test/.claude/triggers/product-agent_trigger_1755330920.json","test/.claude/triggers/product-agent_trigger_1755331091.json","test/.claude/triggers/product-agent_trigger_1755332320.json","test/.claude/triggers/product-agent_trigger_1755333071.json","test/.claude/triggers/product-agent_trigger_1755333208.json","test/.claude/triggers/product-agent_trigger_1755333744.json","test/.claude/triggers/product-agent_trigger_1755335365.json","test/.claude/triggers/product-agent_trigger_1755335491.json"]
+  },
+  "context": {
+    "commit_message": "♻️ Streamline super-agents command - remove Claude launching
+
+• Remove automatic Claude launching from super-agents command
+• Remove --wild flag (no longer needed)
+• Now shows clear status and next steps for users
+• Update templates with latest MCP bridge improvements
+• Verified MCP configuration works with Knowledge Manager
+
+The super-agents command now:
+1. Initializes project if needed
+2. Starts Knowledge Manager
+3. Shows system status and clear next steps
+4. Tells user to run 'claude' separately for MCP integration
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",
+    "product_files": [".claude/triggers/product-agent_trigger_1755360275.json","src/super_agents/templates/default_project/agents/product-agent.md","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755310226.json","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755315650.json","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755316409.json","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755316749.json","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755319240.json","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755320792.json","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755322570.json","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755330296.json","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755330920.json","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755331091.json","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755332320.json","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755333071.json","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755333208.json","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755333744.json","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755335365.json","src/super_agents/templates/default_project/triggers/product-agent_trigger_1755335491.json","test/.claude/agents/product-agent.md","test/.claude/triggers/product-agent_trigger_1755310226.json","test/.claude/triggers/product-agent_trigger_1755315650.json","test/.claude/triggers/product-agent_trigger_1755316409.json","test/.claude/triggers/product-agent_trigger_1755316749.json","test/.claude/triggers/product-agent_trigger_1755319240.json","test/.claude/triggers/product-agent_trigger_1755320792.json","test/.claude/triggers/product-agent_trigger_1755322570.json","test/.claude/triggers/product-agent_trigger_1755330296.json","test/.claude/triggers/product-agent_trigger_1755330920.json","test/.claude/triggers/product-agent_trigger_1755331091.json","test/.claude/triggers/product-agent_trigger_1755332320.json","test/.claude/triggers/product-agent_trigger_1755333071.json","test/.claude/triggers/product-agent_trigger_1755333208.json","test/.claude/triggers/product-agent_trigger_1755333744.json","test/.claude/triggers/product-agent_trigger_1755335365.json","test/.claude/triggers/product-agent_trigger_1755335491.json"],
+    "product_trigger": "requirements_changes_detected",
+    "strategy_type": "feature_prioritization_and_planning"
+  },
+  "created_at": "2025-08-16T10:07:34-07:00",
+  "priority": "medium",
+  "automation_level": "full"
+}

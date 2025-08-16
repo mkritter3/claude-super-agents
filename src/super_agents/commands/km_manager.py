@@ -83,6 +83,41 @@ class KnowledgeManagerController:
         
         raise RuntimeError("No available ports found (5001-5100)")
     
+    def update_mcp_config(self, port: int) -> None:
+        """Update MCP configuration with the dynamic port"""
+        mcp_config_file = Path(".claude/mcp_config.json")
+        
+        if mcp_config_file.exists():
+            try:
+                # Read existing config
+                with open(mcp_config_file, 'r') as f:
+                    config = json.load(f)
+                
+                # Update port
+                config['local_km_port'] = port
+                
+                # Write back
+                with open(mcp_config_file, 'w') as f:
+                    json.dump(config, f, indent=2)
+                    
+            except (json.JSONDecodeError, OSError) as e:
+                console.print(f"[yellow]Warning: Could not update MCP config: {e}[/yellow]")
+        else:
+            # Create new config
+            config = {
+                'local_km_port': port,
+                'project_dir': str(Path.cwd())
+            }
+            
+            # Ensure directory exists
+            mcp_config_file.parent.mkdir(parents=True, exist_ok=True)
+            
+            try:
+                with open(mcp_config_file, 'w') as f:
+                    json.dump(config, f, indent=2)
+            except OSError as e:
+                console.print(f"[yellow]Warning: Could not create MCP config: {e}[/yellow]")
+    
     def check_dependencies(self) -> bool:
         """Check if required Python packages are installed"""
         missing_deps = []
@@ -188,6 +223,9 @@ except ImportError as e:
         
         # Save PID
         self.pid_file.write_text(str(process.pid))
+        
+        # Update MCP configuration with dynamic port
+        self.update_mcp_config(km_port)
         
         # Wait a moment for startup
         time.sleep(3)
