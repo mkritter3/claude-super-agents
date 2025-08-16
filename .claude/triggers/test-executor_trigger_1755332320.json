@@ -1,0 +1,36 @@
+{
+  "agent": "test-executor",
+  "trigger_event": {
+    "type": "CODE_CHANGES_NEED_TESTING",
+    "commit": "6115c07e388dea8f04d9352e61dd864995fe3a91",
+    "test_relevant_files": [".claude/km_bridge_local.py",".claude/triggers/test-executor_trigger_1755331091.json","km_stdio_bridge_simple.py"]
+  },
+  "context": {
+    "commit_message": "Simplify to local directory-based AET system
+
+MASSIVE simplification - each project gets its own local AET:
+- Everything runs from ./.claude/ in project directory
+- No port coordination needed
+- No project IDs or hashing
+- No file locking
+- Just 150 lines instead of 1000+
+
+Key changes:
+- km_stdio_bridge_simple.py: Only looks for local server in ./.claude/km_server/
+- setup_local_aet.sh: Sets up complete AET system locally
+- Each directory is completely independent
+- Dead simple, actually works
+
+This is what we should have built from the start.
+
+🤖 Generated with Claude Code
+
+Co-Authored-By: Claude <noreply@anthropic.com>",
+    "changed_files": [".claude/km_bridge_local.py",".claude/triggers/test-executor_trigger_1755331091.json","km_stdio_bridge_simple.py"],
+    "test_trigger": "quality_gate_validation",
+    "test_scope": "relevant_to_changes"
+  },
+  "created_at": "2025-08-16T01:18:40-07:00",
+  "priority": "high",
+  "automation_level": "full"
+}

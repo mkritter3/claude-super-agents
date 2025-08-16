@@ -1,0 +1,35 @@
+{
+  "agent": "documentation-agent", 
+  "trigger_event": {
+    "type": "CODE_COMMITTED",
+    "commit": "6115c07e388dea8f04d9352e61dd864995fe3a91",
+    "files_changed": [".claude/aet_status.sh",".claude/km_bridge_local.py",".claude/km_server/km.pid",".claude/km_server/port",".claude/mcp_config.json",".claude/triggers/documentation-agent_trigger_1755331091.json",".claude/triggers/performance-optimizer-agent_trigger_1755331091.json",".claude/triggers/product-agent_trigger_1755331091.json",".claude/triggers/test-executor_trigger_1755331091.json","CLAUDE.md","KM_MCP_SIMPLE.md","km_bridge_wrapper_simple.sh","km_stdio_bridge_simple.py","setup_local_aet.sh"]
+  },
+  "context": {
+    "commit_message": "Simplify to local directory-based AET system
+
+MASSIVE simplification - each project gets its own local AET:
+- Everything runs from ./.claude/ in project directory
+- No port coordination needed
+- No project IDs or hashing
+- No file locking
+- Just 150 lines instead of 1000+
+
+Key changes:
+- km_stdio_bridge_simple.py: Only looks for local server in ./.claude/km_server/
+- setup_local_aet.sh: Sets up complete AET system locally
+- Each directory is completely independent
+- Dead simple, actually works
+
+This is what we should have built from the start.
+
+🤖 Generated with Claude Code
+
+Co-Authored-By: Claude <noreply@anthropic.com>",
+    "changed_files": [".claude/aet_status.sh",".claude/km_bridge_local.py",".claude/km_server/km.pid",".claude/km_server/port",".claude/mcp_config.json",".claude/triggers/documentation-agent_trigger_1755331091.json",".claude/triggers/performance-optimizer-agent_trigger_1755331091.json",".claude/triggers/product-agent_trigger_1755331091.json",".claude/triggers/test-executor_trigger_1755331091.json","CLAUDE.md","KM_MCP_SIMPLE.md","km_bridge_wrapper_simple.sh","km_stdio_bridge_simple.py","setup_local_aet.sh"],
+    "documentation_trigger": "code_changes_detected"
+  },
+  "created_at": "2025-08-16T01:18:40-07:00",
+  "priority": "low",
+  "automation_level": "full"
+}
