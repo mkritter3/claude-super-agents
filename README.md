@@ -53,6 +53,10 @@ cd super-agents
 # Install the requests library (needed for network communication)
 python3 -m pip install requests
 
+# Optional: Install Knowledge Manager for the server
+# (Only needed if you want to use 'super-agents start')
+pip install knowledge-manager
+
 # That's it for dependencies!
 ```
 
@@ -72,8 +76,7 @@ When it asks for your password (sudo), enter your computer's login password.
 
 ```bash
 # Check if it worked
-super-agents --version
-super-agents-local help
+super-agents help
 ```
 
 ## 🎯 How to Use It
@@ -87,22 +90,28 @@ super-agents-local help
 
 2. Set up the AI agents:
    ```bash
-   super-agents-local
+   super-agents
    ```
    
    This creates a `.claude/` folder with everything needed.
 
-3. Check if it's working:
+3. Start the Knowledge Manager server:
    ```bash
-   super-agents-local status
+   super-agents start
+   ```
+
+4. Check if it's working:
+   ```bash
+   super-agents status
    ```
 
 ### Daily Use
 
-Once set up, the AI agents work automatically when you:
-- Open Claude Code in that project
-- Make git commits
-- Run various commands
+Once set up:
+1. Start the server when you begin work: `super-agents start`
+2. Open Claude Code in that project
+3. The AI agents work automatically when you make git commits
+4. Stop the server when done: `super-agents stop`
 
 ## 🛠️ Troubleshooting
 
@@ -111,15 +120,14 @@ Once set up, the AI agents work automatically when you:
 If you get "command not found" errors:
 
 1. Make sure you reopened Terminal after installation
-2. Try running directly:
+2. Check if it's in /usr/local/bin:
    ```bash
-   python3 -m pipx run super-agents
+   ls -la /usr/local/bin/super-agents
    ```
-3. Check your PATH:
+3. Try running with full path:
    ```bash
-   echo $PATH
+   /usr/local/bin/super-agents help
    ```
-   Should include something like `/Users/yourname/.local/bin`
 
 ### "No module named requests"
 
@@ -133,7 +141,7 @@ python3 -m pip install requests
 Make files executable:
 ```bash
 chmod +x ~/super-agents/install.sh
-chmod +x ~/super-agents/super-agents-local
+chmod +x ~/super-agents/super-agents
 ```
 
 ### Can't find the project
@@ -148,21 +156,19 @@ ls   # Lists files in current directory
 
 - **Your project**: Gets a `.claude/` folder with AI agents
 - **Your computer**: 
-  - `/usr/local/bin/super-agents-local` - Global command
-  - `~/.local/bin/super-agents` - Main super-agents command
-  - No system files are modified
+  - `/usr/local/bin/super-agents` - The super-agents command
+  - No other system files are modified
 
 ## 🗑️ Uninstalling
 
 To remove from a project:
 ```bash
-super-agents-local clean
+super-agents clean
 ```
 
 To remove from your computer:
 ```bash
-python3 -m pipx uninstall super-agents
-sudo rm /usr/local/bin/super-agents-local
+sudo rm /usr/local/bin/super-agents
 ```
 
 ## 💡 Tips for Beginners
@@ -191,11 +197,12 @@ If you're stuck:
 1. Check you're in the right folder: `pwd`
 2. Check the file exists: `ls`
 3. Check Python is installed: `python3 --version`
-4. Try running with full path: `~/super-agents/super-agents-local`
+4. Try running with full path: `/usr/local/bin/super-agents`
+5. Check available commands: `super-agents help`
 
 ## 📝 What This Actually Does
 
-When you run `super-agents-local` in a project, it:
+When you run `super-agents` in a project, it:
 
 1. Creates `.claude/agents/` with 23 AI agent configurations
 2. Sets up a local Knowledge Manager server
@@ -206,4 +213,16 @@ Each project is completely independent - no conflicts between projects.
 
 ## 🎉 You're Done!
 
-Once installed, just run `super-agents-local` in any project folder to set up AI agents for that project. It's that simple!
+Once installed, just run `super-agents` in any project folder to set up AI agents for that project.
+
+### Available Commands
+
+- `super-agents` - Set up AET in current directory
+- `super-agents start` - Start the Knowledge Manager server
+- `super-agents stop` - Stop the server
+- `super-agents restart` - Restart the server
+- `super-agents status` - Check system health
+- `super-agents clean` - Remove AET from current directory
+- `super-agents help` - Show all commands
+
+Each project gets its own isolated setup!

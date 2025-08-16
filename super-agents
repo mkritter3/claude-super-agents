@@ -18,16 +18,23 @@ NC='\033[0m' # No Color
 setup_local_aet() {
     echo -e "${GREEN}🚀 Setting up AET system in $PROJECT_DIR${NC}"
     
-    # Check if super-agents is installed globally
-    if ! command -v super-agents >/dev/null 2>&1; then
-        echo -e "${RED}✗ super-agents not found. Install with: pipx install super-agents${NC}"
-        exit 1
-    fi
-    
     # Initialize AET if needed
     if [ ! -d "$CLAUDE_DIR/agents" ]; then
         echo "Initializing AET agents..."
-        super-agents init --force
+        # Copy agent definitions from the script directory
+        if [ -d "$SCRIPT_DIR/.claude/agents" ]; then
+            mkdir -p "$CLAUDE_DIR"
+            cp -r "$SCRIPT_DIR/.claude/agents" "$CLAUDE_DIR/"
+            echo -e "${GREEN}✓${NC} Copied agent definitions"
+        else
+            echo -e "${YELLOW}Creating basic agent structure...${NC}"
+            mkdir -p "$CLAUDE_DIR/agents"
+            # Create a basic agent definition
+            cat > "$CLAUDE_DIR/agents/developer-agent.md" <<'EOF'
+# Developer Agent
+Code implementation specialist
+EOF
+        fi
     else
         echo -e "${GREEN}✓${NC} AET agents already initialized"
     fi
@@ -60,6 +67,22 @@ setup_km_server() {
     
     mkdir -p "$CLAUDE_DIR/km_server"
     echo $PORT > "$CLAUDE_DIR/km_server/port"
+    
+    # Copy local KM server from the script directory
+    if [ -f "$SCRIPT_DIR/.claude/system/km_server.py" ]; then
+        cp "$SCRIPT_DIR/.claude/system/km_server.py" "$CLAUDE_DIR/km_server/"
+        chmod +x "$CLAUDE_DIR/km_server/km_server.py"
+        echo -e "${GREEN}✓${NC} Copied local KM server"
+    else
+        echo -e "${YELLOW}Warning: Local KM server not found in $SCRIPT_DIR/.claude/system/${NC}"
+    fi
+    
+    # Copy supporting files if they exist
+    for file in kma_server.py kma_database.json start_km.sh; do
+        if [ -f "$SCRIPT_DIR/.claude/system/$file" ]; then
+            cp "$SCRIPT_DIR/.claude/system/$file" "$CLAUDE_DIR/km_server/"
+        fi
+    done
     
     # Create KM data directory
     export KM_DATA_DIR="$CLAUDE_DIR/km_server/data"
@@ -226,10 +249,85 @@ clean_aet() {
     fi
 }
 
+# Function to start KM server
+start_km_server() {
+    if [ ! -f "$CLAUDE_DIR/km_server/port" ]; then
+        echo -e "${RED}✗ AET not configured. Run 'super-agents' first.${NC}"
+        exit 1
+    fi
+    
+    PORT=$(cat "$CLAUDE_DIR/km_server/port")
+    
+    # Check if already running
+    if lsof -Pi :$PORT -sTCP:LISTEN -t >/dev/null 2>&1; then
+        echo -e "${GREEN}✓${NC} KM server already running on port $PORT"
+        return 0
+    fi
+    
+    echo -e "${GREEN}Starting Knowledge Manager on port $PORT...${NC}"
+    
+    # Set KM data directory
+    export KM_DATA_DIR="$CLAUDE_DIR/km_server/data"
+    mkdir -p "$KM_DATA_DIR"
+    
+    # Start local KM server
+    if [ -f "$CLAUDE_DIR/km_server/km_server.py" ]; then
+        cd "$CLAUDE_DIR/km_server"
+        python3 km_server.py --port $PORT > server.log 2>&1 &
+        KM_PID=$!
+        echo $KM_PID > pid
+        cd - > /dev/null
+        
+        # Wait for server to start
+        for i in {1..10}; do
+            if curl -s "http://localhost:$PORT/health" >/dev/null 2>&1; then
+                echo -e "${GREEN}✓${NC} Knowledge Manager started (PID: $KM_PID)"
+                echo -e "Logs: $CLAUDE_DIR/km_server/server.log"
+                return 0
+            fi
+            sleep 0.5
+        done
+        
+        echo -e "${RED}✗ Server failed to start. Check logs: $CLAUDE_DIR/km_server/server.log${NC}"
+        exit 1
+    else
+        echo -e "${RED}✗ Local KM server not found. Run 'super-agents' to set it up first.${NC}"
+        exit 1
+    fi
+}
+
+# Function to stop KM server
+stop_km_server() {
+    if [ -f "$CLAUDE_DIR/km_server/pid" ]; then
+        PID=$(cat "$CLAUDE_DIR/km_server/pid")
+        if kill -0 $PID 2>/dev/null; then
+            kill $PID
+            rm "$CLAUDE_DIR/km_server/pid"
+            echo -e "${GREEN}✓${NC} Stopped KM server (PID: $PID)"
+        else
+            echo -e "${YELLOW}Server not running (stale PID file)${NC}"
+            rm "$CLAUDE_DIR/km_server/pid"
+        fi
+    else
+        echo "No KM server running in this directory"
+    fi
+}
+
 # Main command handling
 case "${1:-setup}" in
     setup|init|"")
         setup_local_aet
+        ;;
+    start)
+        start_km_server
+        ;;
+    stop)
+        stop_km_server
+        ;;
+    restart)
+        stop_km_server
+        sleep 1
+        start_km_server
         ;;
     status)
         show_status
@@ -245,6 +343,9 @@ case "${1:-setup}" in
         echo ""
         echo "Commands:"
         echo "  setup    Initialize AET in current directory (default)"
+        echo "  start    Start the KM server for this directory"
+        echo "  stop     Stop the KM server"
+        echo "  restart  Restart the KM server"
         echo "  status   Show AET system status"
         echo "  clean    Remove local AET system"
         echo "  help     Show this help message"
@@ -252,13 +353,8 @@ case "${1:-setup}" in
         echo "Each directory gets its own isolated AET system."
         ;;
     *)
-        # Pass through to original super-agents
-        if command -v super-agents >/dev/null 2>&1; then
-            super-agents "$@"
-        else
-            echo -e "${RED}Unknown command: $1${NC}"
-            echo "Run 'super-agents help' for usage"
-            exit 1
-        fi
+        echo -e "${RED}Unknown command: $1${NC}"
+        echo "Run 'super-agents help' for usage"
+        exit 1
         ;;
 esac
