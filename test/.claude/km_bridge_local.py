@@ -89,10 +89,35 @@ class LocalKMBridge:
                 
                 tools = []
                 for tool in spec.get("tools", []):
+                    # Convert array-based parameters to JSON Schema format
+                    parameters_array = tool.get("parameters", [])
+                    properties = {}
+                    required = []
+                    
+                    for param in parameters_array:
+                        param_name = param.get("name")
+                        param_type = param.get("type", "string")
+                        param_desc = param.get("description", "")
+                        is_optional = param.get("optional", False)
+                        
+                        if param_name:
+                            properties[param_name] = {
+                                "type": param_type,
+                                "description": param_desc
+                            }
+                            if not is_optional:
+                                required.append(param_name)
+                    
+                    input_schema = {
+                        "type": "object",
+                        "properties": properties,
+                        "required": required
+                    }
+                    
                     tools.append({
                         "name": f"km__{tool.get('tool_name', tool.get('name'))}",
                         "description": tool.get("description", ""),
-                        "parameters": tool.get("parameters", [])
+                        "inputSchema": input_schema
                     })
                 return {"tools": tools}
             
