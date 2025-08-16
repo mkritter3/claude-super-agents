@@ -41,25 +41,45 @@ Unlike traditional automation, this system achieves **true autonomy** through:
 
 ## 📦 Installation
 
-### One-Time Global Installation
+### Recommended: Standard Python Installation
 
 ```bash
-# Clone and install
+# Clone the repository
 git clone https://github.com/yourusername/super-agents.git
 cd super-agents
-./install.sh
 
-# Choose installation type:
-# 1. Global (recommended) - Available system-wide
-# 2. User - No sudo required, installs in ~/.local/bin
-# 3. Development - For contributors
+# Install for current user (recommended - no sudo required)
+pip install .
+
+# Or install in development mode (for contributors)
+pip install -e .
 ```
+
+**Note:** The `install.sh` script is deprecated. Use standard `pip` commands for better cross-platform compatibility.
+
+For detailed installation instructions, see [INSTALL.md](INSTALL.md).
 
 ### Requirements
 
-- Python 3.8 or higher
-- pip package manager
-- Git (for autonomous operations)
+- **Python 3.8+** - Check with `python3 --version`
+- **pip** - Python package manager
+- **Git** - For autonomous operations
+- **Claude Code** (optional) - For launching Claude (`claude` command)
+
+### Updating
+
+To update to the latest version after pulling changes:
+
+```bash
+cd super-agents
+git pull
+
+# Reinstall (pip automatically detects the appropriate location)
+pip install --upgrade .
+
+# Or for development mode
+pip install --upgrade -e .
+```
 
 ## 🎮 Usage
 
@@ -330,29 +350,68 @@ cd super-agents
 
 ## 🆘 Troubleshooting
 
-### Command Not Found
+### Installation Issues
+
+#### "UNKNOWN-0.0.0" Package Name
+If you see this during installation, ensure:
+1. You're in the super-agents directory
+2. Run: `sudo pip3 install --force-reinstall .` (note the dot!)
+3. Or use: `./install.sh` for guided installation
+
+#### Command Not Found
 ```bash
-# Check installation
+# Check if installed
 pip3 show super-agents
 
-# Add to PATH for user installs
-echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
-source ~/.bashrc
+# For user installations, add to PATH:
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc  # macOS
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc # Linux
+source ~/.zshrc  # or ~/.bashrc
 ```
 
-### Port Conflicts
+#### Permission Errors
 ```bash
-# List all instances
+# If you get permission errors, use user installation:
+pip3 install --user .
+
+# Or for global, ensure sudo:
+sudo pip3 install .
+```
+
+### Runtime Issues
+
+#### Claude Command Not Found
+If you get "Error: 'claude' command not found!":
+- Install Claude Code from https://claude.ai/code
+- Or use super-agents without Claude for agent management only
+
+#### Port Conflicts
+```bash
+# List all running instances
 super-agents list
 
-# Stop specific project
+# Stop specific project's Knowledge Manager
 cd project-dir
 super-agents stop
+
+# Or stop by port
+kill $(lsof -ti:5001)  # Replace 5001 with actual port
 ```
 
-### Missing Dependencies
+#### Missing Dependencies
 ```bash
+# Install all required packages
 pip3 install click rich colorama flask numpy
+
+# Or reinstall super-agents to get dependencies
+pip3 install --user --force-reinstall .
+```
+
+#### TypeError or Crashes
+Update to the latest version:
+```bash
+git pull
+sudo pip3 install --force-reinstall .  # or pip3 install --user --force-reinstall .
 ```
 
 ## 📚 Documentation

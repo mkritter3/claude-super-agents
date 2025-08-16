@@ -87,12 +87,14 @@ def run_default(wild=False):
     # Show available agents
     try:
         agents_dir = Path(".claude/agents")
-        if agents_dir.exists():
-            agent_files = list(agents_dir.glob("*.md"))
+        if agents_dir.exists() and agents_dir.is_dir():
+            # Convert Path objects to strings immediately to avoid Click parsing issues
+            agent_files = [str(f) for f in agents_dir.glob("*.md") if f.is_file()]
             if agent_files:
                 console.print("Available agents:")
                 for agent_file in sorted(agent_files):
-                    console.print(f"  • {agent_file.stem}")
+                    agent_name = Path(agent_file).stem
+                    console.print(f"  • {agent_name}")
     except Exception as e:
         console.print(f"[yellow]Warning: Could not list agents: {e}[/yellow]")
     

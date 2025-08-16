@@ -5,6 +5,8 @@ Initialize command - Sets up a new project with AET agents
 import os
 import json
 import shutil
+import fcntl
+import time
 from pathlib import Path
 from datetime import datetime
 from typing import Optional, Dict, List
@@ -37,7 +39,7 @@ def check_project_initialized() -> bool:
 
 
 def create_manifest(files_created: List[str]) -> None:
-    """Create a manifest file tracking all created files"""
+    """Create a manifest file tracking all created files with file locking for safety"""
     manifest = {
         "version": "1.0.0",
         "created_at": datetime.now().isoformat(),
@@ -49,19 +51,81 @@ def create_manifest(files_created: List[str]) -> None:
     }
     
     manifest_path = Path(".super_agents_manifest.json")
-    with open(manifest_path, "w") as f:
-        json.dump(manifest, f, indent=2)
+    lock_path = Path(".super_agents_manifest.lock")
     
-    console.print("[dim]Created manifest file: .super_agents_manifest.json[/dim]")
+    # Use file locking to prevent concurrent writes (Unix/Linux/macOS only)
+    # On Windows, file locking works differently, so we'll gracefully degrade
+    try:
+        max_retries = 10
+        retry_delay = 0.1
+        
+        for attempt in range(max_retries):
+            try:
+                # Create or open lock file
+                with open(lock_path, 'w') as lock_file:
+                    # Try to acquire exclusive lock (non-blocking)
+                    fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    
+                    # Write manifest while holding lock
+                    try:
+                        with open(manifest_path, "w") as f:
+                            json.dump(manifest, f, indent=2)
+                        console.print("[dim]Created manifest file: .super_agents_manifest.json[/dim]")
+                        break
+                    finally:
+                        # Release lock
+                        fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
+                        
+            except BlockingIOError:
+                # Another process has the lock, wait and retry
+                if attempt < max_retries - 1:
+                    time.sleep(retry_delay)
+                    retry_delay *= 2  # Exponential backoff
+                else:
+                    console.print("[yellow]Warning: Could not acquire lock for manifest file after retries[/yellow]")
+                    # Fall back to direct write
+                    with open(manifest_path, "w") as f:
+                        json.dump(manifest, f, indent=2)
+            except Exception as e:
+                console.print(f"[yellow]Warning: File locking not available, writing directly[/yellow]")
+                # Fall back to direct write (Windows or other systems without fcntl)
+                with open(manifest_path, "w") as f:
+                    json.dump(manifest, f, indent=2)
+                break
+    except (ImportError, AttributeError):
+        # fcntl not available (Windows), write directly
+        with open(manifest_path, "w") as f:
+            json.dump(manifest, f, indent=2)
+        console.print("[dim]Created manifest file: .super_agents_manifest.json[/dim]")
+    
+    # Clean up lock file if it exists
+    try:
+        if lock_path.exists():
+            lock_path.unlink()
+    except:
+        pass
 
 
 def copy_template_files(source_path: Path, dest_path: Path, force: bool = False) -> List[str]:
     """
-    Copy template files from package to destination with safety checks
+    Copy template files from package to destination with safety checks and robust error handling
     Returns list of created files for manifest
     """
     files_created = []
     conflicts = []
+    
+    # Check write permissions on destination
+    try:
+        test_file = dest_path / ".write_test_temp"
+        test_file.touch()
+        test_file.unlink()
+    except PermissionError:
+        console.print(f"[red]Error: No write permissions in {dest_path}[/red]")
+        console.print("[yellow]Please check directory permissions or choose a different location[/yellow]")
+        return []
+    except OSError as e:
+        console.print(f"[red]Error: Cannot write to {dest_path}: {e}[/red]")
+        return []
     
     # First, scan for conflicts
     for root, dirs, files in os.walk(source_path):
@@ -98,10 +162,13 @@ def copy_template_files(source_path: Path, dest_path: Path, force: bool = False)
             console.print(f"[green]Creating backup in {backup_dir}[/green]")
             
             for conflict in conflicts:
-                src = dest_path / conflict
-                dst = backup_dir / conflict
-                dst.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(src, dst)
+                try:
+                    src = dest_path / conflict
+                    dst = backup_dir / conflict
+                    dst.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(src, dst)
+                except (PermissionError, OSError) as e:
+                    console.print(f"[yellow]Warning: Could not backup {conflict}: {e}[/yellow]")
             
             force = True  # Now we can overwrite
         # Choice 2 means we skip existing files (force remains False)
@@ -111,10 +178,17 @@ def copy_template_files(source_path: Path, dest_path: Path, force: bool = False)
         rel_root = Path(root).relative_to(source_path)
         dest_root = dest_path / rel_root
         
-        # Create directories
-        dest_root.mkdir(parents=True, exist_ok=True)
+        # Create directories with error handling
+        try:
+            dest_root.mkdir(parents=True, exist_ok=True)
+        except PermissionError:
+            console.print(f"[red]Error: Cannot create directory {dest_root}[/red]")
+            continue
+        except OSError as e:
+            console.print(f"[red]Error creating directory {dest_root}: {e}[/red]")
+            continue
         
-        # Copy files
+        # Copy files with error handling
         for file_name in files:
             src_file = Path(root) / file_name
             dest_file = dest_root / file_name
@@ -123,12 +197,21 @@ def copy_template_files(source_path: Path, dest_path: Path, force: bool = False)
                 console.print(f"[dim]Skipping existing file: {dest_file.relative_to(dest_path)}[/dim]")
                 continue
             
-            shutil.copy2(src_file, dest_file)
-            files_created.append(str(dest_file.relative_to(dest_path)))
-            
-            # Make scripts executable
-            if file_name.endswith(('.py', '.sh')) or file_name == 'aet':
-                os.chmod(dest_file, 0o755)
+            try:
+                shutil.copy2(src_file, dest_file)
+                files_created.append(str(dest_file.relative_to(dest_path)))
+                
+                # Make scripts executable
+                if file_name.endswith(('.py', '.sh')) or file_name == 'aet':
+                    os.chmod(dest_file, 0o755)
+            except PermissionError:
+                console.print(f"[yellow]Warning: Permission denied copying {file_name}[/yellow]")
+            except OSError as e:
+                if e.errno == 28:  # No space left on device
+                    console.print(f"[red]Error: No space left on device[/red]")
+                    return files_created
+                else:
+                    console.print(f"[yellow]Warning: Could not copy {file_name}: {e}[/yellow]")
     
     return files_created
 

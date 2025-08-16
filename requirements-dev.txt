@@ -1,0 +1,31 @@
+# Development dependencies with pinned versions
+# Generated from setup.cfg for reproducible development environments
+#
+# To install for development:
+#   pip install -r requirements-dev.txt
+#   pip install -e .
+
+# Core dependencies (pinned for reproducibility)
+click==8.1.7
+flask==2.3.3
+numpy==1.24.4
+colorama==0.4.6
+rich==13.7.0
+
+# Development tools
+pytest==7.4.3
+pytest-cov==4.1.0
+black==23.12.1
+flake8==6.1.0
+mypy==1.8.0
+pip-tools==7.3.0
+
+# Documentation
+sphinx==7.2.6
+sphinx-rtd-theme==2.0.0
+
+# Build tools
+build==1.0.3
+twine==4.0.2
+setuptools>=68.0.0
+wheel>=0.41.0

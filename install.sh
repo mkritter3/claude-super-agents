@@ -1,16 +1,46 @@
 #!/bin/bash
 
+################################################################################
 # Super-Agents Installation Script
-# This script installs the super-agents command globally using pip
+# 
+# Purpose: Install the super-agents command globally or locally on any system
+# 
+# This script performs the following operations:
+# 1. Validates system requirements (Python 3.8+, pip)
+# 2. Offers three installation modes:
+#    - Global: System-wide installation (requires sudo)
+#    - User: Local installation in ~/.local/bin (no sudo)
+#    - Development: Editable install for contributors
+# 3. Handles PATH configuration for user installations
+# 4. Verifies successful installation
+# 5. Provides troubleshooting guidance
+#
+# Usage:
+#   ./install.sh              # Interactive installation
+#   
+# Requirements:
+#   - Python 3.8 or higher
+#   - pip package manager
+#   - Git (for development mode)
+#
+# Installation creates:
+#   - super-agents command (globally accessible)
+#   - Python package in site-packages
+#   - Entry point in appropriate bin directory
+#
+# Exit codes:
+#   0 - Success
+#   1 - Requirements not met or installation failed
+################################################################################
 
-set -e
+set -e  # Exit on error
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-CYAN='\033[0;36m'
-NC='\033[0m' # No Color
+# Terminal color codes for enhanced readability
+RED='\033[0;31m'      # Error messages
+GREEN='\033[0;32m'    # Success messages
+YELLOW='\033[1;33m'   # Warnings
+CYAN='\033[0;36m'     # Information
+NC='\033[0m'          # Reset color
 
 echo ""
 echo "════════════════════════════════════════════════════════════"
@@ -18,14 +48,14 @@ echo "  Super-Agents Global Installation"
 echo "════════════════════════════════════════════════════════════"
 echo ""
 
-# Check if Python is installed
+# Step 1: Validate Python installation
 if ! command -v python3 &> /dev/null; then
     echo -e "${RED}✗${NC} Python 3 is not installed"
     echo "Please install Python 3.8 or higher"
     exit 1
 fi
 
-# Check Python version
+# Step 2: Validate Python version meets minimum requirement (3.8)
 PYTHON_VERSION=$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
 REQUIRED_VERSION="3.8"
 
@@ -37,7 +67,7 @@ fi
 
 echo -e "${GREEN}✓${NC} Python $PYTHON_VERSION detected"
 
-# Check if pip is installed
+# Step 3: Validate pip package manager availability
 if ! command -v pip3 &> /dev/null; then
     echo -e "${YELLOW}⚠${NC} pip3 is not installed"
     echo "Installing pip..."
@@ -48,14 +78,14 @@ if ! command -v pip3 &> /dev/null; then
     }
 fi
 
-# Check if we're in the right directory
+# Step 4: Validate script is run from project root directory
 if [ ! -f "pyproject.toml" ] || [ ! -d "src/super_agents" ]; then
     echo -e "${RED}✗${NC} This script must be run from the super-agents project directory"
     echo "Please cd to the super-agents directory and run ./install.sh"
     exit 1
 fi
 
-# Offer installation options
+# Step 5: Present installation options to user
 echo ""
 echo "Installation Options:"
 echo "  1. Install globally (recommended)"
@@ -71,7 +101,9 @@ case $INSTALL_OPTION in
         echo "This may require sudo password"
         echo ""
         
-        # Install globally
+        # Option 1: Global installation with sudo
+        # Installs to system Python site-packages
+        # Creates command in /usr/local/bin or similar
         sudo pip3 install . || {
             echo -e "${RED}✗${NC} Installation failed"
             echo "Try option 2 (user installation) instead"
@@ -87,7 +119,9 @@ case $INSTALL_OPTION in
         echo -e "${CYAN}Installing super-agents in user space...${NC}"
         echo ""
         
-        # Install for user
+        # Option 2: User-local installation without sudo
+        # Installs to ~/.local/lib/python*/site-packages
+        # Creates command in ~/.local/bin
         pip3 install --user . || {
             echo -e "${RED}✗${NC} Installation failed"
             exit 1
@@ -95,7 +129,8 @@ case $INSTALL_OPTION in
         
         INSTALL_TYPE="user"
         
-        # Check if user's pip bin directory is in PATH
+        # Important: Check if user's pip bin directory is in PATH
+        # Without this, the command won't be accessible
         USER_BIN="$HOME/.local/bin"
         if [[ ":$PATH:" != *":$USER_BIN:"* ]]; then
             echo ""
@@ -117,7 +152,9 @@ case $INSTALL_OPTION in
         echo "Changes to the source code will be immediately reflected"
         echo ""
         
-        # Install in editable/development mode
+        # Option 3: Development mode (editable install)
+        # Links to source directory instead of copying
+        # Changes to source code are immediately reflected
         pip3 install -e . || {
             echo -e "${RED}✗${NC} Installation failed"
             exit 1
@@ -133,7 +170,7 @@ case $INSTALL_OPTION in
         ;;
 esac
 
-# Verify installation
+# Step 6: Verify installation succeeded and command is accessible
 echo ""
 echo "Verifying installation..."
 
@@ -174,7 +211,8 @@ else
     exit 1
 fi
 
-# Offer to uninstall old version if it exists
+# Step 7: Clean up old installations if present
+# This prevents conflicts between different installation methods
 if [ -f "/usr/local/bin/super-agents" ] && [ "$INSTALL_TYPE" != "global" ]; then
     echo -e "${YELLOW}⚠${NC} Old global installation detected at /usr/local/bin/super-agents"
     read -p "Remove old installation? (y/N): " REMOVE_OLD
