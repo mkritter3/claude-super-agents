@@ -1701,6 +1701,76 @@ print("User data restoration completed!")
             self.logger.warning(f"Directory cleanup failed: {e}")
 ```
 
+## Critical Best Practice: Python Environment Detection
+
+### Problem: Hardcoded Python Paths Break Cross-Environment Compatibility
+
+Many installation systems fail because they use hardcoded Python commands like `"python3"` in configuration files, leading to `ModuleNotFoundError` when the Python environment lacks required dependencies.
+
+### Solution: Dynamic Python Detection
+
+**Implement environment detection during installation:**
+
+```python
+def detect_python_executable() -> str:
+    """
+    Detect the correct Python executable that has required dependencies.
+    Returns the full path to a working Python executable.
+    """
+    candidates = [
+        # Try project-specific environments first
+        os.path.expanduser("~/.local/pipx/venvs/your-project/bin/python"),
+        # Try system Python with package managers
+        "/opt/homebrew/bin/python3",
+        "/usr/local/bin/python3",
+        # Current Python interpreter
+        sys.executable,
+        # Fallback to system python3
+        "python3",
+    ]
+    
+    for python_path in candidates:
+        if python_path.startswith("/") and not os.path.exists(python_path):
+            continue
+            
+        try:
+            # Test if this Python has required modules
+            result = subprocess.run([
+                python_path, "-c", "import requests; print('OK')"
+            ], capture_output=True, text=True, timeout=5)
+            
+            if result.returncode == 0:
+                return python_path
+        except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+            continue
+    
+    # Warning if no suitable Python found
+    print("Warning: No Python with required modules found")
+    return "python3"  # Fallback
+```
+
+**Use template substitution in configuration files:**
+
+```json
+// Template file: config.json.template
+{
+  "command": "{{PYTHON_EXECUTABLE}}",
+  "args": ["server.py"]
+}
+
+// During installation: replace placeholder with detected path
+content = template_content.replace('{{PYTHON_EXECUTABLE}}', detected_python)
+```
+
+**Benefits:**
+- ✅ **Cross-environment compatibility**: Works with pip, pipx, conda, homebrew
+- ✅ **Dependency validation**: Ensures required modules are available
+- ✅ **User-friendly**: No manual Python path configuration needed
+- ✅ **Future-proof**: Adapts to different Python installations automatically
+
+**Real-World Example:**
+The super-agents project implemented this pattern to prevent MCP bridge failures. Instead of hardcoded `"python3"`, it detects the pipx environment with requests module and substitutes the full path during installation.
+
 ## Summary
 
 This comprehensive guide provides everything needed to build production-ready installation systems:

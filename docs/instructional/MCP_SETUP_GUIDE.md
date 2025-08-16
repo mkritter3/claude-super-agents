@@ -388,7 +388,34 @@ ls .mcp.json
 3. **Check file permissions**: Is your server script executable?
 4. **Look for Python environment issues**: Is Python in PATH?
 
-#### Issue 2: "No Tools Available" 
+#### Issue 2: "Python ModuleNotFoundError"
+**Symptoms:** MCP server fails with `ModuleNotFoundError: No module named 'requests'`
+**Root Cause:** Wrong Python executable in `.mcp.json`
+**Solution:** Use the correct Python environment:
+
+```json
+{
+  "mcpServers": {
+    "my-server": {
+      "command": "/path/to/correct/python",
+      "args": ["server.py"]
+    }
+  }
+}
+```
+
+**Find the right Python:**
+```bash
+# Test which Python has required modules
+python3 -c "import requests; print('OK')"
+/opt/homebrew/bin/python3 -c "import requests; print('OK')"
+
+# Use the one that prints 'OK'
+```
+
+**Note:** Modern installation tools like super-agents automatically detect the correct Python environment.
+
+#### Issue 3: "No Tools Available" 
 **Symptoms:** Server connects but no tools show up
 **Root Cause:** Wrong parameter format
 **Solution:** Use proper JSON Schema in `inputSchema`:
@@ -407,14 +434,14 @@ ls .mcp.json
 }
 ```
 
-#### Issue 3: "JSON Parse Errors"
+#### Issue 4: "JSON Parse Errors"
 **Symptoms:** Server crashes on requests
 **Solutions:**
 1. **Validate JSON output**: Use `json.dumps()` for all responses
 2. **Handle exceptions**: Wrap everything in try/catch
 3. **Check stdin handling**: Make sure you're reading line by line
 
-#### Issue 4: "Server Stops Responding"
+#### Issue 5: "Server Stops Responding"
 **Symptoms:** Tools work once then fail
 **Root Cause:** Server exits instead of staying alive
 **Solution:** Implement proper event loop:
