@@ -1,0 +1,22 @@
+{
+  "agent": "documentation-agent", 
+  "trigger_event": {
+    "type": "CODE_COMMITTED",
+    "commit": "3462384f0175b0548e3224eab23b05e91122e92a",
+    "files_changed": [".claude/triggers/documentation-agent_trigger_1755335365.json",".claude/triggers/product-agent_trigger_1755335365.json",".claude/triggers/test-executor_trigger_1755335365.json","README.md","super-agents"]
+  },
+  "context": {
+    "commit_message": "🔧 Embed KM server directly in script
+
+- No more file copying from script directory
+- Embedded Flask-based KM server that creates itself
+- Only requires 'pip install flask' instead of external packages
+- Eliminates path confusion between installed script and source directory
+- Now truly self-contained per directory",
+    "changed_files": [".claude/triggers/documentation-agent_trigger_1755335365.json",".claude/triggers/product-agent_trigger_1755335365.json",".claude/triggers/test-executor_trigger_1755335365.json","README.md","super-agents"],
+    "documentation_trigger": "code_changes_detected"
+  },
+  "created_at": "2025-08-16T02:11:31-07:00",
+  "priority": "low",
+  "automation_level": "full"
+}

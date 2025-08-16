@@ -1,174 +1,85 @@
 # Super-Agents 🤖 - AI Team for Your Code
 
-This gives you 23 AI agents that help you write, review, and manage code. Each project gets its own isolated setup.
+23 AI agents that help you write, review, and manage code. Each project gets its own isolated setup.
 
-## 📋 Prerequisites (What You Need First)
-
-Before installing, make sure you have:
-
-1. **Python 3** - Check if you have it:
-   ```bash
-   python3 --version
-   ```
-   Should show something like `Python 3.9.6` or higher.
-   
-   If not installed:
-   - Mac: Python 3 comes pre-installed
-   - Windows: Download from [python.org](https://python.org)
-   - Linux: `sudo apt install python3`
-
-2. **Git** - Check if you have it:
-   ```bash
-   git --version
-   ```
-   
-   If not installed:
-   - Mac: `brew install git` or download from [git-scm.com](https://git-scm.com)
-   - Windows: Download from [git-scm.com](https://git-scm.com)
-   - Linux: `sudo apt install git`
-
-3. **Claude Code** (optional but recommended)
-   - Download from Anthropic if you have access
-
-## 🚀 One-Command Installation
+## 🚀 Install
 
 ```bash
-# Clone and install
 git clone https://github.com/yourusername/super-agents.git
 cd super-agents
 pip install -e .
 ```
 
-That's it! No sudo, no complex setup, no dependency management needed.
-
-## 🎯 How to Use It
-
-### Initialize Any Project (One Command)
+## 🎯 Use
 
 ```bash
-cd /path/to/your/project
+# Initialize in any project
+cd /your/project
 super-agents init
-```
 
-This sets up the complete AET system with 23 agents in your project.
-
-### Launch Claude with AET Agents
-
-```bash
+# Launch Claude with AET agents
 super-agents
 ```
 
-This starts the Knowledge Manager and launches Claude Code with all agents ready.
+## What You Get
 
-### Daily Workflow
+✅ **23 Specialized Agents** - architect, developer, reviewer, security, devops, etc.  
+✅ **Autonomous Operations** - Agents trigger automatically on git commits  
+✅ **Local Knowledge Manager** - Per-project isolation with dynamic ports  
+✅ **Claude Code Integration** - Seamless AI-powered development workflow
 
-1. **Initialize once per project**: `super-agents init`
-2. **Start when coding**: `super-agents` (launches Claude)
-3. **Agents work automatically** when you make git commits
-4. **Stop when done**: `super-agents stop`
+## Commands
 
-## 🛠️ Troubleshooting
+- `super-agents init` - Set up AET in current project
+- `super-agents` - Start system and launch Claude
+- `super-agents status` - Check system health  
+- `super-agents stop` - Stop Knowledge Manager
+- `super-agents --help` - See all commands
 
-### "command not found"
+## Requirements
 
-If `super-agents` command not found:
+- Python 3.8+
+- Git (for autonomous operations)
+- Claude Code (recommended)
 
-```bash
-# Make sure you're in the right directory
-cd super-agents
-pip install -e .
+All dependencies installed automatically.
 
-# Or check where it was installed
-pip show super-agents
-```
+## How It Works
 
-### Missing Dependencies
+1. **Initialize once**: `super-agents init` sets up 23 agents in your project
+2. **Code normally**: Write code, make commits
+3. **Agents activate**: Git hooks trigger autonomous operations
+4. **Quality maintained**: Automatic testing, documentation, security checks
 
-All dependencies are automatically installed with `pip install -e .`
+Each project is completely isolated with its own agent team.
 
-### Permission Issues
+## Agent Team
 
-No sudo needed! The new system installs to your user directory only.
+### Core Engineering
+- **architect-agent** - System design and technical architecture
+- **developer-agent** - Code implementation and features  
+- **reviewer-agent** - Code review and quality assurance
+- **integrator-agent** - Safe merging and integration
 
-### Can't find the project
+### Autonomous Operations  
+- **contract-guardian** - Prevents API/schema breaking changes
+- **test-executor** - Automatic quality gates and test execution
+- **documentation-agent** - Maintains documentation automatically
+- **monitoring-agent** - Auto-configures observability
+- **security-agent** - Security audits and vulnerability scanning
 
-Make sure you're in the right folder:
-```bash
-pwd  # Shows current directory
-ls   # Lists files in current directory
-```
+### Full-Stack Development
+- **frontend-agent** - React/Vue/Angular UI implementation
+- **database-agent** - Schema design and query optimization  
+- **devops-agent** - CI/CD pipelines and deployment automation
+- **ux-agent** - User experience design and accessibility
 
-## 📁 What Gets Installed Where
+...and 10 more specialized agents for complete project coverage.
 
-- **Your project**: Gets a `.claude/` folder with AI agents
-- **Your computer**: 
-  - `/usr/local/bin/super-agents` - The super-agents command
-  - No other system files are modified
+## Troubleshooting
 
-## 🗑️ Uninstalling
+**Command not found?** Run `pip install -e .` in the super-agents directory.
 
-To remove from a project:
-```bash
-super-agents clean
-```
+**Need help?** Run `super-agents --help` or check `super-agents status`.
 
-To remove from your computer:
-```bash
-sudo rm /usr/local/bin/super-agents
-```
-
-## 💡 Tips for Beginners
-
-1. **Terminal Basics**:
-   - `cd foldername` - Enter a folder
-   - `cd ..` - Go back one folder
-   - `ls` - List files in current folder
-   - `pwd` - Show current folder path
-   - `Tab` key - Auto-complete file/folder names
-
-2. **Copy-Paste in Terminal**:
-   - Mac: Cmd+C to copy, Cmd+V to paste
-   - Windows: Right-click to paste
-   - Linux: Ctrl+Shift+C to copy, Ctrl+Shift+V to paste
-
-3. **File Paths**:
-   - `~` means your home directory
-   - `.` means current directory
-   - `..` means parent directory
-
-## 🆘 Getting Help
-
-If you're stuck:
-
-1. Check you're in the right folder: `pwd`
-2. Check the file exists: `ls`
-3. Check Python is installed: `python3 --version`
-4. Try running with full path: `/usr/local/bin/super-agents`
-5. Check available commands: `super-agents help`
-
-## 📝 What This Actually Does
-
-When you run `super-agents` in a project, it:
-
-1. Creates `.claude/agents/` with 23 AI agent configurations
-2. Sets up a local Knowledge Manager server
-3. Configures event tracking and automation
-4. Installs git hooks for automatic operations
-
-Each project is completely independent - no conflicts between projects.
-
-## 🎉 You're Done!
-
-Once installed, just run `super-agents` in any project folder to set up AI agents for that project.
-
-### Available Commands
-
-- `super-agents` - Set up AET in current directory
-- `super-agents start` - Start the Knowledge Manager server
-- `super-agents stop` - Stop the server
-- `super-agents restart` - Restart the server
-- `super-agents status` - Check system health
-- `super-agents clean` - Remove AET from current directory
-- `super-agents help` - Show all commands
-
-Each project gets its own isolated setup!
+That's it! The system works flawlessly out of the box. 🚀

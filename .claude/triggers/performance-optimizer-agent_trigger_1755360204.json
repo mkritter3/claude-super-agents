@@ -1,0 +1,61 @@
+{
+  "agent": "performance-optimizer-agent",
+  "trigger_event": {
+    "type": "CODE_COMMITTED",
+    "commit": "ed3dd9eab915002c4f4da54addeaa1a95905057c", 
+    "performance_relevant_files": ["km_stdio_bridge.py","setup.py","src/super_agents/templates/default_project/.claude/km_bridge_local.py"]
+  },
+  "context": {
+    "commit_message": "🚀 Rebuild installation system from dual-path to unified Python-only approach
+
+This transforms the installation from a broken dual-system approach to a single,
+reliable Python package installation that works flawlessly out of the box.
+
+## Changes Made
+
+### Removed Legacy Install System
+- install.sh - Bash installer with missing dependency management
+- super-agents - 511-line bash script with embedded Python code
+- setup.py - Legacy setup file (pyproject.toml handles this)
+- km_bridge_wrapper.sh, km_stdio_bridge.py - Redundant wrapper scripts
+- README_KM_MCP.md - Outdated MCP documentation
+
+### Enhanced Template System
+- Copy complete .claude/ directory to src/super_agents/templates/default_project/
+- Include all 23 agent definitions (was missing from templates)
+- Include complete system modules (49 Python files)
+- Include full event system, databases, and configurations
+- Result: 113 files deployed vs. 1 minimal fallback
+
+### Unified Installation Process
+- Single command: pip install -e .
+- Automatic dependency resolution
+- No sudo required (user-space installation)
+- Cross-platform compatibility
+- No more installation method confusion
+
+### Updated Documentation
+- INSTALL.md - Simplified to one-command install
+- README.md - Updated installation and usage instructions
+- Removed complex troubleshooting for legacy bash system
+
+## Impact
+
+**Before**: Dual installation creating conflicting commands, missing dependencies,
+incomplete agent deployment, brittle source discovery
+
+**After**: Single pip command deploys complete 23-agent AET system with all
+dependencies automatically managed
+
+The system now provides true "flawless out of the box" operation.
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",
+    "performance_files": ["km_stdio_bridge.py","setup.py","src/super_agents/templates/default_project/.claude/km_bridge_local.py"],
+    "performance_trigger": "code_changes_analysis"
+  },
+  "created_at": "2025-08-16T09:03:24-07:00",
+  "priority": "low",
+  "automation_level": "full"
+}
