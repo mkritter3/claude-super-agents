@@ -372,7 +372,7 @@ def copy_template_files(source_path: Path, dest_path: Path, force: bool = False,
                 else:
                     console.print(f"[yellow]Warning: Could not copy {file_name}: {e}[/yellow]")
     
-    return files_created
+    return files_created, backups_created
 
 
 def setup_mcp_configuration() -> None:

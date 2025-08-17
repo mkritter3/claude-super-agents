@@ -1,0 +1,33 @@
+{
+  "agent": "performance-optimizer-agent",
+  "trigger_event": {
+    "type": "CODE_COMMITTED",
+    "commit": "93195595d85cf523d77085e7756ab2c83a58837c", 
+    "performance_relevant_files": ["src/super_agents/templates/default_project/.claude/system/commands/cleanup.py"]
+  },
+  "context": {
+    "commit_message": "✨ Add retroactive manifest creation for legacy installations
+
+Enhanced cleanup system to handle installations created before manifest tracking.
+When no manifest is found, the system offers to scan the installation and create
+a retroactive manifest by comparing with the template structure.
+
+Features:
+- Automatic detection of super-agents files by template comparison
+- SHA256 hash calculation for file integrity tracking
+- Support for additional files not in template (.mcp.json, CLAUDE.md, etc.)
+- Graceful fallback when rich library not available
+- User-friendly prompts with clear explanations
+
+This allows cleanup of ANY super-agents installation, regardless of when it was created.
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",
+    "performance_files": ["src/super_agents/templates/default_project/.claude/system/commands/cleanup.py"],
+    "performance_trigger": "code_changes_analysis"
+  },
+  "created_at": "2025-08-17T01:41:51-07:00",
+  "priority": "low",
+  "automation_level": "full"
+}
