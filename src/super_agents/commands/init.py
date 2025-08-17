@@ -444,11 +444,14 @@ def initialize_project(force: bool = False) -> bool:
                         template_dest = package_dir / "templates" / "default_project"
                         template_dest.mkdir(parents=True, exist_ok=True)
                         
-                        # Copy necessary files
-                        if (source_dir / ".claude").exists():
-                            shutil.copytree(source_dir / ".claude", template_dest / ".claude", dirs_exist_ok=True)
-                        if (source_dir / "CLAUDE.md").exists():
-                            shutil.copy2(source_dir / "CLAUDE.md", template_dest / "CLAUDE.md")
+                        # Copy necessary files only if template doesn't exist
+                        # This prevents duplication of .claude subdirectories
+                        if not (template_dest / ".claude").exists():
+                            if (source_dir / ".claude").exists():
+                                shutil.copytree(source_dir / ".claude", template_dest / ".claude", dirs_exist_ok=True)
+                        if not (template_dest / "CLAUDE.md").exists():
+                            if (source_dir / "CLAUDE.md").exists():
+                                shutil.copy2(source_dir / "CLAUDE.md", template_dest / "CLAUDE.md")
                         
                         template_path = template_dest
                     
