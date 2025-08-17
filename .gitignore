@@ -82,3 +82,12 @@ src/*.egg-info/
 .claude.backup.*/
 archived_files/
 !src/super_agents/templates/default_project/archived_files/
+
+# Template pollution prevention - no runtime artifacts in templates
+src/super_agents/templates/*/test_reports/
+src/super_agents/templates/*/**/*.log
+src/super_agents/templates/*/**/*.db
+src/super_agents/templates/*/**/*.ndjson
+src/super_agents/templates/*/**/*.pid
+src/super_agents/templates/*/**/*.port
+src/super_agents/templates/*/**/*.lock
