@@ -1,0 +1,32 @@
+{
+  "agent": "documentation-agent", 
+  "trigger_event": {
+    "type": "CODE_COMMITTED",
+    "commit": "c178c6506e32e32185e5ad5d2594a15eea92a23c",
+    "files_changed": [".claude/triggers/documentation-agent_trigger_1755419282.json",".claude/triggers/product-agent_trigger_1755419282.json",".claude/triggers/test-executor_trigger_1755419282.json","src/super_agents/cli.py"]
+  },
+  "context": {
+    "commit_message": "🐛 Fix CLI initialization: Use template's proper init system with Python executable substitution
+
+The CLI was using basic file copying instead of the template's sophisticated
+initialization system that handles Python executable substitution in .mcp.json.
+
+This fixes the Knowledge Manager MCP connection issue where {{PYTHON_EXECUTABLE}}
+placeholders weren't being replaced with actual Python paths.
+
+Changes:
+- Updated CLI initialize_project() to use template's copy_template_files()
+- Added proper Python executable detection and substitution
+- Enabled manifest creation for cleanup system integration
+- Maintained backward compatibility with existing installations
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",
+    "changed_files": [".claude/triggers/documentation-agent_trigger_1755419282.json",".claude/triggers/product-agent_trigger_1755419282.json",".claude/triggers/test-executor_trigger_1755419282.json","src/super_agents/cli.py"],
+    "documentation_trigger": "code_changes_detected"
+  },
+  "created_at": "2025-08-17T01:33:03-07:00",
+  "priority": "low",
+  "automation_level": "full"
+}

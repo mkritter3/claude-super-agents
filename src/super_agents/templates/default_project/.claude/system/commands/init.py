@@ -332,19 +332,28 @@ def copy_template_files(source_path: Path, dest_path: Path, force: bool = False,
             
             try:
                 # Handle template files with substitution
-                if file_name == '.mcp.json' and python_executable:
-                    # Read template content and substitute Python executable
+                if (file_name == '.mcp.json' and python_executable) or file_name == 'mcp_config.json':
+                    # Read template content and substitute placeholders
                     with open(src_file, 'r') as f:
                         content = f.read()
                     
-                    # Substitute the Python executable placeholder
-                    content = content.replace('{{PYTHON_EXECUTABLE}}', python_executable)
+                    # Substitute placeholders
+                    if python_executable:
+                        content = content.replace('{{PYTHON_EXECUTABLE}}', python_executable)
+                    
+                    # Always substitute project directory
+                    project_dir = str(dest_path.resolve())
+                    content = content.replace('{{PROJECT_DIR}}', project_dir)
                     
                     # Write the processed content
                     with open(dest_file, 'w') as f:
                         f.write(content)
                     
-                    console.print(f"[dim]Processed template: {dest_file.relative_to(dest_path)} (Python: {python_executable})[/dim]")
+                    substitutions = []
+                    if python_executable:
+                        substitutions.append(f"Python: {python_executable}")
+                    substitutions.append(f"ProjectDir: {project_dir}")
+                    console.print(f"[dim]Processed template: {dest_file.relative_to(dest_path)} ({', '.join(substitutions)})[/dim]")
                 else:
                     # Regular file copy
                     shutil.copy2(src_file, dest_file)
