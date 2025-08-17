@@ -1,0 +1,19 @@
+{
+  "timestamp": "2025-08-17T00:54:11.311026",
+  "duration_seconds": 0.06,
+  "tests_run": 22,
+  "failures": 0,
+  "errors": 1,
+  "skipped": 0,
+  "success_rate": 95.45,
+  "details": {
+    "failures": [],
+    "errors": [
+      {
+        "test": "test_error_recovery_integration (test_reliability_integration.ReliabilityIntegrationTests.test_error_recovery_integration)",
+        "error": "Traceback (most recent call last):\n  File \"/Volumes/MKR HD/coding-projects/Systems/projects/claude-super-agents/src/super_agents/templates/default_project/.claude/system/tests/integration/test_reliability_integration.py\", line 173, in test_error_recovery_integration\n    recovery_result = recovery.handle_error(error_info)\n  File \"/Volumes/MKR HD/coding-projects/Systems/projects/claude-super-agents/src/super_agents/templates/default_project/.claude/system/reliability/error_recovery.py\", line 54, in handle_error\n    handler = self.handlers.get(error_info.error_type)\n                                ^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'dict' object has no attribute 'error_type'\n"
+      }
+    ],
+    "skipped": []
+  }
+}

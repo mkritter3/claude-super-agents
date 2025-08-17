@@ -1,0 +1,49 @@
+{
+  "timestamp": "2025-08-17T00:43:52.869970",
+  "duration_seconds": 0.06,
+  "tests_run": 22,
+  "failures": 3,
+  "errors": 1,
+  "skipped": 4,
+  "success_rate": 81.82,
+  "details": {
+    "failures": [
+      {
+        "test": "test_performance_optimizations_integration (test_template_system.TemplateSystemIntegrationTests.test_performance_optimizations_integration)",
+        "error": "Traceback (most recent call last):\n  File \"/Volumes/MKR HD/coding-projects/Systems/projects/claude-super-agents/src/super_agents/templates/default_project/.claude/system/tests/integration/test_template_system.py\", line 161, in test_performance_optimizations_integration\n    self.assertEqual(lazy_mod.name, 'test_module')\n                     ^^^^^^^^^^^^^\n  File \"/Volumes/MKR HD/coding-projects/Systems/projects/claude-super-agents/src/super_agents/templates/default_project/.claude/system/performance/lazy_loader.py\", line 37, in __getattr__\n    self._module = importlib.import_module(self.module_name)\n                   ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.13/3.13.7/Frameworks/Python.framework/Versions/3.13/lib/python3.13/importlib/__init__.py\", line 88, in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<frozen importlib._bootstrap>\", line 1387, in _gcd_import\n  File \"<frozen importlib._bootstrap>\", line 1360, in _find_and_load\n  File \"<frozen importlib._bootstrap>\", line 1324, in _find_and_load_unlocked\nModuleNotFoundError: No module named 'test_module'\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/Volumes/MKR HD/coding-projects/Systems/projects/claude-super-agents/src/super_agents/templates/default_project/.claude/system/tests/integration/test_template_system.py\", line 175, in test_performance_optimizations_integration\n    self.fail(f\"Performance integration failed: {e}\")\n    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Performance integration failed: No module named 'test_module'\n"
+      },
+      {
+        "test": "test_reliability_features_integration (test_template_system.TemplateSystemIntegrationTests.test_reliability_features_integration)",
+        "error": "Traceback (most recent call last):\n  File \"/Volumes/MKR HD/coding-projects/Systems/projects/claude-super-agents/src/super_agents/templates/default_project/.claude/system/tests/integration/test_template_system.py\", line 227, in test_reliability_features_integration\n    from reliability.circuit_breaker import CircuitBreaker\nImportError: cannot import name 'CircuitBreaker' from 'reliability.circuit_breaker' (/Volumes/MKR HD/coding-projects/Systems/projects/claude-super-agents/src/super_agents/templates/default_project/.claude/system/reliability/circuit_breaker.py)\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/Volumes/MKR HD/coding-projects/Systems/projects/claude-super-agents/src/super_agents/templates/default_project/.claude/system/tests/integration/test_template_system.py\", line 254, in test_reliability_features_integration\n    self.fail(f\"Reliability integration failed: {e}\")\n    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Reliability integration failed: cannot import name 'CircuitBreaker' from 'reliability.circuit_breaker' (/Volumes/MKR HD/coding-projects/Systems/projects/claude-super-agents/src/super_agents/templates/default_project/.claude/system/reliability/circuit_breaker.py)\n"
+      },
+      {
+        "test": "test_template_upgrade_compatibility (test_template_system.TemplateSystemIntegrationTests.test_template_upgrade_compatibility)",
+        "error": "Traceback (most recent call last):\n  File \"/Volumes/MKR HD/coding-projects/Systems/projects/claude-super-agents/src/super_agents/templates/default_project/.claude/system/tests/integration/test_template_system.py\", line 364, in test_template_upgrade_compatibility\n    from version import VERSION, FEATURES\nModuleNotFoundError: No module named 'version'\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/Volumes/MKR HD/coding-projects/Systems/projects/claude-super-agents/src/super_agents/templates/default_project/.claude/system/tests/integration/test_template_system.py\", line 372, in test_template_upgrade_compatibility\n    self.fail(f\"Version compatibility test failed: {e}\")\n    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Version compatibility test failed: No module named 'version'\n"
+      }
+    ],
+    "errors": [
+      {
+        "test": "test_template_initialization (test_template_system.TemplateSystemIntegrationTests.test_template_initialization)",
+        "error": "Traceback (most recent call last):\n  File \"/Volumes/MKR HD/coding-projects/Systems/projects/claude-super-agents/src/super_agents/templates/default_project/.claude/system/tests/integration/test_template_system.py\", line 58, in test_template_initialization\n    (template_base / 'commands' / '__init__.py').touch()\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"/opt/homebrew/Cellar/python@3.13/3.13.7/Frameworks/Python.framework/Versions/3.13/lib/python3.13/pathlib/_local.py\", line 714, in touch\n    fd = os.open(self, flags, mode)\nFileNotFoundError: [Errno 2] No such file or directory: '.claude/system/commands/__init__.py'\n"
+      }
+    ],
+    "skipped": [
+      {
+        "test": "test_circuit_breaker_integration (test_reliability_integration.ReliabilityIntegrationTests.test_circuit_breaker_integration)",
+        "reason": "Circuit breaker module not available: cannot import name 'CircuitBreaker' from 'reliability.circuit_breaker' (/Volumes/MKR HD/coding-projects/Systems/projects/claude-super-agents/src/super_agents/templates/default_project/.claude/system/reliability/circuit_breaker.py)"
+      },
+      {
+        "test": "test_error_recovery_integration (test_reliability_integration.ReliabilityIntegrationTests.test_error_recovery_integration)",
+        "reason": "Error recovery module not available: cannot import name 'CircuitBreaker' from 'reliability.circuit_breaker' (/Volumes/MKR HD/coding-projects/Systems/projects/claude-super-agents/src/super_agents/templates/default_project/.claude/system/reliability/circuit_breaker.py)"
+      },
+      {
+        "test": "test_graceful_degradation_integration (test_reliability_integration.ReliabilityIntegrationTests.test_graceful_degradation_integration)",
+        "reason": "Graceful degradation module not available: cannot import name 'CircuitBreaker' from 'reliability.circuit_breaker' (/Volumes/MKR HD/coding-projects/Systems/projects/claude-super-agents/src/super_agents/templates/default_project/.claude/system/reliability/circuit_breaker.py)"
+      },
+      {
+        "test": "test_health_monitoring_integration (test_reliability_integration.ReliabilityIntegrationTests.test_health_monitoring_integration)",
+        "reason": "Health monitoring module not available: cannot import name 'CircuitBreaker' from 'reliability.circuit_breaker' (/Volumes/MKR HD/coding-projects/Systems/projects/claude-super-agents/src/super_agents/templates/default_project/.claude/system/reliability/circuit_breaker.py)"
+      }
+    ]
+  }
+}

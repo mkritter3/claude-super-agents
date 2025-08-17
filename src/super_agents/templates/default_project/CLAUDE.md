@@ -78,6 +78,12 @@ You have access to Context7 MCP tools for fetching current library documentation
 ./.claude/aet status
 ./.claude/aet health  
 ./.claude/aet metrics
+
+# System management (via super-agents CLI)
+super-agents init              # Initialize new project
+super-agents cleanup          # Safe removal with backup restoration
+super-agents cleanup --dry-run # Preview cleanup actions
+super-agents cleanup --force  # Skip confirmation prompts
 ```
 
 ### **Autonomous Operations (System Controls)**
@@ -299,6 +305,54 @@ This system achieves **true autonomy** through:
 3. **Natural Language as Control Plane**: Technical events become actionable prompts
 
 **Result**: A system that prevents production issues, maintains quality, and optimizes performance **without constant human supervision** while preserving human control over strategic decisions.
+
+## 🧹 **Cleanup & Uninstall System**
+
+### **Safe Removal with Backup Restoration**
+
+The super-agents system includes a robust cleanup system that can safely remove all installed files and restore original backups:
+
+```bash
+# Preview what would be cleaned up (recommended first step)
+super-agents cleanup --dry-run
+
+# Interactive cleanup with confirmation
+super-agents cleanup
+
+# Automated cleanup without confirmation  
+super-agents cleanup --force
+```
+
+### **How Cleanup Works**
+
+1. **Manifest-Based Tracking**: During init, all created files are tracked with SHA256 hashes
+2. **Safety Validation**: Checks for running processes and prevents unsafe operations
+3. **Backup Restoration**: Automatically restores any files that were backed up during init
+4. **User Modification Detection**: Warns about files you've modified that will be lost
+5. **Phased Execution**: Restores backups → deletes files → removes directories → cleans manifest
+
+### **Safety Features**
+
+- **Process Detection**: Prevents cleanup while super-agents processes are running
+- **Hash Verification**: Detects which files you've modified since installation  
+- **Backup Restoration**: Automatically restores any original files that were backed up
+- **Confirmation Prompts**: Interactive confirmation with detailed impact summary
+- **Dry Run Mode**: Preview all actions without making any changes
+
+### **What Gets Cleaned Up**
+
+- All `.claude/` directory contents (agents, system files, configurations)
+- `CLAUDE.md` file and any other installed templates
+- `.mcp.json` MCP configuration file
+- All backup directories created during installation
+
+### **What Gets Restored**
+
+- Any files that existed before installation and were backed up
+- Original file permissions and timestamps
+- Directory structure as it existed before super-agents
+
+**Note**: Files you've modified after installation will be permanently deleted unless you back them up manually first.
 
 ## 🎯 **Your Role Summary**
 

@@ -1,23 +1,19 @@
 #!/usr/bin/env python3
 """
-Super Agents CLI - Main command-line interface
+Super Agents CLI - Streamlined command-line interface that delegates to template
 """
 
-import click
 import os
 import sys
 import subprocess
 import shutil
 from pathlib import Path
+
+import click
 from rich.console import Console
 from rich.panel import Panel
-from rich.table import Table
 
 from super_agents import __version__
-from super_agents.commands.init import initialize_project
-from super_agents.commands.upgrade import upgrade_project
-from super_agents.commands.km_manager import KnowledgeManagerController
-from super_agents.commands.status import show_status
 
 console = Console()
 
@@ -26,57 +22,195 @@ console = Console()
 @click.option('--stop', is_flag=True, help="Stop the Knowledge Manager")
 @click.option('--status', is_flag=True, help="Show status of current project's AET system")
 @click.option('--list', is_flag=True, help="List all projects with running KM instances")
+@click.option('--profile', is_flag=True, help="Enable performance profiling")
 @click.version_option(version=__version__)
 @click.pass_context
-def main(ctx, stop, status, list):
+def main(ctx, stop, status, list, profile):
     """
     Super Agents - Autonomous Engineering Team (AET) System
     
     A production-ready multi-agent orchestration system with true autonomous operations.
     """
-    # Handle direct flags
+    # Store options in context for delegation
+    ctx.ensure_object(dict)
+    ctx.obj['profile'] = profile
+    
+    # Handle direct flags by delegating to template
     if stop:
-        km = KnowledgeManagerController()
-        km.stop()
+        delegate_to_template('stop')
         return
     
     if status:
-        show_status()
+        delegate_to_template('status')
         return
     
     if list:
-        km = KnowledgeManagerController()
-        km.list_all_instances()
+        delegate_to_template('list')
         return
     
     # If no command specified, run default behavior
     if ctx.invoked_subcommand is None:
-        # Default behavior: init if needed, start KM
-        run_default()
+        # Default behavior: ensure project is initialized, then start
+        if not is_project_initialized():
+            console.print("[yellow]No AET agents found - initializing project...[/yellow]")
+            if not initialize_project():
+                console.print("[red]Failed to initialize project[/red]")
+                sys.exit(1)
+        
+        # Delegate to template for startup
+        delegate_to_template('start', ['--profile'] if profile else [])
 
 
-def run_default():
-    """Default behavior when no subcommand is given"""
-    from super_agents.commands.init import check_project_initialized
+def is_project_initialized() -> bool:
+    """Check if the current directory has been initialized with AET"""
+    return Path('.claude').exists() and Path('.claude/system').exists()
+
+
+def initialize_project() -> bool:
+    """Initialize a new project by copying the template"""
+    try:
+        # Find the template directory
+        template_source = get_template_path()
+        if not template_source:
+            console.print("[red]Could not find template directory[/red]")
+            return False
+        
+        current_dir = Path.cwd()
+        
+        # Copy the entire template
+        console.print("Copying AET template...")
+        for item in template_source.iterdir():
+            dest = current_dir / item.name
+            if item.is_dir():
+                if dest.exists():
+                    shutil.rmtree(dest)
+                shutil.copytree(item, dest)
+            else:
+                shutil.copy2(item, dest)
+        
+        console.print("[green]✓[/green] AET template copied successfully")
+        
+        # Make scripts executable
+        make_scripts_executable()
+        
+        return True
+        
+    except Exception as e:
+        console.print(f"[red]Error during initialization: {e}[/red]")
+        return False
+
+
+def get_template_path() -> Path:
+    """Find the template directory in the installed package"""
+    try:
+        # Try to find template relative to this file
+        current_file = Path(__file__)
+        template_path = current_file.parent / "templates" / "default_project"
+        
+        if template_path.exists():
+            return template_path
+        
+        # Try alternative locations
+        import super_agents
+        package_dir = Path(super_agents.__file__).parent
+        template_path = package_dir / "templates" / "default_project"
+        
+        if template_path.exists():
+            return template_path
+            
+        return None
+        
+    except Exception:
+        return None
+
+
+def make_scripts_executable():
+    """Make key scripts executable"""
+    scripts = [
+        ".claude/aet",
+        ".claude/aet_status.sh", 
+        ".claude/setup.sh",
+        ".claude/km_bridge_local.py"
+    ]
     
+    for script in scripts:
+        script_path = Path(script)
+        if script_path.exists():
+            script_path.chmod(0o755)
+
+
+def delegate_to_template(command: str, extra_args: list = None):
+    """Delegate a command to the template's command system"""
+    if extra_args is None:
+        extra_args = []
+        
     # Check if project is initialized
-    if not check_project_initialized():
-        console.print("[yellow]No AET agents found - initializing project...[/yellow]")
-        if not initialize_project():
-            console.print("[red]Failed to initialize project[/red]")
-            sys.exit(1)
-    else:
-        console.print("[green]✓[/green] AET agents already configured in this project")
-    
-    # Start Knowledge Manager
-    km = KnowledgeManagerController()
-    km_port = km.start()
-    
-    if not km_port:
-        console.print("[red]Failed to start Knowledge Manager[/red]")
+    if not is_project_initialized():
+        console.print("[red]Project not initialized. Run 'super-agents init' first.[/red]")
         sys.exit(1)
     
-    # Show system status
+    # Add .claude/system to Python path and run the command
+    template_commands = Path('.claude/system/commands')
+    if not template_commands.exists():
+        console.print("[red]Template commands not found. Run 'super-agents upgrade'.[/red]")
+        sys.exit(1)
+    
+    # Import and run the template command
+    sys.path.insert(0, str(Path('.claude/system')))
+    
+    try:
+        if command == 'start':
+            from commands.km_manager import KnowledgeManagerController
+            from commands.init import check_project_initialized
+            
+            # Start the Knowledge Manager using template logic
+            console.print("[green]✓[/green] AET agents already configured in this project")
+            km = KnowledgeManagerController()
+            km_port = km.start()
+            
+            if not km_port:
+                console.print("[red]Failed to start Knowledge Manager[/red]")
+                sys.exit(1)
+            
+            # Show ready message
+            show_ready_message(km_port)
+            
+        elif command == 'stop':
+            from commands.km_manager import KnowledgeManagerController
+            km = KnowledgeManagerController()
+            km.stop()
+            
+        elif command == 'status':
+            from commands.status import show_status
+            show_status()
+            
+        elif command == 'list':
+            from commands.km_manager import KnowledgeManagerController
+            km = KnowledgeManagerController()
+            km.list_all_instances()
+            
+        elif command == 'cleanup':
+            from commands.cleanup import SuperAgentsCleanup
+            cleanup_system = SuperAgentsCleanup()
+            
+            # Parse arguments from extra_args
+            force = '--force' in extra_args
+            dry_run = '--dry-run' in extra_args
+            
+            success = cleanup_system.cleanup(force=force, dry_run=dry_run)
+            sys.exit(0 if success else 1)
+            
+    except ImportError as e:
+        console.print(f"[red]Failed to import template command: {e}[/red]")
+        console.print("[dim]Try running 'super-agents upgrade' to update the template[/dim]")
+        sys.exit(1)
+    except Exception as e:
+        console.print(f"[red]Error executing command: {e}[/red]")
+        sys.exit(1)
+
+
+def show_ready_message(km_port: int):
+    """Show the system ready message"""
     console.print("\n" + "═" * 60)
     console.print("  📊 AET System Ready")
     console.print("═" * 60)
@@ -88,12 +222,11 @@ def run_default():
     try:
         agents_dir = Path(".claude/agents")
         if agents_dir.exists() and agents_dir.is_dir():
-            # Convert Path objects to strings immediately to avoid Click parsing issues
-            agent_files = [str(f) for f in agents_dir.glob("*.md") if f.is_file()]
+            agent_files = [f for f in agents_dir.glob("*.md") if f.is_file()]
             if agent_files:
                 console.print("Available agents:")
                 for agent_file in sorted(agent_files):
-                    agent_name = Path(agent_file).stem
+                    agent_name = agent_file.stem
                     console.print(f"  • {agent_name}")
     except Exception as e:
         console.print(f"[yellow]Warning: Could not list agents: {e}[/yellow]")
@@ -109,8 +242,13 @@ def run_default():
 @click.option('--force', is_flag=True, help="Force initialization even if files exist")
 def init(force):
     """Initialize a new project with AET agents"""
-    if initialize_project(force=force):
+    if is_project_initialized() and not force:
+        console.print("[yellow]Project already initialized. Use --force to reinitialize.[/yellow]")
+        return
+    
+    if initialize_project():
         console.print("[green]✓[/green] Project initialized successfully!")
+        console.print("[dim]Run 'super-agents' to start the system[/dim]")
     else:
         console.print("[red]✗[/red] Failed to initialize project")
         sys.exit(1)
@@ -120,155 +258,111 @@ def init(force):
 @click.option('--backup-dir', help="Custom backup directory path")
 def upgrade(backup_dir):
     """Upgrade an existing project to the latest version"""
-    if upgrade_project(backup_dir=backup_dir):
-        console.print("[green]✓[/green] Project upgraded successfully!")
-    else:
-        console.print("[red]✗[/red] Failed to upgrade project")
-        sys.exit(1)
+    delegate_to_template('upgrade', ['--backup-dir', backup_dir] if backup_dir else [])
+
+
+@main.command()
+@click.option('--force', is_flag=True, help="Skip confirmation prompts")
+@click.option('--dry-run', is_flag=True, help="Show what would be done without making changes")
+def cleanup(force, dry_run):
+    """Clean up super-agents installation and restore original files"""
+    delegate_to_template('cleanup', 
+                        (['--force'] if force else []) + 
+                        (['--dry-run'] if dry_run else []))
 
 
 @main.command()
 def status():
     """Show detailed status of the current project"""
-    show_status()
+    delegate_to_template('status')
 
 
 @main.command()
 def stop():
     """Stop the Knowledge Manager for this project"""
-    km = KnowledgeManagerController()
-    km.stop()
+    delegate_to_template('stop')
 
 
 @main.command()
 def list():
     """List all projects with running KM instances"""
-    km = KnowledgeManagerController()
-    km.list_all_instances()
+    delegate_to_template('list')
 
 
+# All other commands delegate to template scripts
 @main.command()
 def recover():
     """Run error recovery system"""
-    console.print(Panel.fit("🔧 Running AET Error Recovery", style="bold yellow"))
-    
-    recovery_script = Path(".claude/system/error_recovery.py")
-    if recovery_script.exists():
-        subprocess.run([sys.executable, str(recovery_script), "--recover"])
-    else:
-        console.print("[red]Error recovery system not found[/red]")
-        console.print("[dim]Run 'super-agents init' to set up the project first[/dim]")
+    run_template_script('error_recovery.py', ['--recover'])
 
 
 @main.command()
 def monitor():
     """Monitor process health"""
-    console.print(Panel.fit("📊 AET Process Monitor", style="bold cyan"))
-    
-    monitor_script = Path(".claude/system/process_manager.py")
-    if monitor_script.exists():
-        subprocess.run([sys.executable, str(monitor_script), "--monitor"])
-    else:
-        console.print("[red]Process manager not found[/red]")
-        console.print("[dim]Run 'super-agents init' to set up the project first[/dim]")
+    run_template_script('process_manager.py', ['--monitor'])
 
 
 @main.command()
 def validate():
     """Validate system integrity"""
-    console.print(Panel.fit("✅ AET System Validation", style="bold green"))
-    
-    validate_script = Path(".claude/system/atomic_operations.py")
-    if validate_script.exists():
-        console.print("\n[bold]Event Log:[/bold]")
-        subprocess.run([sys.executable, str(validate_script), "--validate-log"])
-        console.print("\n[bold]Trigger Files:[/bold]")
-        subprocess.run([sys.executable, str(validate_script), "--validate-triggers"])
-    else:
-        console.print("[red]Atomic operations system not found[/red]")
-        console.print("[dim]Run 'super-agents init' to set up the project first[/dim]")
+    run_template_script('atomic_operations.py', ['--validate-log'])
 
 
 @main.command()
 def security():
     """Security audit and management"""
-    console.print(Panel.fit("🔒 AET Security Manager", style="bold red"))
-    
-    security_script = Path(".claude/system/security_manager.py")
-    if security_script.exists():
-        subprocess.run([sys.executable, str(security_script), "--audit-report"])
-    else:
-        console.print("[red]Security manager not found[/red]")
-        console.print("[dim]Run 'super-agents init' to set up the project first[/dim]")
+    run_template_script('security_manager.py', ['--audit-report'])
 
 
 @main.command()
 def optimize():
     """Model optimization matrix"""
-    console.print(Panel.fit("🎯 AET Model Optimizer", style="bold magenta"))
-    
-    optimizer_script = Path(".claude/system/model_optimizer.py")
-    if optimizer_script.exists():
-        subprocess.run([sys.executable, str(optimizer_script), "--matrix"])
-    else:
-        console.print("[red]Model optimizer not found[/red]")
-        console.print("[dim]Run 'super-agents init' to set up the project first[/dim]")
+    run_template_script('model_optimizer.py', ['--matrix'])
 
 
 @main.command()
 def parallel():
     """Start parallel executor with worker pool"""
-    console.print(Panel.fit("⚡ AET Parallel Executor (Phase 1.1)", style="bold yellow"))
-    
-    parallel_script = Path(".claude/system/parallel_executor.py")
-    if parallel_script.exists():
-        console.print("Starting parallel executor with optimal worker count...")
-        subprocess.run([sys.executable, str(parallel_script), "--start"])
-    else:
-        console.print("[red]Parallel executor not found[/red]")
-        console.print("[dim]Run 'super-agents init' to set up the project first[/dim]")
+    run_template_script('parallel_executor.py', ['--start'])
 
 
 @main.command()
 @click.argument('task_spec')
 def submit(task_spec):
-    """
-    Submit task for parallel execution
-    
-    TASK_SPEC format: AGENT:TASK
-    Example: developer-agent:implement_feature
-    """
-    parallel_script = Path(".claude/system/parallel_executor.py")
-    if parallel_script.exists():
-        subprocess.run([sys.executable, str(parallel_script), "--submit", task_spec])
-    else:
-        console.print("[red]Parallel executor not found[/red]")
-        console.print("[dim]Run 'super-agents init' to set up the project first[/dim]")
+    """Submit task for parallel execution"""
+    run_template_script('parallel_executor.py', ['--submit', task_spec])
 
 
 @main.command()
 def queue_stats():
     """Show parallel queue statistics"""
-    console.print(Panel.fit("📊 Parallel Queue Statistics", style="bold cyan"))
-    
-    parallel_script = Path(".claude/system/parallel_executor.py")
-    if parallel_script.exists():
-        subprocess.run([sys.executable, str(parallel_script), "--stats"])
-    else:
-        console.print("[red]Parallel executor not found[/red]")
-        console.print("[dim]Run 'super-agents init' to set up the project first[/dim]")
+    run_template_script('parallel_executor.py', ['--stats'])
 
 
 @main.command()
 @click.argument('task_id')
 def task(task_id):
     """Check status of specific task"""
-    parallel_script = Path(".claude/system/parallel_executor.py")
-    if parallel_script.exists():
-        subprocess.run([sys.executable, str(parallel_script), "--status", task_id])
-    else:
-        console.print("[red]Parallel executor not found[/red]")
-        console.print("[dim]Run 'super-agents init' to set up the project first[/dim]")
+    run_template_script('parallel_executor.py', ['--status', task_id])
+
+
+def run_template_script(script_name: str, args: list = None):
+    """Run a script from the template system directory"""
+    if not is_project_initialized():
+        console.print("[red]Project not initialized. Run 'super-agents init' first.[/red]")
+        sys.exit(1)
+    
+    script_path = Path(f".claude/system/{script_name}")
+    if not script_path.exists():
+        console.print(f"[red]{script_name} not found[/red]")
+        console.print("[dim]Run 'super-agents upgrade' to update the template[/dim]")
+        sys.exit(1)
+    
+    cmd = [sys.executable, str(script_path)]
+    if args:
+        cmd.extend(args)
+    
+    subprocess.run(cmd)
 
 
 if __name__ == '__main__':

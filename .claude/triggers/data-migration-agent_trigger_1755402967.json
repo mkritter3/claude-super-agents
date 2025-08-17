@@ -1,0 +1,27 @@
+{
+  "agent": "data-migration-agent",
+  "trigger_event": {
+    "type": "SCHEMA_CHANGED", 
+    "commit": "9bd6436c5e2d89464b957c3fceefabf878cd9533",
+    "schema_files": ["src/super_agents/templates/default_project/system/schema.sql","src/super_agents/templates/default_project_old/.claude/system/schema.sql","src/super_agents/templates/default_project_old/system/schema.sql"]
+  },
+  "context": {
+    "commit_message": "🧹 Clean up template: Remove Context7 files and runtime artifacts
+
+- Remove settings.json and settings.local.json from template (Context7-specific)
+- Remove Context7 hook script and setup code from init.py
+- Remove runtime artifacts: logs, triggers, state files, monitoring data
+- Remove duplicate directory structures that caused file duplication
+- Template now reduced from 411 to 157 files
+- Core AET functionality preserved, Context7 can be added manually if needed
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",
+    "schema_files": ["src/super_agents/templates/default_project/system/schema.sql","src/super_agents/templates/default_project_old/.claude/system/schema.sql","src/super_agents/templates/default_project_old/system/schema.sql"],
+    "migration_trigger": "schema_changes_detected"
+  },
+  "created_at": "2025-08-16T20:56:07-07:00",
+  "priority": "high",
+  "automation_level": "full"
+}

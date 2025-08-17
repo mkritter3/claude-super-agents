@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "km": {
-      "command": "{{PYTHON_EXECUTABLE}}",
-      "args": [".claude/km_bridge_local.py"]
-    }
-  }
-}

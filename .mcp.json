@@ -3,6 +3,10 @@
     "context7": {
       "command": "npx",
       "args": ["-y", "@upstash/context7"]
+    },
+    "km": {
+      "command": "/Users/michaelritter/.local/pipx/venvs/super-agents/bin/python",
+      "args": [".claude/km_bridge_local.py"]
     }
   }
 }
