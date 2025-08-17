@@ -1,0 +1,31 @@
+{
+  "agent": "performance-optimizer-agent",
+  "trigger_event": {
+    "type": "CODE_COMMITTED",
+    "commit": "f2c751ddd2e7720fe968d6112748fcffe2453fb5", 
+    "performance_relevant_files": ["src/super_agents/templates/default_project/.claude/system/commands/init.py"]
+  },
+  "context": {
+    "commit_message": "🔧 Fix PROJECT_DIR placeholder substitution in mcp_config.json
+
+Enhanced template initialization system to properly substitute {{PROJECT_DIR}}
+placeholder in .claude/mcp_config.json file during project initialization.
+
+This ensures all configuration files have correct paths after installation.
+
+Changes:
+- Added PROJECT_DIR placeholder substitution to copy_template_files()
+- Enhanced template file detection to include mcp_config.json
+- Added comprehensive placeholder logging for debugging
+- Improved substitution logic for multiple placeholders
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",
+    "performance_files": ["src/super_agents/templates/default_project/.claude/system/commands/init.py"],
+    "performance_trigger": "code_changes_analysis"
+  },
+  "created_at": "2025-08-17T01:35:36-07:00",
+  "priority": "low",
+  "automation_level": "full"
+}

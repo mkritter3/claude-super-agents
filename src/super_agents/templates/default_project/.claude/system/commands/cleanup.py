@@ -10,10 +10,10 @@ import json
 import hashlib
 import shutil
 import time
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
 from dataclasses import dataclass
-from datetime import datetime
 
 try:
     from rich.console import Console
@@ -26,7 +26,15 @@ except ImportError:
     class SimpleConsole:
         def print(self, text, style=None):
             print(text)
+    
+    class SimpleConfirm:
+        @staticmethod
+        def ask(prompt: str) -> bool:
+            response = input(f"{prompt} (y/n): ").lower().strip()
+            return response in ('y', 'yes')
+    
     console = SimpleConsole()
+    Confirm = SimpleConfirm
 
 
 @dataclass
@@ -60,9 +68,18 @@ class SuperAgentsCleanup:
         """Load the super-agents manifest"""
         try:
             if not self.manifest_path.exists():
-                console.print("[red]❌ Cleanup cannot proceed: super-agents manifest not found.[/red]")
-                console.print("[dim]Was the project initialized correctly with 'super-agents init'?[/dim]")
-                return False
+                console.print("[yellow]⚠ Super-agents manifest not found.[/yellow]")
+                console.print("[dim]This installation may have been created before manifest tracking.[/dim]")
+                
+                # Offer to create a retroactive manifest
+                if Confirm.ask("Would you like to create a manifest for this installation?"):
+                    if self.create_retroactive_manifest():
+                        return self.load_manifest()  # Retry loading
+                    else:
+                        return False
+                else:
+                    console.print("[red]❌ Cleanup cannot proceed without manifest.[/red]")
+                    return False
             
             with open(self.manifest_path, 'r') as f:
                 self.manifest_data = json.load(f)
@@ -73,6 +90,116 @@ class SuperAgentsCleanup:
         except Exception as e:
             console.print(f"[red]❌ Error loading manifest: {e}[/red]")
             return False
+    
+    def create_retroactive_manifest(self) -> bool:
+        """Create a manifest for an existing installation by scanning files"""
+        try:
+            console.print("[dim]Scanning installation to create manifest...[/dim]")
+            
+            # Get template path to compare against
+            template_source = self._get_template_path()
+            if not template_source:
+                console.print("[red]❌ Cannot find template for comparison[/red]")
+                return False
+            
+            managed_files = []
+            managed_directories = []
+            
+            # Scan for super-agents files by comparing with template
+            for root, dirs, files in os.walk(template_source):
+                rel_root = Path(root).relative_to(template_source)
+                local_dir = self.project_dir / rel_root
+                
+                if local_dir.exists():
+                    managed_directories.append(str(rel_root))
+                    
+                    for file_name in files:
+                        local_file = local_dir / file_name
+                        if local_file.exists():
+                            managed_files.append(str(rel_root / file_name))
+            
+            # Add common super-agents files that might not be in template
+            additional_files = ['.mcp.json', 'CLAUDE.md', 'km_bridge_local.py']
+            for file_name in additional_files:
+                file_path = self.project_dir / file_name
+                if file_path.exists() and file_name not in managed_files:
+                    managed_files.append(file_name)
+            
+            # Calculate hashes for existing files
+            managed_files_with_hashes = {}
+            for file_rel_path in managed_files:
+                file_path = self.project_dir / file_rel_path
+                if file_path.exists():
+                    file_hash = self._calculate_file_hash(file_path)
+                    managed_files_with_hashes[file_rel_path] = {
+                        "hash": file_hash,
+                        "size": file_path.stat().st_size
+                    }
+            
+            # Create manifest
+            manifest = {
+                "schema_version": "1.0",
+                "created_at": datetime.now().isoformat(),
+                "installation_type": "retroactive",
+                "managed_assets": {
+                    "directories": managed_directories,
+                    "files": managed_files_with_hashes
+                },
+                "overwritten_files": {},  # Can't determine retroactively
+                "metadata": {
+                    "python_executable": sys.executable,
+                    "python_version": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
+                    "total_files": len(managed_files_with_hashes),
+                    "total_directories": len(managed_directories)
+                }
+            }
+            
+            # Write manifest
+            self.manifest_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(self.manifest_path, 'w') as f:
+                json.dump(manifest, f, indent=2)
+            
+            console.print(f"[green]✓[/green] Created retroactive manifest ({len(managed_files_with_hashes)} files tracked)")
+            return True
+            
+        except Exception as e:
+            console.print(f"[red]❌ Error creating retroactive manifest: {e}[/red]")
+            return False
+    
+    def _get_template_path(self) -> Path:
+        """Find the template directory"""
+        try:
+            # Try to find template relative to the current system
+            current_file = Path(__file__)
+            template_path = current_file.parent.parent.parent.parent.parent / "templates" / "default_project"
+            
+            if template_path.exists():
+                return template_path
+            
+            # Try alternative locations
+            import super_agents
+            package_dir = Path(super_agents.__file__).parent
+            template_path = package_dir / "templates" / "default_project"
+            
+            if template_path.exists():
+                return template_path
+                
+            return None
+            
+        except Exception:
+            return None
+    
+    def _calculate_file_hash(self, file_path: Path) -> str:
+        """Calculate SHA256 hash of a file"""
+        import hashlib
+        try:
+            sha256_hash = hashlib.sha256()
+            with open(file_path, "rb") as f:
+                for byte_block in iter(lambda: f.read(4096), b""):
+                    sha256_hash.update(byte_block)
+            return sha256_hash.hexdigest()
+        except Exception:
+            return ""
     
     def check_running_processes(self) -> List[str]:
         """Check for running super-agents processes"""
