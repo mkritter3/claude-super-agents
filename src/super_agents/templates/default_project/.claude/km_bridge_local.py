@@ -2,9 +2,11 @@
 import sys
 import json
 import os
-import requests
 import logging
 from typing import Dict, Any
+from urllib.request import urlopen, Request
+from urllib.error import URLError, HTTPError
+import urllib.parse
 
 # Set up logging
 log_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'km_bridge_local.log')
@@ -33,29 +35,26 @@ class LocalKMBridge:
                 config = json.load(f)
                 port = config.get("local_km_port", 5002)
                 self.base_url = f"http://localhost:{port}"
-                self.session = requests.Session()
                 
                 # Test connection before declaring success
                 try:
-                    response = self.session.get(f"{self.base_url}/health", timeout=5)
-                    if response.status_code == 200:
-                        logging.info(f"Successfully connected to local KM on port {port}")
-                        self.connection_status = "ready"
-                    else:
-                        logging.error(f"KM health check failed with status {response.status_code}")
-                        self.connection_status = "failed"
-                        self.base_url = None
-                        self.session = None
+                    request = Request(f"{self.base_url}/health")
+                    with urlopen(request, timeout=5) as response:
+                        if response.getcode() == 200:
+                            logging.info(f"Successfully connected to local KM on port {port}")
+                            self.connection_status = "ready"
+                        else:
+                            logging.error(f"KM health check failed with status {response.getcode()}")
+                            self.connection_status = "failed"
+                            self.base_url = None
                 except Exception as e:
                     logging.error(f"Failed to connect to KM on port {port}: {e}")
                     self.connection_status = "failed"
                     self.base_url = None
-                    self.session = None
         else:
             logging.error("Config file NOT found. This is likely the cause of the failure.")
             self.connection_status = "no_config"
             self.base_url = None
-            self.session = None
     
     def handle_request(self, request: Dict[str, Any]) -> Dict[str, Any]:
         if not self.base_url:
@@ -83,9 +82,11 @@ class LocalKMBridge:
                 }
             
             elif method == "tools/list":
-                response = self.session.get(f"{self.base_url}/mcp/spec")
-                response.raise_for_status()
-                spec = response.json()
+                request = Request(f"{self.base_url}/mcp/spec")
+                with urlopen(request) as response:
+                    if response.getcode() != 200:
+                        raise HTTPError(response.url, response.getcode(), "Failed to get spec", None, None)
+                    spec = json.loads(response.read().decode('utf-8'))
                 
                 tools = []
                 for tool in spec.get("tools", []):
@@ -133,14 +134,17 @@ class LocalKMBridge:
                     "id": request.get("id")
                 }
                 
-                response = self.session.post(
+                request_data = json.dumps(mcp_request).encode('utf-8')
+                http_request = Request(
                     f"{self.base_url}/mcp",
-                    json=mcp_request,
+                    data=request_data,
                     headers={"Content-Type": "application/json"}
                 )
-                response.raise_for_status()
                 
-                result = response.json()
+                with urlopen(http_request) as response:
+                    if response.getcode() != 200:
+                        raise HTTPError(response.url, response.getcode(), "Failed to call tool", None, None)
+                    result = json.loads(response.read().decode('utf-8'))
                 return {
                     "content": [{
                         "type": "text",
