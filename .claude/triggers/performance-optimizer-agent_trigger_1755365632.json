@@ -1,0 +1,42 @@
+{
+  "agent": "performance-optimizer-agent",
+  "trigger_event": {
+    "type": "CODE_COMMITTED",
+    "commit": "55c523e83b7dcfabd56f64e3c933e3d917352dab", 
+    "performance_relevant_files": ["src/super_agents/templates/default_project/.claude/km_bridge_local.py","test/.claude/km_bridge_local.py"]
+  },
+  "context": {
+    "commit_message": "🔧 Fix MCP tools parameter schema format for Claude Code compatibility
+
+This resolves the "capabilities: none" issue by converting Knowledge Manager's
+array-based parameter format to proper JSON Schema format required by MCP protocol.
+
+**Issue:**
+- Knowledge Manager returns parameters as arrays: [{"name": "x", "type": "string"}]
+- MCP protocol expects JSON Schema objects: {"properties": {"x": {"type": "string"}}}
+- Claude Code couldn't recognize tools due to format mismatch
+
+**Solution:**
+- Convert array parameters to JSON Schema with inputSchema, properties, required
+- Handle optional vs required parameters correctly
+- Maintain backward compatibility with KM server API
+
+**Result:**
+- Claude Code now shows 5 available Knowledge Manager tools
+- Tools have proper parameter validation and auto-completion
+- MCP integration fully functional with 23-agent AET system access
+
+**Systematic Fix:**
+- Applied to both active instance and template
+- All future super-agents installations inherit the correct format
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",
+    "performance_files": ["src/super_agents/templates/default_project/.claude/km_bridge_local.py","test/.claude/km_bridge_local.py"],
+    "performance_trigger": "code_changes_analysis"
+  },
+  "created_at": "2025-08-16T10:33:52-07:00",
+  "priority": "low",
+  "automation_level": "full"
+}

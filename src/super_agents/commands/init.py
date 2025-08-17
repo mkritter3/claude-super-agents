@@ -333,57 +333,7 @@ def setup_mcp_configuration() -> None:
         console.print("[green]✓[/green] Claude Code MCP configuration ready")
 
 
-def setup_context7_integration() -> None:
-    """Setup Context7 documentation integration hooks"""
-    console.print("[cyan]Setting up Context7 documentation integration...[/cyan]")
-    
-    settings_file = Path(".claude/settings.json")
-    settings = {}
-    
-    # Load existing settings if present
-    if settings_file.exists():
-        try:
-            with open(settings_file, 'r') as f:
-                settings = json.load(f)
-        except:
-            settings = {}
-    
-    # Add hooks configuration
-    if 'hooks' not in settings:
-        settings['hooks'] = {}
-    
-    if 'PreToolUse' not in settings['hooks']:
-        settings['hooks']['PreToolUse'] = []
-    
-    # Check if Context7 hook already exists
-    context7_hook_exists = False
-    for hook_group in settings['hooks']['PreToolUse']:
-        if hook_group.get('matcher') == 'Task':
-            for hook in hook_group.get('hooks', []):
-                if 'context7-fetch.py' in hook.get('command', ''):
-                    context7_hook_exists = True
-                    break
-    
-    # Add Context7 hook if not present
-    if not context7_hook_exists:
-        context7_hook = {
-            'matcher': 'Task',
-            'hooks': [{
-                'type': 'command',
-                'command': '$CLAUDE_PROJECT_DIR/.claude/hooks/context7-fetch.py',
-                'timeout': 15
-            }]
-        }
-        settings['hooks']['PreToolUse'].append(context7_hook)
-        
-        # Write back to file
-        settings_file.parent.mkdir(parents=True, exist_ok=True)
-        with open(settings_file, 'w') as f:
-            json.dump(settings, f, indent=2)
-        
-        console.print("[green]✓[/green] Context7 integration configured")
-    else:
-        console.print("[dim]Context7 integration already configured[/dim]")
+# Context7 integration removed - no longer needed in template
 
 
 def initialize_database() -> None:
@@ -513,8 +463,7 @@ def initialize_project(force: bool = False) -> bool:
         # Setup MCP configuration
         setup_mcp_configuration()
         
-        # Setup Context7 integration
-        setup_context7_integration()
+        # Context7 integration removed
         
         # Create manifest
         if files_created:

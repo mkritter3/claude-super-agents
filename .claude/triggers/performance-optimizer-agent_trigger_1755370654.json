@@ -1,0 +1,54 @@
+{
+  "agent": "performance-optimizer-agent",
+  "trigger_event": {
+    "type": "CODE_COMMITTED",
+    "commit": "bf7df11c93b90805b23fe5f16770c66c387676ed", 
+    "performance_relevant_files": ["src/super_agents/commands/init.py"]
+  },
+  "context": {
+    "commit_message": "🔧 Systematic fix: Auto-detect Python executable for MCP bridge
+
+**Root Cause Fixed:**
+The .mcp.json file was hardcoded to use 'python3' instead of detecting
+the correct Python executable with required dependencies (requests module).
+
+**Systematic Solution:**
+1. **Dynamic Python Detection**: Added detect_python_executable() function
+   - Tests multiple Python candidates (pipx venv, homebrew, system)
+   - Verifies 'requests' module availability before selection
+   - Provides clear feedback about Python selection
+
+2. **Template Processing**: Enhanced .mcp.json template with substitution
+   - Template uses {{PYTHON_EXECUTABLE}} placeholder
+   - Installation process substitutes detected Python path
+   - Eliminates hardcoded 'python3' references
+
+3. **Robust Installation**: Updated copy_template_files() function
+   - Processes .mcp.json templates with Python path substitution
+   - Maintains backward compatibility with fallback creation
+   - Provides clear feedback about Python selection
+
+**Impact:**
+- ✅ MCP bridge now works in any directory after super-agents init
+- ✅ No more 'ModuleNotFoundError: No module named requests' failures
+- ✅ Automatic detection prevents environment mismatches
+- ✅ Clear feedback helps users understand Python selection
+
+**Testing:**
+- Python detection correctly finds pipx super-agents environment
+- Template substitution working as expected
+- Fallback mechanisms in place for edge cases
+
+This prevents the MCP connection failures that occurred when Claude Code
+tried to start the bridge with a Python environment lacking dependencies.
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",
+    "performance_files": ["src/super_agents/commands/init.py"],
+    "performance_trigger": "code_changes_analysis"
+  },
+  "created_at": "2025-08-16T11:57:34-07:00",
+  "priority": "low",
+  "automation_level": "full"
+}

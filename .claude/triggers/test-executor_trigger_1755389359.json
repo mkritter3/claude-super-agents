@@ -1,0 +1,25 @@
+{
+  "agent": "test-executor",
+  "trigger_event": {
+    "type": "CODE_CHANGES_NEED_TESTING",
+    "commit": "6d5047eab2a3e147a5e3a73a26a75f9237113f34",
+    "test_relevant_files": ["src/super_agents/commands/init.py"]
+  },
+  "context": {
+    "commit_message": "🐛 Fix file duplication in super-agents initialization
+
+Prevent .claude subdirectories from being copied to root during template creation.
+Added existence checks to avoid double-copying template files when fallback
+template creation is triggered.
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",
+    "changed_files": ["src/super_agents/commands/init.py"],
+    "test_trigger": "quality_gate_validation",
+    "test_scope": "relevant_to_changes"
+  },
+  "created_at": "2025-08-16T17:09:19-07:00",
+  "priority": "high",
+  "automation_level": "full"
+}

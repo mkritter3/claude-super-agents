@@ -1,0 +1,28 @@
+{
+  "agent": "test-executor",
+  "trigger_event": {
+    "type": "CODE_CHANGES_NEED_TESTING",
+    "commit": "1839948993981f7027cf09c7cbe4a229e84070ec",
+    "test_relevant_files": ["src/super_agents/commands/init.py","src/super_agents/commands/upgrade.py"]
+  },
+  "context": {
+    "commit_message": "Organize super-agents archiving into single directory structure
+
+- Changed backup location from scattered root directories to organized archived_files/
+- Initialization backups: archived_files/super_agents_backup_YYYYMMDD_HHMMSS/
+- Upgrade backups: archived_files/super_agents_upgrade_YYYYMMDD_HHMMSS/
+- Enhanced backup manifests with detailed metadata and reasoning
+- Updated .gitignore to exclude archive directories but include template documentation
+- Added README.md in archive template explaining structure and cleanup procedures
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",
+    "changed_files": ["src/super_agents/commands/init.py","src/super_agents/commands/upgrade.py"],
+    "test_trigger": "quality_gate_validation",
+    "test_scope": "relevant_to_changes"
+  },
+  "created_at": "2025-08-16T10:54:28-07:00",
+  "priority": "high",
+  "automation_level": "full"
+}

@@ -1,0 +1,43 @@
+{
+  "agent": "performance-optimizer-agent",
+  "trigger_event": {
+    "type": "CODE_COMMITTED",
+    "commit": "cb7562f6bcc627eac58319284bd4c7a5f53a8a86", 
+    "performance_relevant_files": ["src/super_agents/templates/default_project/.claude/km_bridge_local.py","test/.claude/km_bridge_local.py"]
+  },
+  "context": {
+    "commit_message": "✨ Systematic MCP bridge protocol compliance and connection validation
+
+This commit implements comprehensive improvements to the MCP bridge system:
+
+**Protocol Compliance:**
+- Updated to MCP protocol version 2024-11-05
+- Proper JSON-RPC response structure with serverInfo
+- Capabilities reporting with tools.listChanged support
+
+**Connection Validation:**
+- Added health check before declaring KM connection ready
+- Connection status tracking (ready/failed/no_config)
+- Comprehensive error handling and logging
+
+**Systematic Fix:**
+- Applied to both active instance and template
+- All future super-agents installations inherit improvements
+- Replaces one-off debugging with robust architecture
+
+**Benefits:**
+- Reliable MCP server startup in Claude Code
+- Clear connection status reporting
+- Better debugging through structured logging
+- Template ensures consistent behavior across installations
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",
+    "performance_files": ["src/super_agents/templates/default_project/.claude/km_bridge_local.py","test/.claude/km_bridge_local.py"],
+    "performance_trigger": "code_changes_analysis"
+  },
+  "created_at": "2025-08-16T10:30:48-07:00",
+  "priority": "low",
+  "automation_level": "full"
+}

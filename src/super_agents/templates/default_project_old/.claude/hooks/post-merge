@@ -1,0 +1,129 @@
+#!/bin/bash
+#
+# Post-merge hook for autonomous operational triggers
+#
+# This hook triggers when code is merged, indicating potential deployment readiness
+
+# Get merge information
+MERGE_HEAD=$(git rev-parse HEAD)
+MERGE_MSG=$(git log -1 --pretty=%B)
+TIMESTAMP=$(date +%s)
+
+# Base paths
+CLAUDE_DIR=".claude"
+TRIGGERS_DIR="$CLAUDE_DIR/triggers"
+EVENTS_DIR="$CLAUDE_DIR/events"
+
+# Ensure directories exist
+mkdir -p "$TRIGGERS_DIR" "$EVENTS_DIR"
+
+# Log the merge event
+echo "{\"event_id\":\"evt_${TIMESTAMP}_merge\",\"type\":\"CODE_MERGED\",\"timestamp\":$TIMESTAMP,\"payload\":{\"commit\":\"$MERGE_HEAD\",\"message\":\"$(echo "$MERGE_MSG" | tr '"' "'")\"}}" >> "$EVENTS_DIR/log.ndjson"
+
+# Get files changed in this merge
+CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r HEAD HEAD~1)
+
+# Analyze changes for deployment readiness
+DEPLOYMENT_INDICATORS=false
+API_CHANGES=false
+SCHEMA_CHANGES=false
+CONFIG_CHANGES=false
+
+while IFS= read -r file; do
+    case "$file" in
+        # API/route files suggest monitoring needed
+        *api/*|*routes/*|*endpoints/*|*controllers/*)
+            API_CHANGES=true
+            ;;
+        
+        # Schema changes require migration planning
+        *.sql|*migrations/*|*schema/*)
+            SCHEMA_CHANGES=true
+            ;;
+        
+        # Config changes might affect deployment
+        docker-compose.yml|Dockerfile|kubernetes/*|*.env|*config*)
+            CONFIG_CHANGES=true
+            DEPLOYMENT_INDICATORS=true
+            ;;
+        
+        # Package files suggest dependency changes
+        package.json|requirements.txt|Cargo.toml|go.mod)
+            DEPLOYMENT_INDICATORS=true
+            ;;
+    esac
+done <<< "$CHANGED_FILES"
+
+# Create comprehensive monitoring trigger for post-merge
+cat > "$TRIGGERS_DIR/monitoring-agent_trigger_${TIMESTAMP}_merge.json" << EOF
+{
+  "agent": "monitoring-agent",
+  "trigger_event": {
+    "type": "CODE_MERGED",
+    "commit": "$MERGE_HEAD",
+    "deployment_ready": $DEPLOYMENT_INDICATORS,
+    "api_changes": $API_CHANGES,
+    "config_changes": $CONFIG_CHANGES
+  },
+  "context": {
+    "merge_message": "$MERGE_MSG",
+    "changed_files": $(echo "$CHANGED_FILES" | jq -R -s -c 'split("\n")[:-1]'),
+    "monitoring_focus": "post_merge_verification",
+    "deployment_readiness": $DEPLOYMENT_INDICATORS
+  },
+  "created_at": "$(date -Iseconds)",
+  "priority": "medium",
+  "automation_level": "full"
+}
+EOF
+
+# Create documentation update trigger
+cat > "$TRIGGERS_DIR/documentation-agent_trigger_${TIMESTAMP}_merge.json" << EOF
+{
+  "agent": "documentation-agent",
+  "trigger_event": {
+    "type": "CODE_MERGED",
+    "commit": "$MERGE_HEAD",
+    "api_changes": $API_CHANGES,
+    "requires_doc_update": true
+  },
+  "context": {
+    "merge_message": "$MERGE_MSG",
+    "changed_files": $(echo "$CHANGED_FILES" | jq -R -s -c 'split("\n")[:-1]'),
+    "documentation_focus": "post_merge_updates",
+    "api_changes_detected": $API_CHANGES
+  },
+  "created_at": "$(date -Iseconds)",
+  "priority": "medium",
+  "automation_level": "full"
+}
+EOF
+
+# If schema changes detected, trigger migration planning
+if [ "$SCHEMA_CHANGES" = true ]; then
+    cat > "$TRIGGERS_DIR/data-migration-agent_trigger_${TIMESTAMP}_merge.json" << EOF
+{
+  "agent": "data-migration-agent",
+  "trigger_event": {
+    "type": "SCHEMA_MERGED",
+    "commit": "$MERGE_HEAD",
+    "schema_files": $(echo "$CHANGED_FILES" | grep -E '\.(sql|migration)$|migrations/|schema/' | jq -R -s -c 'split("\n")[:-1]')
+  },
+  "context": {
+    "merge_message": "$MERGE_MSG",
+    "schema_files": $(echo "$CHANGED_FILES" | grep -E '\.(sql|migration)$|migrations/|schema/' | jq -R -s -c 'split("\n")[:-1]'),
+    "migration_context": "post_merge_schema_validation"
+  },
+  "created_at": "$(date -Iseconds)",
+  "priority": "high", 
+  "automation_level": "full"
+}
+EOF
+fi
+
+# If deployment indicators present, prepare for deployment monitoring
+if [ "$DEPLOYMENT_INDICATORS" = true ]; then
+    echo "{\"event_id\":\"evt_${TIMESTAMP}_deploy_ready\",\"type\":\"DEPLOYMENT_READY\",\"timestamp\":$TIMESTAMP,\"payload\":{\"commit\":\"$MERGE_HEAD\",\"deployment_indicators\":true}}" >> "$EVENTS_DIR/log.ndjson"
+fi
+
+exit 0

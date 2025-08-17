@@ -1,0 +1,66 @@
+{
+  "contract-guardian": {
+    "read": [
+      "*"
+    ],
+    "write": [
+      ".claude/triggers/",
+      ".claude/events/"
+    ],
+    "execute": [],
+    "network": false,
+    "priority": "critical"
+  },
+  "security-agent": {
+    "read": [
+      "*"
+    ],
+    "write": [
+      ".claude/security/",
+      ".claude/triggers/"
+    ],
+    "execute": [
+      "security_scan.sh"
+    ],
+    "network": false,
+    "priority": "critical"
+  },
+  "test-executor": {
+    "read": [
+      "*"
+    ],
+    "write": [
+      ".claude/test_reports/"
+    ],
+    "execute": [
+      "pytest",
+      "npm test"
+    ],
+    "network": false,
+    "priority": "high"
+  },
+  "developer-agent": {
+    "read": [
+      "*"
+    ],
+    "write": [
+      "src/",
+      "lib/",
+      "tests/"
+    ],
+    "execute": [],
+    "network": false,
+    "priority": "normal"
+  },
+  "monitoring-agent": {
+    "read": [
+      "*"
+    ],
+    "write": [
+      ".claude/monitoring/"
+    ],
+    "execute": [],
+    "network": true,
+    "priority": "high"
+  }
+}
