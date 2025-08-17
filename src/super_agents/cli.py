@@ -77,23 +77,40 @@ def initialize_project() -> bool:
         
         current_dir = Path.cwd()
         
-        # Copy the entire template
+        # Use template's proper initialization system with Python executable substitution
         console.print("Copying AET template...")
-        for item in template_source.iterdir():
-            dest = current_dir / item.name
-            if item.is_dir():
-                if dest.exists():
-                    shutil.rmtree(dest)
-                shutil.copytree(item, dest)
-            else:
-                shutil.copy2(item, dest)
         
-        console.print("[green]✓[/green] AET template copied successfully")
+        # Add template system to path to import copy_template_files
+        sys.path.insert(0, str(template_source / '.claude/system'))
         
-        # Make scripts executable
-        make_scripts_executable()
-        
-        return True
+        try:
+            from commands.init import copy_template_files, create_manifest
+            
+            # Find Python executable
+            python_executable = shutil.which('python3') or shutil.which('python') or sys.executable
+            
+            # Copy template files with proper substitution
+            files_created, backups_created = copy_template_files(
+                template_source, 
+                current_dir, 
+                force=False,
+                python_executable=python_executable
+            )
+            
+            # Create manifest for cleanup system
+            create_manifest(files_created, backups_created)
+            
+            console.print("[green]✓[/green] AET template copied successfully")
+            make_scripts_executable()
+            return True
+            
+        except ImportError as e:
+            console.print(f"[red]Error importing template initialization: {e}[/red]")
+            return False
+        finally:
+            # Remove template system from path
+            if str(template_source / '.claude/system') in sys.path:
+                sys.path.remove(str(template_source / '.claude/system'))
         
     except Exception as e:
         console.print(f"[red]Error during initialization: {e}[/red]")
