@@ -1,0 +1,40 @@
+{
+  "agent": "test-executor",
+  "trigger_event": {
+    "type": "CODE_CHANGES_NEED_TESTING",
+    "commit": "6fd73b27b336c464c1152aca5907e572cffcdedb",
+    "test_relevant_files": [".claude/triggers/test-executor_trigger_1755418921.json","src/super_agents/templates/default_project/.claude/test_reports/integration_test_report_20250817_004352.json","src/super_agents/templates/default_project/.claude/test_reports/integration_test_report_20250817_005411.json","src/super_agents/templates/default_project/.claude/test_reports/integration_test_report_20250817_005447.json","test_reports/integration_test_report_20250817_004352.json","test_reports/integration_test_report_20250817_005411.json","test_reports/integration_test_report_20250817_005447.json"]
+  },
+  "context": {
+    "commit_message": "🧹 Clean template: Remove development artifacts and fix hardcoded paths
+
+Removed development-specific artifacts from template to ensure clean user installations:
+
+## Removed Development Artifacts
+- Runtime logs (*.log, *.ndjson)
+- Development databases (*.db, *.sqlite)
+- Test reports (moved to ./test_reports/ in project root)
+- Process artifacts (*.pid, *.port, *.lock)
+
+## Fixed Configuration
+- Updated mcp_config.json to use {{PROJECT_DIR}} placeholder instead of hardcoded development path
+
+## Template Integrity
+- Template now contains only pristine project files
+- No development-specific data pollutes user installations
+- Maintains proper template-based architecture
+
+This ensures users get clean installations without development artifacts
+while preserving the correct business logic location in templates.
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",
+    "changed_files": [".claude/triggers/test-executor_trigger_1755418921.json","src/super_agents/templates/default_project/.claude/test_reports/integration_test_report_20250817_004352.json","src/super_agents/templates/default_project/.claude/test_reports/integration_test_report_20250817_005411.json","src/super_agents/templates/default_project/.claude/test_reports/integration_test_report_20250817_005447.json","test_reports/integration_test_report_20250817_004352.json","test_reports/integration_test_report_20250817_005411.json","test_reports/integration_test_report_20250817_005447.json"],
+    "test_trigger": "quality_gate_validation",
+    "test_scope": "relevant_to_changes"
+  },
+  "created_at": "2025-08-17T01:26:46-07:00",
+  "priority": "high",
+  "automation_level": "full"
+}
