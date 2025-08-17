@@ -1,0 +1,79 @@
+{
+  "agent": "data-migration-agent",
+  "trigger_event": {
+    "type": "SCHEMA_CHANGED", 
+    "commit": "5856bf86a0d9d5b72c73fc0116a7f9d61dae29ff",
+    "schema_files": ["src/super_agents/templates/default_project_old/.claude/system/schema.sql","src/super_agents/templates/default_project_old/system/schema.sql","test/.claude/system/schema.sql","test2/.claude/system/schema.sql","test2/system/schema.sql"]
+  },
+  "context": {
+    "commit_message": "🧹 Implement robust cleanup/uninstall system with backup restoration
+
+Based on Gemini's comprehensive recommendations, implemented a complete
+manifest-based cleanup system that can safely remove super-agents and
+restore original files.
+
+## Key Features
+
+### Manifest-Based File Tracking
+- SHA256 hash validation for file integrity detection
+- Complete tracking of created files and directories
+- Backup restoration metadata with original paths
+
+### Enterprise-Grade Safety
+- Running process detection prevents unsafe cleanup
+- User modification analysis warns about data loss
+- Interactive confirmation with detailed impact summary
+- Dry-run mode for preview without changes
+
+### Phased Cleanup Execution
+1. Backup restoration (original files returned)
+2. File deletion (managed files removed)
+3. Directory cleanup (empty directories removed)
+4. Manifest cleanup (tracking data cleared)
+
+### CLI Integration
+- `super-agents cleanup` - Interactive cleanup with confirmation
+- `super-agents cleanup --dry-run` - Preview mode
+- `super-agents cleanup --force` - Automated mode
+
+### Template System Architecture
+- Complete cleanup logic in template system
+- Updated init.py to create proper manifests
+- Backup tracking integrated with file operations
+
+## Implementation Details
+
+### Updated Files
+- src/super_agents/cli.py - Added cleanup command and delegation
+- src/super_agents/templates/default_project/.claude/system/commands/cleanup.py - Full cleanup system
+- src/super_agents/templates/default_project/.claude/system/commands/init.py - Manifest creation
+- src/super_agents/templates/default_project/CLAUDE.md - Documentation and usage
+
+### Safety Validations
+- Process detection via PID file analysis
+- Hash-based modification detection
+- Backup file existence verification
+- Permission and access checks
+
+## Documentation
+
+Complete documentation added to CLAUDE.md covering:
+- Usage patterns and CLI commands
+- Safety features and validations
+- Backup restoration process
+- Enterprise deployment considerations
+
+This provides a production-ready cleanup system that maintains the
+integrity of the template-based architecture while ensuring safe
+removal and restoration capabilities.
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>",
+    "schema_files": ["src/super_agents/templates/default_project_old/.claude/system/schema.sql","src/super_agents/templates/default_project_old/system/schema.sql","test/.claude/system/schema.sql","test2/.claude/system/schema.sql","test2/system/schema.sql"],
+    "migration_trigger": "schema_changes_detected"
+  },
+  "created_at": "2025-08-17T01:17:51-07:00",
+  "priority": "high",
+  "automation_level": "full"
+}
